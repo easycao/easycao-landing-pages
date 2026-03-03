@@ -17,7 +17,7 @@ export default function CTASection() {
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
           }`}
         >
-          Nao perca a proxima live
+          Não perca a próxima live
         </h2>
         <p
           className={`text-white/80 text-base lg:text-lg text-center mb-10 transition-all duration-600 ${

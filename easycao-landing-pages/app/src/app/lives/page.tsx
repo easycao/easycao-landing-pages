@@ -138,8 +138,8 @@ export default function LivesPage() {
                 <p className="text-white/60 text-xs">Examinador ICAO Credenciado</p>
               </div>
               <div className="text-right">
-                <p className="text-white/60 text-xs">Metrica ICAO</p>
-                <p className="text-white font-bold text-sm">Niveis 4 a 6</p>
+                <p className="text-white/60 text-xs">Métrica ICAO</p>
+                <p className="text-white font-bold text-sm">Níveis 4 a 6</p>
               </div>
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function LivesPage() {
                 </h1>
 
                 <p className="text-white/80 text-base lg:text-xl mt-5 max-w-lg mx-auto lg:mx-0">
-                  Aulas ao vivo, <span className="text-white font-semibold">gratuitas</span> toda terca e quinta-feira.
+                  Aulas ao vivo, <span className="text-white font-semibold">gratuitas</span> toda terça e quinta-feira.
                 </p>
 
               </div>

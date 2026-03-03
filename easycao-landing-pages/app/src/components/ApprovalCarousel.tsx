@@ -12,7 +12,7 @@ export default function ApprovalCarousel() {
   const approvals = Array.from({ length: 20 }, (_, i) => ({
     id: i + 1,
     src: "/aprovacoes/1.png",
-    alt: `Aprovacao ICAO ${i + 1}`,
+    alt: `Aprovação ICAO ${i + 1}`,
   }));
 
   const pause = useCallback(() => {
@@ -26,7 +26,7 @@ export default function ApprovalCarousel() {
   return (
     <section ref={ref} className="py-16 lg:py-20 bg-gray-light overflow-hidden">
       <h2 className="text-2xl lg:text-4xl font-bold text-black text-center mb-4">
-        +1000 aprovacoes de alunos Easycao
+        +1000 aprovações de alunos Easycao
       </h2>
 
       <div className="marquee-container mt-10">
@@ -58,7 +58,7 @@ export default function ApprovalCarousel() {
       </div>
 
       <p className="text-primary font-semibold text-base lg:text-lg text-center mt-8">
-        Te desafio a ver todas as aprovacoes
+        Te desafio a ver todas as aprovações
       </p>
     </section>
   );

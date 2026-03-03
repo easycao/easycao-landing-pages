@@ -46,10 +46,10 @@ export default function ProfessorSection() {
             </h2>
 
             <p className="text-black/70 text-base lg:text-lg mt-6 leading-relaxed">
-              Examinador ICAO credenciado e criador do Metodo Easycao.
-              Especialista em preparacao para a prova ICAO, ja ajudou
-              milhares de pilotos a alcancarem a certificacao necessaria
-              para avancarem em suas carreiras.
+              Examinador ICAO credenciado e criador do Método Easycao.
+              Especialista em preparação para a prova ICAO, já ajudou
+              milhares de pilotos a alcançarem a certificação necessária
+              para avançarem em suas carreiras.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
@@ -86,7 +86,7 @@ export default function ProfessorSection() {
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
                 <span className="text-primary-dark font-medium text-sm">
-                  Criador do Metodo Easycao
+                  Criador do Método Easycao
                 </span>
               </div>
             </div>

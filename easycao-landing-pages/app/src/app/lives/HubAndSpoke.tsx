@@ -8,15 +8,15 @@ const spokes = [
     icon: "🎯",
     title: "Como a prova realmente funciona",
     description:
-      "Entenda a estrutura completa, os criterios de avaliacao e o que os examinadores esperam de voce em cada uma das 4 partes.",
+      "Entenda a estrutura completa, os critérios de avaliação e o que os examinadores esperam de você em cada uma das 4 partes.",
     stat: "4 partes",
     statLabel: "do exame",
   },
   {
     icon: "🚫",
-    title: "Por que decorar respostas nao funciona",
+    title: "Por que decorar respostas não funciona",
     description:
-      "O examinador SEMPRE muda a pergunta. Respostas decoradas travam quando o cenario e diferente. Aprenda a responder com naturalidade.",
+      "O examinador SEMPRE muda a pergunta. Respostas decoradas travam quando o cenário é diferente. Aprenda a responder com naturalidade.",
     stat: "#1",
     statLabel: "erro dos pilotos",
   },
@@ -24,7 +24,7 @@ const spokes = [
     icon: "📋",
     title: "O que o examinador realmente avalia",
     description:
-      "Evidencias de fala separadas pela Metrica ICAO em 6 descritores. Nao e sobre ingles perfeito — e sobre comportamento linguistico.",
+      "Evidências de fala separadas pela Métrica ICAO em 6 descritores. Não é sobre inglês perfeito — é sobre comportamento linguístico.",
     stat: "6",
     statLabel: "descritores",
   },
@@ -32,9 +32,9 @@ const spokes = [
     icon: "🎧",
     title: "Como responder sem entender tudo",
     description:
-      "Resposta funcional vale mais que compreensao total. Aprenda a lidar com a duvida e reagir bem mesmo quando nao entende cada palavra.",
+      "Resposta funcional vale mais que compreensão total. Aprenda a lidar com a dúvida e reagir bem mesmo quando não entende cada palavra.",
     stat: "100%",
-    statLabel: "pratico",
+    statLabel: "prático",
   },
 ];
 
@@ -62,7 +62,7 @@ export default function HubAndSpoke() {
             }`}
             style={{ transitionDelay: "100ms" }}
           >
-            O que voce vai aprender
+            O que você vai aprender
           </h2>
         </div>
 

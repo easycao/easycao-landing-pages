@@ -7,7 +7,7 @@ const parts = [
   {
     number: "01",
     title: "Aviation Topics",
-    description: "Perguntas sobre aviacao e experiencia como piloto",
+    description: "Perguntas sobre aviação e experiência como piloto",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -20,7 +20,7 @@ const parts = [
   {
     number: "02",
     title: "Interacting as a Pilot",
-    description: "Comunicacoes entre piloto e controle de trafego",
+    description: "Comunicações entre piloto e controle de tráfego",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -31,7 +31,7 @@ const parts = [
   {
     number: "03",
     title: "Unexpected Situations",
-    description: "Dialogos de emergencia gravados e reporte",
+    description: "Diálogos de emergência gravados e reporte",
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -183,7 +183,7 @@ export default function ICAODashboard() {
 
           {/* Photo — centered, large, aligned to bottom */}
           <Image
-            src="/diogo.png"
+            src="/diogo.webp"
             alt="Prof. Diogo Verzola"
             width={500}
             height={600}
@@ -212,8 +212,8 @@ export default function ICAODashboard() {
                 <p className="text-white/60 text-[10px]">Examinador ICAO Credenciado</p>
               </div>
               <div className="text-right">
-                <p className="text-white/60 text-[10px]">Metrica ICAO</p>
-                <p className="text-white font-bold text-xs">Niveis 4 a 6</p>
+                <p className="text-white/60 text-[10px]">Métrica ICAO</p>
+                <p className="text-white font-bold text-xs">Níveis 4 a 6</p>
               </div>
             </div>
           </div>

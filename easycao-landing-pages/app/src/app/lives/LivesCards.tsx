@@ -12,10 +12,10 @@ const lives = [
       </svg>
     ),
     title: "Aula ao Vivo",
-    day: "Terca-feira",
-    time: "19h (Brasilia)",
+    day: "Terça-feira",
+    time: "19h (Brasília)",
     description:
-      "Toda terca eu explico a prova ICAO do zero e tiro todas as suas duvidas ao vivo. Voce vai entender como o exame funciona, o que o examinador avalia e como se preparar do jeito certo — sem decorar respostas, sem metodos ultrapassados. E o melhor: ao vivo, interativo, com espaco pra perguntar.",
+      "Toda terça eu explico a prova ICAO do zero e tiro todas as suas dúvidas ao vivo. Você vai entender como o exame funciona, o que o examinador avalia e como se preparar do jeito certo — sem decorar respostas, sem métodos ultrapassados. E o melhor: ao vivo, interativo, com espaço pra perguntar.",
     tag: "Instagram Live",
   },
   {
@@ -27,9 +27,9 @@ const lives = [
     ),
     title: "Simulado ICAO",
     day: "Quinta-feira",
-    time: "13h30 (Brasilia)",
+    time: "13h30 (Brasília)",
     description:
-      "Toda quinta eu aplico uma Prova ICAO ao vivo usando o simulador ICAO, lendo e corrigindo as respostas que voces mandarem no chat em tempo real. Voce vai praticar exatamente como seria na prova de verdade — com feedback imediato do que funcionou e do que precisa melhorar.",
+      "Toda quinta eu aplico uma Prova ICAO ao vivo usando o simulador ICAO, lendo e corrigindo as respostas que vocês mandarem no chat em tempo real. Você vai praticar exatamente como seria na prova de verdade — com feedback imediato do que funcionou e do que precisa melhorar.",
     tag: "YouTube Live",
   },
 ];

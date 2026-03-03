@@ -119,7 +119,7 @@ export default function CountdownTimer() {
   return (
     <div className="bg-white rounded-2xl shadow-2xl p-8 lg:p-10 mt-12">
       <p className="text-black/60 text-center font-medium text-sm">
-        Proxima live:
+        Próxima live:
       </p>
       <p className="text-primary text-center font-semibold text-lg lg:text-xl mt-2">
         🔴 {nextLive.label}

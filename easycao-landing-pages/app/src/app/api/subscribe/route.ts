@@ -70,9 +70,8 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, alreadySubscribed: true });
       }
 
-      console.error("Mailchimp error:", JSON.stringify(data));
       return NextResponse.json(
-        { error: "Erro ao cadastrar. Tente novamente.", debug: data },
+        { error: "Erro ao cadastrar. Tente novamente." },
         { status: 500 }
       );
     }

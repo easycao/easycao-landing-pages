@@ -164,7 +164,7 @@ export default function LeadForm({ variant = "hero" }: LeadFormProps) {
       </button>
 
       <p className="text-xs text-gray-400 text-center mt-3">
-        Seus dados estao seguros conosco 🔒
+        Seus dados estão seguros conosco 🔒
       </p>
     </form>
   );

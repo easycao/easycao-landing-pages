@@ -86,7 +86,7 @@ export default function ConfirmaCadastroPage() {
             </div>
             <div>
               <span className="text-xs font-bold tracking-wider block text-[#34B8F8]">
-                TERCA 19H
+                TERÇA 19H
               </span>
               <span className="text-white font-semibold text-base whitespace-nowrap">Instagram Live</span>
             </div>
@@ -151,11 +151,11 @@ export default function ConfirmaCadastroPage() {
 
         <div className="mt-8 pt-6 border-t border-gray-border">
           <p className="text-black/50 font-semibold text-xs uppercase tracking-wider">
-            Horarios das lives:
+            Horários das lives:
           </p>
           <div className="mt-3 space-y-1">
             <p className="text-black/60 text-sm">
-              📅 Terca 19h — Aula ao vivo (Instagram)
+              📅 Terça 19h — Aula ao vivo (Instagram)
             </p>
             <p className="text-black/60 text-sm">
               📅 Quinta 13h30 — Simulado ICAO (YouTube)
