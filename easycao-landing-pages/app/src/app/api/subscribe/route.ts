@@ -7,7 +7,7 @@ const MAILCHIMP_TAG = process.env.MAILCHIMP_TAG || "Lives";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, phone } = await request.json();
+    const { name, email, phone, flightHours } = await request.json();
 
     if (!name || !email || !phone) {
       return NextResponse.json(
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         merge_fields: {
           FNAME: name,
           PHONE: phone,
-          HORASDEVOO: "0",
+          HORASDEVOO: flightHours || "0",
         },
       }),
     });
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            merge_fields: { FNAME: name, PHONE: phone },
+            merge_fields: { FNAME: name, PHONE: phone, HORASDEVOO: flightHours || "0" },
           }),
         });
 
