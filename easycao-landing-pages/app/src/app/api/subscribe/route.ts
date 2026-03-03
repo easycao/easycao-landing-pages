@@ -30,6 +30,7 @@ export async function POST(request: Request) {
         merge_fields: {
           FNAME: name,
           PHONE: phone,
+          HORASDEVOO: "",
         },
       }),
     });
