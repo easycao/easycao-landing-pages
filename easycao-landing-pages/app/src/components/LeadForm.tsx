@@ -170,3 +170,9 @@ export default function LeadForm({ variant = "hero" }: LeadFormProps) {
   );
 }
 
+declare global {
+  interface Window {
+    dataLayer: Record<string, unknown>[];
+  }
+}
+
