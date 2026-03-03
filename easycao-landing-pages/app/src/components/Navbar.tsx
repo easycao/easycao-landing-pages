@@ -55,6 +55,14 @@ export default function Navbar() {
                     {page.title.replace(/:.*/,"")}
                   </Link>
                 ))}
+                <div className="border-t border-gray-border mt-1 pt-1">
+                  <Link
+                    href="/conteudos"
+                    className="block px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+                  >
+                    Ver todos os conteudos &rarr;
+                  </Link>
+                </div>
               </div>
             )}
           </div>
@@ -121,6 +129,13 @@ export default function Navbar() {
                 {page.title.replace(/:.*/,"")}
               </Link>
             ))}
+            <Link
+              href="/conteudos"
+              onClick={() => setMenuOpen(false)}
+              className="block py-2 text-sm font-medium text-primary"
+            >
+              Ver todos os conteudos &rarr;
+            </Link>
           </div>
           <div className="border-t border-gray-border pt-3 space-y-2">
             <Link

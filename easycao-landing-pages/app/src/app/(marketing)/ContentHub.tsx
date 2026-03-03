@@ -54,6 +54,14 @@ export default function ContentHub() {
             </Link>
           ))}
         </div>
+        <div className="text-center mt-8">
+          <Link
+            href="/conteudos"
+            className="inline-block bg-white border-2 border-primary text-primary font-bold rounded-xl px-8 py-3 hover:bg-primary hover:text-white transition-all"
+          >
+            Ver todos os conteudos
+          </Link>
+        </div>
       </div>
     </section>
   );

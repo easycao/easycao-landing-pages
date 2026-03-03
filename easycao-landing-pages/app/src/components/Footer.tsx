@@ -9,6 +9,7 @@ import {
 import { getPagesByCategory } from "../lib/content-pages";
 
 const corePages = getPagesByCategory("core");
+const gapPages = getPagesByCategory("gap");
 
 export default function Footer() {
   return (
@@ -75,9 +76,33 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Metodo */}
+          {/* Column 3: Mais Conteudos + Metodo */}
           <div>
             <h3 className="font-bold text-sm uppercase tracking-widest text-white/80 mb-4">
+              Mais Conteudos
+            </h3>
+            <ul className="space-y-2">
+              {gapPages.slice(0, 5).map((page) => (
+                <li key={page.slug}>
+                  <Link
+                    href={`/${page.slug}`}
+                    className="text-sm text-white/50 hover:text-white transition-colors"
+                  >
+                    {page.title.replace(/:.*/,"").replace(/\[.*\]/,"").trim()}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link
+                  href="/conteudos"
+                  className="text-sm text-white/70 hover:text-white font-medium transition-colors"
+                >
+                  Ver todos &rarr;
+                </Link>
+              </li>
+            </ul>
+
+            <h3 className="font-bold text-sm uppercase tracking-widest text-white/80 mb-4 mt-6">
               Metodo
             </h3>
             <ul className="space-y-2">
