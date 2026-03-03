@@ -131,7 +131,7 @@ export default function CountdownTimer() {
             key={block.label}
             className="bg-gray-light rounded-xl px-4 lg:px-6 py-3 lg:py-4 text-center min-w-[70px] lg:min-w-[90px]"
           >
-            <span className="text-primary-dark font-extrabold text-3xl lg:text-5xl block">
+            <span className="text-primary-dark font-bold text-3xl lg:text-5xl block">
               {String(block.value).padStart(2, "0")}
             </span>
             <span className="text-black/50 font-medium text-[10px] lg:text-xs uppercase tracking-wider">
