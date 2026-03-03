@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createHash } from "crypto";
 
 const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY!;
 const MAILCHIMP_SERVER = process.env.MAILCHIMP_SERVER!;
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     });
 
     const data = await response.json();
-    const md5Email = await getMd5Hash(email.toLowerCase());
+    const md5Email = getMd5Hash(email.toLowerCase());
 
     if (!response.ok) {
       if (data.title === "Member Exists") {
@@ -98,24 +99,6 @@ export async function POST(request: Request) {
   }
 }
 
-async function getMd5Hash(input: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(input);
-  const hashBuffer = await crypto.subtle.digest("MD5", data).catch(() => {
-    // Fallback: simple hash for environments without MD5 in crypto.subtle
-    let hash = 0;
-    for (let i = 0; i < input.length; i++) {
-      const char = input.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash |= 0;
-    }
-    return hash.toString(16);
-  });
-
-  if (hashBuffer instanceof ArrayBuffer) {
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  return String(hashBuffer);
+function getMd5Hash(input: string): string {
+  return createHash("md5").update(input).digest("hex");
 }
