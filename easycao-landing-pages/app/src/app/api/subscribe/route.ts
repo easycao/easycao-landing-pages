@@ -31,17 +31,15 @@ export async function POST(request: Request) {
           FNAME: name,
           PHONE: phone,
         },
-        tags: [MAILCHIMP_TAG],
       }),
     });
 
     const data = await response.json();
+    const md5Email = await getMd5Hash(email.toLowerCase());
 
     if (!response.ok) {
       if (data.title === "Member Exists") {
-        // Already subscribed — add tag and update fields
-        const memberUrl = `${url}/${data.detail?.split(" ")?.pop() || ""}`;
-        const md5Email = await getMd5Hash(email.toLowerCase());
+        // Already subscribed — update fields
         const updateUrl = `https://${MAILCHIMP_SERVER}.api.mailchimp.com/3.0/lists/${MAILCHIMP_AUDIENCE_ID}/members/${md5Email}`;
 
         await fetch(updateUrl, {
@@ -55,7 +53,7 @@ export async function POST(request: Request) {
           }),
         });
 
-        // Add tag
+        // Add tag separately
         const tagUrl = `https://${MAILCHIMP_SERVER}.api.mailchimp.com/3.0/lists/${MAILCHIMP_AUDIENCE_ID}/members/${md5Email}/tags`;
         await fetch(tagUrl, {
           method: "POST",
@@ -76,6 +74,19 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Add tag separately (tags are read-only on create endpoint)
+    const tagUrl = `https://${MAILCHIMP_SERVER}.api.mailchimp.com/3.0/lists/${MAILCHIMP_AUDIENCE_ID}/members/${md5Email}/tags`;
+    await fetch(tagUrl, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`anystring:${MAILCHIMP_API_KEY}`).toString("base64")}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tags: [{ name: MAILCHIMP_TAG, status: "active" }],
+      }),
+    });
 
     return NextResponse.json({ success: true });
   } catch {
