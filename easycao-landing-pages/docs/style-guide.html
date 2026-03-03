@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easycao — Style Guide Visual Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F96F7;
+    --primary-dark: #0057B4;
+    --primary-light: #34B8F8;
+    --white: #FFFFFF;
+    --black: #353535;
+    --gray-light: #F8FAFC;
+    --gray-border: #E5E7EB;
+    --whatsapp: #25D366;
+    --whatsapp-hover: #1DA851;
+    --hero-start: #0a3d6b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--black);
+    background: var(--white);
+    line-height: 1.6;
+  }
+
+  /* ---- Layout ---- */
+  .guide-header {
+    background: linear-gradient(135deg, var(--hero-start), var(--primary-dark), var(--primary));
+    color: white;
+    padding: 60px 40px;
+    text-align: center;
+  }
+  .guide-header h1 { font-size: 36px; font-weight: 700; }
+  .guide-header p { opacity: 0.8; margin-top: 8px; font-size: 16px; }
+
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .section:last-child { border-bottom: none; }
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--primary-dark);
+  }
+  .section-desc {
+    font-size: 14px;
+    color: rgba(53,53,53,0.6);
+    margin-bottom: 32px;
+  }
+
+  /* ---- Color Swatches ---- */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .swatch {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--gray-border);
+  }
+  .swatch-color {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px 12px;
+  }
+  .swatch-color span {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.9);
+    color: var(--black);
+  }
+  .swatch-info {
+    padding: 10px 12px;
+    background: white;
+  }
+  .swatch-name { font-size: 13px; font-weight: 600; }
+  .swatch-usage { font-size: 11px; color: rgba(53,53,53,0.5); margin-top: 2px; }
+
+  /* ---- Gradient Strip ---- */
+  .gradient-strip {
+    height: 60px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* ---- Typography ---- */
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray-border);
+  }
+  .type-row:last-child { border-bottom: none; }
+  .type-label {
+    width: 120px;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .type-sample { flex: 1; }
+  .type-meta {
+    width: 200px;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: rgba(53,53,53,0.5);
+    text-align: right;
+  }
+
+  /* ---- Spacing ---- */
+  .spacing-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .spacing-bar {
+    height: 24px;
+    background: var(--primary);
+    border-radius: 4px;
+    opacity: 0.15;
+  }
+  .spacing-label {
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    width: 140px;
+    flex-shrink: 0;
+  }
+  .spacing-value {
+    font-size: 11px;
+    color: rgba(53,53,53,0.5);
+    white-space: nowrap;
+  }
+
+  /* ---- Radius ---- */
+  .radius-grid {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .radius-item {
+    text-align: center;
+  }
+  .radius-box {
+    border: 2px solid var(--primary);
+    background: rgba(31,150,247,0.05);
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 8px;
+  }
+  .radius-item span {
+    font-size: 11px;
+    font-weight: 600;
+    display: block;
+  }
+  .radius-item small {
+    font-size: 10px;
+    color: rgba(53,53,53,0.5);
+  }
+
+  /* ---- Shadow ---- */
+  .shadow-grid {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .shadow-item {
+    text-align: center;
+  }
+  .shadow-box {
+    width: 100px;
+    height: 80px;
+    background: white;
+    border-radius: 12px;
+    margin: 0 auto 8px;
+  }
+  .shadow-item span { font-size: 11px; font-weight: 600; display: block; }
+  .shadow-item small { font-size: 10px; color: rgba(53,53,53,0.5); }
+
+  /* ---- Components ---- */
+  .component-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .component-card {
+    border: 1px solid var(--gray-border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .component-demo {
+    padding: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .component-info {
+    padding: 16px 24px;
+    border-top: 1px solid var(--gray-border);
+    background: var(--gray-light);
+  }
+  .component-info h4 { font-size: 14px; font-weight: 700; }
+  .component-info p { font-size: 12px; color: rgba(53,53,53,0.6); margin-top: 4px; }
+
+  /* ---- Button demos ---- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: white;
+  }
+  .btn-primary { background: var(--primary-light); }
+  .btn-primary:hover { background: var(--primary); transform: scale(1.02); }
+  .btn-whatsapp { background: var(--whatsapp); }
+  .btn-whatsapp:hover { background: var(--whatsapp-hover); transform: scale(1.03); }
+  .btn-disabled { background: var(--primary-light); opacity: 0.5; cursor: not-allowed; }
+
+  /* ---- Input demos ---- */
+  .input-demo {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+  }
+  .input-demo svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+  }
+  .input-demo input {
+    width: 100%;
+    padding: 16px 16px 16px 48px;
+    border-radius: 12px;
+    border: 1px solid var(--gray-border);
+    background: var(--gray-light);
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    color: var(--black);
+    outline: none;
+    transition: all 0.2s;
+  }
+  .input-demo input::placeholder { color: #9CA3AF; }
+  .input-demo input:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+
+  /* ---- Card demos ---- */
+  .demo-card {
+    background: white;
+    border: 1px solid var(--gray-border);
+    border-radius: 16px;
+    padding: 24px;
+    max-width: 400px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .demo-card:hover {
+    border-color: rgba(31,150,247,0.3);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  }
+  .demo-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary), var(--primary-light));
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 16px 0 0 16px;
+  }
+  .demo-card:hover::before { opacity: 1; }
+
+  .demo-glass {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 20px 24px;
+    max-width: 360px;
+    color: white;
+  }
+
+  /* ---- Countdown demo ---- */
+  .countdown-grid {
+    display: flex;
+    gap: 12px;
+  }
+  .countdown-block {
+    background: var(--gray-light);
+    border-radius: 12px;
+    padding: 12px 24px;
+    text-align: center;
+    min-width: 80px;
+  }
+  .countdown-number {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    display: block;
+    line-height: 1;
+  }
+  .countdown-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(53,53,53,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  /* ---- Badge demos ---- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-glass {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.9);
+  }
+  .badge-glass .dot {
+    width: 8px;
+    height: 8px;
+    background: #4ADE80;
+    border-radius: 50%;
+  }
+  .badge-stat {
+    background: var(--primary);
+    color: white;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+  .badge-credential {
+    background: #F0F9FF;
+    border: 1px solid rgba(31,150,247,0.2);
+    border-radius: 8px;
+    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-dark);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .badge-tag {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-radius: 9999px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* ---- Animation demos ---- */
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-subtle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  @keyframes marquee-demo {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .anim-box {
+    width: 80px;
+    height: 60px;
+    background: var(--primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .anim-fade { animation: fade-in-up 1.5s ease-out infinite; }
+  .anim-pulse { animation: pulse-subtle 2s ease-in-out infinite; }
+
+  /* ---- Overline ---- */
+  .overline {
+    color: var(--primary);
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+  }
+
+  /* ---- Header demo ---- */
+  .demo-header {
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gray-border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .demo-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 16px;
+  }
+  .demo-header-brand .logo {
+    width: 28px;
+    height: 28px;
+    background: var(--primary);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .demo-header-countdown {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+  }
+  .demo-header-countdown .live-dot {
+    width: 6px;
+    height: 6px;
+    background: #EF4444;
+    border-radius: 50%;
+  }
+
+  /* ---- Footer demo ---- */
+  .demo-footer {
+    background: var(--primary-dark);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .demo-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    font-size: 14px;
+  }
+  .demo-footer-copy {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ---- Opacity table ---- */
+  .opacity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .opacity-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* ---- Dark demo bg ---- */
+  .dark-bg {
+    background: linear-gradient(135deg, var(--hero-start), var(--primary-dark), var(--primary));
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  @media (max-width: 768px) {
+    .type-row { flex-direction: column; gap: 4px; }
+    .type-meta { width: auto; text-align: left; }
+    .spacing-bar { display: none; }
+    .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<div class="guide-header">
+  <h1>Easycao Style Guide</h1>
+  <p>Visual reference extracted from the Lives Landing Page & Thank You Page</p>
+</div>
+
+<!-- ========== 1. COLORS ========== -->
+<div class="section">
+  <h2 class="section-title">1. Color Palette</h2>
+  <p class="section-desc">All colors are defined as CSS custom properties in globals.css via Tailwind v4 @theme</p>
+
+  <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Primary Colors</h3>
+  <div class="swatch-grid" style="margin-bottom:32px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1F96F7;"><span>#1F96F7</span></div>
+      <div class="swatch-info"><div class="swatch-name">primary</div><div class="swatch-usage">Brand blue — buttons, links, accents</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#0057B4;"><span>#0057B4</span></div>
+      <div class="swatch-info"><div class="swatch-name">primary-dark</div><div class="swatch-usage">Gradients, footer, stat numbers</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#34B8F8;"><span>#34B8F8</span></div>
+      <div class="swatch-info"><div class="swatch-name">primary-light</div><div class="swatch-usage">Hover states, time highlights</div></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Neutral Colors</h3>
+  <div class="swatch-grid" style="margin-bottom:32px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid #E5E7EB;"><span>#FFFFFF</span></div>
+      <div class="swatch-info"><div class="swatch-name">white</div><div class="swatch-usage">Cards, form backgrounds</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#353535;"><span style="color:#353535;">#353535</span></div>
+      <div class="swatch-info"><div class="swatch-name">black</div><div class="swatch-usage">Body text (warm charcoal, NOT pure black)</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#F8FAFC; border-bottom:1px solid #E5E7EB;"><span>#F8FAFC</span></div>
+      <div class="swatch-info"><div class="swatch-name">gray-light</div><div class="swatch-usage">Section backgrounds, inputs</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#E5E7EB;"><span>#E5E7EB</span></div>
+      <div class="swatch-info"><div class="swatch-name">gray-border</div><div class="swatch-usage">Borders, dividers</div></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Accent Colors</h3>
+  <div class="swatch-grid" style="margin-bottom:32px;">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#25D366;"><span>#25D366</span></div>
+      <div class="swatch-info"><div class="swatch-name">whatsapp</div><div class="swatch-usage">WhatsApp CTA button</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1DA851;"><span>#1DA851</span></div>
+      <div class="swatch-info"><div class="swatch-name">whatsapp-hover</div><div class="swatch-usage">WhatsApp hover</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#EF4444;"><span>#EF4444</span></div>
+      <div class="swatch-info"><div class="swatch-name">red-500</div><div class="swatch-usage">Live indicator, errors</div></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#4ADE80;"><span>#4ADE80</span></div>
+      <div class="swatch-info"><div class="swatch-name">green-400</div><div class="swatch-usage">Online/active indicator</div></div>
+    </div>
+  </div>
+
+  <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Gradients</h3>
+  <div class="gradient-strip" style="background: linear-gradient(135deg, #0a3d6b, #0057B4, #1F96F7);">Hero: #0a3d6b → #0057B4 → #1F96F7</div>
+  <div class="gradient-strip" style="background: linear-gradient(135deg, #1F96F7, #0057B4);">CTA: #1F96F7 → #0057B4</div>
+
+  <h3 style="font-size:16px; font-weight:700; margin:24px 0 16px;">Text Opacity on Dark</h3>
+  <div class="dark-bg">
+    <div style="margin-bottom:8px;"><span style="color:white; font-weight:700;">text-white</span> <span style="color:rgba(255,255,255,0.5); font-size:12px;">— Headings</span></div>
+    <div style="margin-bottom:8px;"><span style="color:rgba(255,255,255,0.8);">text-white/80</span> <span style="color:rgba(255,255,255,0.5); font-size:12px;">— Body</span></div>
+    <div style="margin-bottom:8px;"><span style="color:rgba(255,255,255,0.7);">text-white/70</span> <span style="color:rgba(255,255,255,0.5); font-size:12px;">— Descriptions</span></div>
+    <div style="margin-bottom:8px;"><span style="color:rgba(255,255,255,0.6);">text-white/60</span> <span style="color:rgba(255,255,255,0.5); font-size:12px;">— Muted</span></div>
+    <div><span style="color:rgba(255,255,255,0.5);">text-white/50</span> <span style="color:rgba(255,255,255,0.5); font-size:12px;">— Very muted</span></div>
+  </div>
+
+  <h3 style="font-size:16px; font-weight:700; margin:24px 0 16px;">Text Opacity on Light</h3>
+  <div style="background:white; border:1px solid var(--gray-border); border-radius:16px; padding:24px;">
+    <div style="margin-bottom:8px;"><span style="color:#353535; font-weight:700;">text-black</span> <span style="color:rgba(53,53,53,0.5); font-size:12px;">— Headings</span></div>
+    <div style="margin-bottom:8px;"><span style="color:rgba(53,53,53,0.7);">text-black/70</span> <span style="color:rgba(53,53,53,0.5); font-size:12px;">— Body</span></div>
+    <div style="margin-bottom:8px;"><span style="color:rgba(53,53,53,0.6);">text-black/60</span> <span style="color:rgba(53,53,53,0.5); font-size:12px;">— Descriptions</span></div>
+    <div><span style="color:rgba(53,53,53,0.5);">text-black/50</span> <span style="color:rgba(53,53,53,0.5); font-size:12px;">— Labels / fine print</span></div>
+  </div>
+</div>
+
+<!-- ========== 2. TYPOGRAPHY ========== -->
+<div class="section">
+  <h2 class="section-title">2. Typography</h2>
+  <p class="section-desc">Poppins — weights 400, 500, 600, 700. Loaded via next/font/google with display: swap.</p>
+
+  <div class="type-row">
+    <div class="type-label">H1</div>
+    <div class="type-sample" style="font-size:36px; font-weight:700; line-height:1.15;">Seja aprovado no exame ICAO</div>
+    <div class="type-meta">44px desktop / 24px mobile<br>Bold 700</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">H2</div>
+    <div class="type-sample" style="font-size:30px; font-weight:700;">Lives semanais gratuitas</div>
+    <div class="type-meta">36px desktop / 24px mobile<br>Bold 700</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">H3 (Card)</div>
+    <div class="type-sample" style="font-size:16px; font-weight:700;">Como a prova realmente funciona</div>
+    <div class="type-meta">16px<br>Bold 700</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">H3 (Live)</div>
+    <div class="type-sample" style="font-size:24px; font-weight:700;">Aula ao Vivo</div>
+    <div class="type-meta">24px desktop / 20px mobile<br>Bold 700</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Body Large</div>
+    <div class="type-sample" style="font-size:18px; color:rgba(53,53,53,0.7);">Aulas ao vivo, gratuitas toda terca e quinta-feira.</div>
+    <div class="type-meta">20px desktop / 16px mobile<br>Regular 400</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Body</div>
+    <div class="type-sample" style="font-size:16px; color:rgba(53,53,53,0.7);">Examinador ICAO credenciado e criador do Metodo Easycao.</div>
+    <div class="type-meta">18px desktop / 16px mobile<br>Regular 400</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Body Small</div>
+    <div class="type-sample" style="font-size:14px; color:rgba(53,53,53,0.6);">Entenda a estrutura completa e os criterios de avaliacao.</div>
+    <div class="type-meta">14px<br>Regular/Medium 400-500</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Overline</div>
+    <div class="type-sample"><span class="overline">Toda semana, ao vivo e gratuito</span></div>
+    <div class="type-meta">14px<br>Medium 500, uppercase, tracking-widest</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Caption</div>
+    <div class="type-sample" style="font-size:12px; color:rgba(53,53,53,0.5);">Seus dados estao seguros conosco</div>
+    <div class="type-meta">12px<br>Medium 500</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Stat Number</div>
+    <div class="type-sample" style="font-size:48px; font-weight:700; color:var(--primary-dark); line-height:1;">07</div>
+    <div class="type-meta">48px desktop / 30px mobile<br>Bold 700, primary-dark</div>
+  </div>
+</div>
+
+<!-- ========== 3. SPACING ========== -->
+<div class="section">
+  <h2 class="section-title">3. Spacing & Layout</h2>
+  <p class="section-desc">Container widths and section padding patterns used throughout the site.</p>
+
+  <h3 style="font-size:16px; font-weight:700; margin-bottom:16px;">Container Widths</h3>
+  <div class="spacing-row">
+    <div class="spacing-label">max-w-7xl</div>
+    <div class="spacing-bar" style="width:100%;"></div>
+    <div class="spacing-value">1280px — Header, hero, footer</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">max-w-6xl</div>
+    <div class="spacing-bar" style="width:90%;"></div>
+    <div class="spacing-value">1152px — Hub & spoke, professor</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">max-w-5xl</div>
+    <div class="spacing-bar" style="width:80%;"></div>
+    <div class="spacing-value">1024px — Lives cards + countdown</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">max-w-xl</div>
+    <div class="spacing-bar" style="width:45%;"></div>
+    <div class="spacing-value">576px — CTA form section</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">max-w-lg</div>
+    <div class="spacing-bar" style="width:40%;"></div>
+    <div class="spacing-value">512px — Form card (CTA variant)</div>
+  </div>
+
+  <h3 style="font-size:16px; font-weight:700; margin:32px 0 16px;">Section Padding</h3>
+  <div class="spacing-row">
+    <div class="spacing-label">Standard</div>
+    <div class="spacing-value">py-16 (64px) mobile → lg:py-20 (80px) desktop</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">Extended</div>
+    <div class="spacing-value">py-16 (64px) mobile → lg:py-24 (96px) desktop</div>
+  </div>
+  <div class="spacing-row">
+    <div class="spacing-label">Horizontal</div>
+    <div class="spacing-value">px-5 (20px) mobile → lg:px-8 (32px) desktop</div>
+  </div>
+</div>
+
+<!-- ========== 4. BORDER RADIUS ========== -->
+<div class="section">
+  <h2 class="section-title">4. Border Radius</h2>
+  <p class="section-desc">Rounded corners scale from 8px (badges) to 24px (featured cards).</p>
+
+  <div class="radius-grid">
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:8px;"></div>
+      <span>rounded-lg</span>
+      <small>8px — Badges</small>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:12px;"></div>
+      <span>rounded-xl</span>
+      <small>12px — Buttons, inputs</small>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:16px;"></div>
+      <span>rounded-2xl</span>
+      <small>16px — Cards</small>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:24px;"></div>
+      <span>rounded-3xl</span>
+      <small>24px — Featured cards</small>
+    </div>
+    <div class="radius-item">
+      <div class="radius-box" style="border-radius:9999px;"></div>
+      <span>rounded-full</span>
+      <small>Pill — Tags, dots</small>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 5. SHADOWS ========== -->
+<div class="section">
+  <h2 class="section-title">5. Shadows</h2>
+  <p class="section-desc">Progressive shadow scale from subtle card resting state to prominent form containers.</p>
+
+  <div class="shadow-grid">
+    <div class="shadow-item">
+      <div class="shadow-box" style="box-shadow:0 1px 2px rgba(0,0,0,0.05);"></div>
+      <span>shadow-sm</span>
+      <small>Default cards</small>
+    </div>
+    <div class="shadow-item">
+      <div class="shadow-box" style="box-shadow:0 4px 6px -1px rgba(0,0,0,0.1);"></div>
+      <span>shadow-md</span>
+      <small>Carousel images</small>
+    </div>
+    <div class="shadow-item">
+      <div class="shadow-box" style="box-shadow:0 10px 15px -3px rgba(0,0,0,0.1);"></div>
+      <span>shadow-lg</span>
+      <small>Buttons</small>
+    </div>
+    <div class="shadow-item">
+      <div class="shadow-box" style="box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);"></div>
+      <span>shadow-xl</span>
+      <small>Card hover</small>
+    </div>
+    <div class="shadow-item">
+      <div class="shadow-box" style="box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);"></div>
+      <span>shadow-2xl</span>
+      <small>Forms, countdown</small>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 6. COMPONENTS ========== -->
+<div class="section">
+  <h2 class="section-title">6. Components</h2>
+  <p class="section-desc">Live component patterns extracted from the codebase.</p>
+
+  <div class="component-grid">
+
+    <!-- Buttons -->
+    <div class="component-card">
+      <div class="component-demo" style="flex-wrap:wrap; gap:16px;">
+        <button class="btn btn-primary">QUERO PARTICIPAR DAS LIVES</button>
+        <button class="btn btn-whatsapp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          ENTRAR NO GRUPO DO WHATSAPP
+        </button>
+        <button class="btn btn-disabled">DISABLED STATE</button>
+      </div>
+      <div class="component-info">
+        <h4>Buttons</h4>
+        <p>Primary (blue), WhatsApp (green), disabled state. All: rounded-xl, font-bold, uppercase, shadow-lg, hover:scale-[1.02-1.03]</p>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="component-card">
+      <div class="component-demo" style="flex-direction:column; gap:12px; width:100%; max-width:420px;">
+        <div class="input-demo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+          <input type="text" placeholder="Seu nome">
+        </div>
+        <div class="input-demo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" placeholder="Seu email">
+        </div>
+        <div class="input-demo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <input type="tel" placeholder="Seu telefone">
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Form Inputs</h4>
+        <p>Icon left (gray-400, 18px), pl-12, py-4, rounded-xl, border-gray-border, bg-gray-light. Focus: ring-2 ring-primary</p>
+      </div>
+    </div>
+
+    <!-- Card with hover -->
+    <div class="component-card">
+      <div class="component-demo">
+        <div class="demo-card">
+          <div style="display:flex; align-items:start; gap:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">🎯</div>
+            <div>
+              <h3 style="font-weight:700; font-size:16px;">Como a prova realmente funciona</h3>
+              <p style="font-size:14px; color:rgba(53,53,53,0.6); margin-top:8px; line-height:1.6;">Entenda a estrutura completa e os criterios de avaliacao.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Content Card (Hub & Spoke)</h4>
+        <p>White bg, border-gray-border, rounded-2xl, p-6. Hover: border-primary/30, shadow-xl, left accent line appears, stat badge pops in</p>
+      </div>
+    </div>
+
+    <!-- Glass card -->
+    <div class="component-card">
+      <div class="component-demo dark-bg">
+        <div class="demo-glass">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <p style="font-weight:600; font-size:14px;">Prof. Diogo Verzola</p>
+              <p style="color:rgba(255,255,255,0.6); font-size:12px;">Examinador ICAO Credenciado</p>
+            </div>
+            <div style="text-align:right;">
+              <p style="color:rgba(255,255,255,0.6); font-size:12px;">Metrica ICAO</p>
+              <p style="font-weight:700; font-size:14px;">Niveis 4 a 6</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Glass Card (Glassmorphism)</h4>
+        <p>bg: rgba(255,255,255,0.07-0.10), backdrop-blur: 16px, border: 1px solid rgba(255,255,255,0.10-0.15). Used for credential boxes, ICAO parts, live schedule cards</p>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="component-card">
+      <div class="component-demo" style="flex-direction:column; gap:12px;">
+        <p style="color:rgba(53,53,53,0.6); font-weight:500; font-size:14px;">Proxima live:</p>
+        <p style="color:var(--primary); font-weight:600; font-size:18px;">🔴 Aula ao Vivo — Terca 19h</p>
+        <div class="countdown-grid">
+          <div class="countdown-block">
+            <span class="countdown-number">02</span>
+            <span class="countdown-label">DIAS</span>
+          </div>
+          <div class="countdown-block">
+            <span class="countdown-number">14</span>
+            <span class="countdown-label">HORAS</span>
+          </div>
+          <div class="countdown-block">
+            <span class="countdown-number">37</span>
+            <span class="countdown-label">MIN</span>
+          </div>
+          <div class="countdown-block">
+            <span class="countdown-number">09</span>
+            <span class="countdown-label">SEG</span>
+          </div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Countdown Timer</h4>
+        <p>White card (shadow-2xl), gray-light number blocks, primary-dark stat numbers (bold), uppercase labels. Auto-updates every second to next Tuesday 19h or Thursday 13h30</p>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="component-card">
+      <div class="component-demo" style="flex-wrap:wrap; gap:16px;">
+        <div style="background:linear-gradient(135deg, var(--hero-start), var(--primary)); padding:16px; border-radius:12px;">
+          <div class="badge badge-glass"><span class="dot"></span> +1000 pilotos aprovados</div>
+        </div>
+        <span class="badge-stat">4 partes <span style="opacity:0.7; font-weight:400; font-size:10px; margin-left:4px;">do exame</span></span>
+        <div class="badge-credential">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Examinador ICAO Credenciado
+        </div>
+        <div style="background:linear-gradient(135deg, var(--primary-dark), var(--primary)); padding:16px; border-radius:12px;">
+          <span class="badge-tag">Instagram Live</span>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Badges & Tags</h4>
+        <p>Glass pill (hero), stat badge (hover popup), credential badge (sky-50 bg), platform tag (white/10 on dark)</p>
+      </div>
+    </div>
+
+    <!-- Navbar (Global) -->
+    <div class="component-card">
+      <div class="component-demo">
+        <div class="demo-header" style="max-width:700px;">
+          <div class="demo-header-brand"><div class="logo">E</div> Easycao</div>
+          <div style="display:flex; align-items:center; gap:24px; font-size:13px; font-weight:500; color:rgba(53,53,53,0.7);">
+            <span>Metodo</span>
+            <span>Lives</span>
+            <span>Prova ICAO</span>
+            <button style="background:var(--primary-light); color:white; border:none; border-radius:12px; padding:10px 20px; font-family:'Poppins',sans-serif; font-weight:700; font-size:13px; cursor:pointer;">MATRICULAR</button>
+          </div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Navbar (Global — all pages except Lives)</h4>
+        <p>sticky top-0, z-50, bg-white/95 backdrop-blur-md, border-b border-gray-border. Logo left, nav links center, CTA button right ("Matricular" or "WhatsApp")</p>
+      </div>
+    </div>
+
+    <!-- Header Countdown (Lives page only) -->
+    <div class="component-card">
+      <div class="component-demo">
+        <div class="demo-header">
+          <div class="demo-header-brand"><div class="logo">E</div> Easycao</div>
+          <div class="demo-header-countdown">
+            <div class="live-dot"></div>
+            <span style="color:rgba(53,53,53,0.7); font-weight:600; font-size:11px;">A proxima aula comeca em</span>
+            <span style="color:var(--primary-dark); font-weight:700;">02D 14H 37M</span>
+          </div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Header Countdown (Lives page only)</h4>
+        <p>Same sticky/blur base. Logo left, countdown timer right. Page-specific variant for /lives landing page.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="component-card">
+      <div class="component-demo">
+        <div class="demo-footer">
+          <div class="demo-footer-brand"><div style="width:28px; height:28px; background:rgba(255,255,255,0.3); border-radius:6px;"></div> Easycao</div>
+          <div class="demo-footer-copy">Easycao &copy; 2026. Todos os direitos reservados.</div>
+        </div>
+      </div>
+      <div class="component-info">
+        <h4>Footer</h4>
+        <p>bg-primary-dark, logo brightness-200, text-white/70 name, text-white/50 copyright</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 7. ANIMATIONS ========== -->
+<div class="section">
+  <h2 class="section-title">7. Animations</h2>
+  <p class="section-desc">Entrance animations, scroll reveal, and micro-interactions.</p>
+
+  <div style="display:flex; gap:32px; flex-wrap:wrap; align-items:center;">
+    <div style="text-align:center;">
+      <div class="anim-box anim-fade">fade</div>
+      <span style="font-size:11px; font-weight:600; display:block; margin-top:8px;">fade-in-up</span>
+      <small style="font-size:10px; color:rgba(53,53,53,0.5);">0.6s ease-out</small>
+    </div>
+    <div style="text-align:center;">
+      <div class="anim-box anim-pulse">pulse</div>
+      <span style="font-size:11px; font-weight:600; display:block; margin-top:8px;">pulse-subtle</span>
+      <small style="font-size:10px; color:rgba(53,53,53,0.5);">2s infinite</small>
+    </div>
+    <div style="text-align:center;">
+      <div class="anim-box" style="background:var(--whatsapp);">hover</div>
+      <span style="font-size:11px; font-weight:600; display:block; margin-top:8px;">scale on hover</span>
+      <small style="font-size:10px; color:rgba(53,53,53,0.5);">1.02-1.03</small>
+    </div>
+  </div>
+
+  <div style="margin-top:32px; padding:24px; background:var(--gray-light); border-radius:12px;">
+    <h4 style="font-size:14px; font-weight:700; margin-bottom:12px;">Scroll Reveal Pattern</h4>
+    <p style="font-size:13px; color:rgba(53,53,53,0.7);">
+      Uses <code style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:12px;">useInView(0.1)</code> hook with IntersectionObserver.
+      Elements start at <code style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:12px;">opacity-0 translate-y-5</code> and
+      transition to <code style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:12px;">opacity-100 translate-y-0</code>.
+      Staggered delays: <code style="background:#e2e8f0; padding:2px 6px; border-radius:4px; font-size:12px;">transitionDelay: ${i * 100-150}ms</code>.
+      Fires once — observer disconnects after first intersection.
+    </p>
+  </div>
+
+  <div style="margin-top:16px; padding:24px; background:var(--gray-light); border-radius:12px;">
+    <h4 style="font-size:14px; font-weight:700; margin-bottom:12px;">Full Animation Inventory</h4>
+    <table style="width:100%; font-size:13px; border-collapse:collapse;">
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">fade-in-up</td><td style="padding:8px 0;">0.6s ease-out</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Entry animations</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">fade-in-left / right</td><td style="padding:8px 0;">0.7s ease-out</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Slide from sides</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">marquee</td><td style="padding:8px 0;">30-40s linear infinite</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Carousel scroll</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">pulse-subtle</td><td style="padding:8px 0;">2s ease-in-out infinite</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">WhatsApp CTA</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">shake</td><td style="padding:8px 0;">0.4s ease-in-out</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Form error feedback</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--gray-border);">
+        <td style="padding:8px 0; font-weight:600;">circle-draw</td><td style="padding:8px 0;">0.8s ease-out</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Check animation circle</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0; font-weight:600;">check-draw</td><td style="padding:8px 0;">0.5s ease-out +0.5s delay</td><td style="padding:8px 0; color:rgba(53,53,53,0.6);">Checkmark stroke</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ========== 8. SECTION PATTERNS ========== -->
+<div class="section">
+  <h2 class="section-title">8. Section Background Patterns</h2>
+  <p class="section-desc">Alternating background pattern used across the landing page.</p>
+
+  <div style="display:grid; gap:4px; border-radius:12px; overflow:hidden;">
+    <div style="background:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--gray-border);">
+      <span style="font-weight:600; font-size:13px;">Header</span>
+      <span style="font-size:12px; color:rgba(53,53,53,0.5);">bg-white/95 backdrop-blur-md (sticky)</span>
+    </div>
+    <div style="background:linear-gradient(135deg, #0a3d6b, #0057B4, #1F96F7); color:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">Hero</span>
+      <span style="font-size:12px; opacity:0.7;">gradient from-[#0a3d6b] via-primary-dark to-primary</span>
+    </div>
+    <div style="background:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">Hub & Spoke</span>
+      <span style="font-size:12px; color:rgba(53,53,53,0.5);">bg-white + decorative circles</span>
+    </div>
+    <div style="background:linear-gradient(135deg, #0057B4, #1F96F7); color:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">Lives + Countdown</span>
+      <span style="font-size:12px; opacity:0.7;">gradient from-primary-dark to-primary</span>
+    </div>
+    <div style="background:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">Professor</span>
+      <span style="font-size:12px; color:rgba(53,53,53,0.5);">bg-white</span>
+    </div>
+    <div style="background:#F8FAFC; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--gray-border);">
+      <span style="font-weight:600; font-size:13px;">Approval Carousel</span>
+      <span style="font-size:12px; color:rgba(53,53,53,0.5);">bg-gray-light (#F8FAFC)</span>
+    </div>
+    <div style="background:linear-gradient(135deg, #1F96F7, #0057B4); color:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">CTA</span>
+      <span style="font-size:12px; opacity:0.7;">gradient from-primary to-primary-dark</span>
+    </div>
+    <div style="background:#0057B4; color:white; padding:16px 24px; display:flex; align-items:center; justify-content:space-between;">
+      <span style="font-weight:600; font-size:13px;">Footer</span>
+      <span style="font-size:12px; opacity:0.7;">bg-primary-dark</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 9. ICON STYLE ========== -->
+<div class="section">
+  <h2 class="section-title">9. Iconography</h2>
+  <p class="section-desc">Feather/Lucide-style stroke SVGs. Stroke-width 1.5 (cards) to 2 (form, credentials).</p>
+
+  <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:center;">
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">User</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">Mail</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.98.37 1.94.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.87.33 1.83.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">Phone</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">Airplane</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">Instagram</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19.13C5.12 19.56 12 19.56 12 19.56s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.43z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">YouTube</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">CheckCircle</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:48px; height:48px; border-radius:12px; background:rgba(31,150,247,0.1); display:flex; align-items:center; justify-content:center; margin:0 auto;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1F96F7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <span style="font-size:11px; display:block; margin-top:6px;">Warning</span>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div style="background:var(--gray-light); padding:32px; text-align:center; border-top:1px solid var(--gray-border);">
+  <p style="font-size:13px; color:rgba(53,53,53,0.5);">Easycao Style Guide — Generated from codebase analysis</p>
+  <p style="font-size:12px; color:rgba(53,53,53,0.4); margin-top:4px;">docs/style-guide.md + docs/style-guide.html</p>
+</div>
+
+</body>
+</html>

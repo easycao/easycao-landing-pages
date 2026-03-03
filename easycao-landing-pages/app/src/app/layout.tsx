@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import WhatsAppFloat from "../components/WhatsAppFloat";
+import { SITE_DESCRIPTION, GTM_WEB_ID } from "../lib/constants";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -12,28 +14,23 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://easycao.com"),
-  title: "Easycao — Domine a prova ICAO. Na prática.",
-  description:
-    "Participe das lives semanais gratuitas com aulas ao vivo e simulados da prova ICAO. Preparação com Diogo Verzola, examinador ICAO credenciado.",
+  title: "Easycao — Tudo sobre a Prova ICAO",
+  description: SITE_DESCRIPTION,
   icons: {
     icon: "/favicon.webp",
     apple: "/favicon.webp",
   },
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
-    title: "Easycao — Domine a prova ICAO. Na prática.",
-    description:
-      "Lives semanais gratuitas com aulas ao vivo e simulados da prova ICAO.",
-    url: "https://easycao.com/lives",
+    title: "Easycao — Tudo sobre a Prova ICAO",
+    description: SITE_DESCRIPTION,
+    url: "https://easycao.com",
     siteName: "Easycao",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Easycao — Domine a prova ICAO",
+        alt: "Easycao — Tudo sobre a Prova ICAO",
       },
     ],
     type: "website",
@@ -41,14 +38,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Easycao — Domine a prova ICAO. Na prática.",
-    description:
-      "Lives semanais gratuitas com aulas ao vivo e simulados da prova ICAO.",
+    title: "Easycao — Tudo sobre a Prova ICAO",
+    description: SITE_DESCRIPTION,
     images: ["/og-image.png"],
   },
 };
-
-const GTM_WEB_ID = "GTM-PDLS5SL";
 
 export default function RootLayout({
   children,
@@ -78,6 +72,7 @@ export default function RootLayout({
           />
         </noscript>
         {children}
+        <WhatsAppFloat />
       </body>
     </html>
   );

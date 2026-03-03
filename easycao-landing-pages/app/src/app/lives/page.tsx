@@ -6,7 +6,7 @@ import ApprovalCarousel from "@/components/ApprovalCarousel";
 import HubAndSpoke from "./HubAndSpoke";
 import ICAODashboard from "./ICAODashboard";
 import LivesCards from "./LivesCards";
-import ProfessorSection from "./ProfessorSection";
+import ProfessorSection from "../../components/ProfessorSection";
 import CTASection from "./CTASection";
 
 export default function LivesPage() {
