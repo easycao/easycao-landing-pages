@@ -139,6 +139,36 @@
   animation: shake 0.4s ease-in-out;
 }
 
+/* Hero entrance animation — staggered blur-fade-up */
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.hero-animate {
+  animation: hero-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Hero noise / grain overlay — fights gradient banding */
+.hero-noise::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .animate-confetti {
   animation: confetti-fall 3s ease-in forwards;
 }
@@ -250,7 +280,7 @@ details .faq-answer {
 }
 
 details[open] .faq-answer {
-  max-height: 500px;
+  max-height: 2000px;
 }
 
 body {

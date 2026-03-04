@@ -151,7 +151,7 @@ export default function LeadForm({ variant = "hero" }: LeadFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full mt-6 py-4 bg-primary-light hover:bg-primary text-white font-bold text-sm lg:text-base uppercase rounded-xl shadow-lg hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+        className="w-full mt-6 py-4 bg-primary hover:bg-primary-dark text-white font-bold text-sm lg:text-base uppercase rounded-full shadow-lg hover:shadow-xl hover:shadow-primary/25 transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? (
           <span className="flex items-center justify-center gap-2">

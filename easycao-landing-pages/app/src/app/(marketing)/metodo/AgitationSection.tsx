@@ -8,7 +8,7 @@ export default function AgitationSection() {
       ),
       title: "Carreira estagnada",
       description:
-        "Sem a proficiencia ICAO, voce nao pode voar internacionalmente. Oportunidades em companhias aereas passam — e voce fica para tras.",
+        "Sem a proficiência ICAO, você não pode voar internacionalmente. Oportunidades em companhias aéreas passam — e você fica para trás.",
     },
     {
       icon: (
@@ -18,7 +18,7 @@ export default function AgitationSection() {
       ),
       title: "Dinheiro perdido",
       description:
-        "Cada tentativa custa R$ 800-1.500. Reprovar 2-3 vezes significa R$ 3.000+ jogados fora, alem dos custos de deslocamento e tempo.",
+        "Cada tentativa custa R$ 800-1.500. Reprovar 2-3 vezes significa R$ 3.000+ jogados fora, além dos custos de deslocamento e tempo.",
     },
     {
       icon: (
@@ -26,9 +26,9 @@ export default function AgitationSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      title: "Tempo desperdicado",
+      title: "Tempo desperdiçado",
       description:
-        "60 dias de espera obrigatoria entre tentativas. Meses de estudo sem direcao. Enquanto isso, outros pilotos passam e avancam na carreira.",
+        "60 dias de espera obrigatória entre tentativas. Meses de estudo sem direção. Enquanto isso, outros pilotos passam e avançam na carreira.",
     },
   ];
 
@@ -36,7 +36,7 @@ export default function AgitationSection() {
     <section className="bg-gray-light py-16 lg:py-20">
       <div className="max-w-5xl mx-auto px-5">
         <h2 className="text-2xl lg:text-3xl font-bold text-black mb-10 text-center">
-          O que acontece quando voce nao passa
+          O que acontece quando você não passa
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {consequences.map((item) => (

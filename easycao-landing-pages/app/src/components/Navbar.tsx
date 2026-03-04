@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { HOTMART_CHECKOUT_URL } from "../lib/constants";
 import { getPagesByCategory } from "../lib/content-pages";
 
@@ -13,88 +13,134 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isActive = (href: string) => pathname === href;
 
+  const handleDropdownEnter = useCallback(() => {
+    if (dropdownTimeout.current) {
+      clearTimeout(dropdownTimeout.current);
+      dropdownTimeout.current = null;
+    }
+    setDropdownOpen(true);
+  }, []);
+
+  const handleDropdownLeave = useCallback(() => {
+    dropdownTimeout.current = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 150);
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-border">
-      <nav className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center justify-between h-14 lg:h-16">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+      <nav className="max-w-7xl mx-auto px-4 lg:px-8 flex items-center h-14 lg:h-16">
+        {/* Logo — left */}
+        <Link href="/" className="flex items-center gap-2 mr-auto">
           <Image src="/logo.webp" alt="Easycao" width={32} height={32} />
-          <span className="font-bold text-black text-lg">Easycao</span>
+          <span className="font-bold text-primary text-lg tracking-tight">Easycao</span>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden lg:flex items-center gap-8">
-          {/* Prova ICAO dropdown */}
-          <div
-            className="relative"
-            onMouseEnter={() => setDropdownOpen(true)}
-            onMouseLeave={() => setDropdownOpen(false)}
-          >
-            <button className={`font-medium transition-colors ${dropdownOpen ? "text-primary" : "text-black/70 hover:text-primary"}`}>
-              Prova ICAO
-              <svg className="inline ml-1 w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+        {/* Desktop nav + CTA — right */}
+        <div className="hidden lg:flex items-center gap-4">
+          {/* Nav links in pill container */}
+          <div className="flex items-center gap-1 bg-gray-light rounded-full p-1.5 border border-gray-border/60">
+            {/* Prova ICAO dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={handleDropdownEnter}
+              onMouseLeave={handleDropdownLeave}
+            >
+              <button
+                className={`px-5 py-2 rounded-full text-[15px] font-semibold transition-all duration-200 ${
+                  dropdownOpen
+                    ? "text-primary bg-white shadow-sm"
+                    : "text-black/70 hover:text-primary hover:bg-white/80"
+                }`}
+              >
+                Prova ICAO
+                <svg
+                  className={`inline ml-1.5 w-3.5 h-3.5 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
 
-            {dropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 w-72 bg-white rounded-xl shadow-xl border border-gray-border py-2 z-50">
-                {corePages.map((page) => (
-                  <Link
-                    key={page.slug}
-                    href={`/${page.slug}`}
-                    className={`block px-4 py-2.5 text-sm transition-colors ${
-                      isActive(`/${page.slug}`)
-                        ? "text-primary bg-primary/5 font-medium"
-                        : "text-black/70 hover:text-primary hover:bg-primary/5"
-                    }`}
-                  >
-                    {page.title.replace(/:.*/,"")}
-                  </Link>
-                ))}
-                <div className="border-t border-gray-border mt-1 pt-1">
-                  <Link
-                    href="/conteudos"
-                    className="block px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
-                  >
-                    Ver todos os conteudos &rarr;
-                  </Link>
+              {/* Dropdown — with invisible bridge to prevent hover gap */}
+              {dropdownOpen && (
+                <div className="absolute top-full left-0 pt-2 z-50">
+                  <div className="w-80 bg-white rounded-2xl shadow-2xl shadow-black/8 border border-gray-border/80 py-2 overflow-hidden">
+                    {corePages.map((page) => (
+                      <Link
+                        key={page.slug}
+                        href={`/${page.slug}`}
+                        className={`group/item flex items-center gap-3 px-4 py-2.5 text-sm transition-all duration-150 ${
+                          isActive(`/${page.slug}`)
+                            ? "text-primary bg-primary/8 font-semibold"
+                            : "text-black/65 hover:text-primary hover:bg-primary/5 hover:pl-5"
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full shrink-0 transition-all duration-200 ${
+                          isActive(`/${page.slug}`)
+                            ? "bg-primary shadow-[0_0_8px_rgba(31,150,247,0.6)]"
+                            : "bg-black/15 group-hover/item:bg-primary group-hover/item:shadow-[0_0_8px_rgba(31,150,247,0.6)]"
+                        }`} />
+                        {page.title.replace(/:.*/,"").trim()}
+                      </Link>
+                    ))}
+                    <div className="border-t border-gray-border/60 mt-2 pt-2 mx-2">
+                      <Link
+                        href="/conteudos"
+                        className="flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 rounded-lg transition-all duration-150"
+                      >
+                        Ver todos os conteudos
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
+            <Link
+              href="/metodo"
+              className={`px-5 py-2 rounded-full text-[15px] font-semibold transition-all duration-200 ${
+                isActive("/metodo")
+                  ? "text-primary bg-white shadow-sm"
+                  : "text-black/70 hover:text-primary hover:bg-white/80"
+              }`}
+            >
+              Metodo
+            </Link>
+
+            <Link
+              href="/lives"
+              className={`px-5 py-2 rounded-full text-[15px] font-semibold transition-all duration-200 ${
+                isActive("/lives")
+                  ? "text-primary bg-white shadow-sm"
+                  : "text-black/70 hover:text-primary hover:bg-white/80"
+              }`}
+            >
+              Lives
+            </Link>
           </div>
 
-          <Link
-            href="/metodo"
-            className={`font-medium transition-colors ${
-              isActive("/metodo") ? "text-primary" : "text-black/70 hover:text-primary"
-            }`}
+          {/* CTA button — shine sweep on hover */}
+          <a
+            href={HOTMART_CHECKOUT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/cta relative overflow-hidden bg-primary hover:bg-[#1888e0] text-white font-bold text-[15px] rounded-full px-7 py-2.5 shadow-[0_2px_8px_rgba(31,150,247,0.3)] hover:shadow-[0_4px_16px_rgba(31,150,247,0.45)] active:scale-[0.97] transition-all duration-300 ease-out"
           >
-            Metodo
-          </Link>
-
-          <Link
-            href="/lives"
-            className={`font-medium transition-colors ${
-              isActive("/lives") ? "text-primary" : "text-black/70 hover:text-primary"
-            }`}
-          >
-            Lives
-          </Link>
+            <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
+            <span className="relative">Matricular</span>
+          </a>
         </div>
-
-        {/* Desktop CTA */}
-        <a
-          href={HOTMART_CHECKOUT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden lg:inline-block bg-primary-light hover:bg-primary text-white font-bold rounded-xl px-6 py-2.5 transition-all hover:scale-[1.02]"
-        >
-          Matricular
-        </a>
 
         {/* Mobile hamburger */}
         <button
@@ -118,37 +164,38 @@ export default function Navbar() {
       {menuOpen && (
         <div className="lg:hidden border-t border-gray-border bg-white px-4 pb-4">
           <div className="py-3">
-            <p className="text-xs font-medium text-black/50 uppercase tracking-widest mb-2">Prova ICAO</p>
+            <p className="text-xs font-semibold text-black/40 uppercase tracking-widest mb-2">Prova ICAO</p>
             {corePages.map((page) => (
               <Link
                 key={page.slug}
                 href={`/${page.slug}`}
                 onClick={() => setMenuOpen(false)}
-                className="block py-2 text-sm text-black/70 hover:text-primary"
+                className="flex items-center gap-2.5 py-2.5 text-sm text-black/65 hover:text-primary transition-colors"
               >
-                {page.title.replace(/:.*/,"")}
+                <span className="w-1 h-1 rounded-full bg-black/20 shrink-0" />
+                {page.title.replace(/:.*/,"").trim()}
               </Link>
             ))}
             <Link
               href="/conteudos"
               onClick={() => setMenuOpen(false)}
-              className="block py-2 text-sm font-medium text-primary"
+              className="block py-2.5 text-sm font-semibold text-primary"
             >
               Ver todos os conteudos &rarr;
             </Link>
           </div>
-          <div className="border-t border-gray-border pt-3 space-y-2">
+          <div className="border-t border-gray-border pt-3 space-y-1">
             <Link
               href="/metodo"
               onClick={() => setMenuOpen(false)}
-              className="block py-2 font-medium text-black/70 hover:text-primary"
+              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
             >
               Metodo
             </Link>
             <Link
               href="/lives"
               onClick={() => setMenuOpen(false)}
-              className="block py-2 font-medium text-black/70 hover:text-primary"
+              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
             >
               Lives
             </Link>
@@ -157,7 +204,7 @@ export default function Navbar() {
             href={HOTMART_CHECKOUT_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="block mt-3 text-center bg-primary-light hover:bg-primary text-white font-bold rounded-xl px-6 py-3 transition-all"
+            className="block mt-4 text-center bg-primary hover:bg-primary-dark text-white font-bold rounded-full px-6 py-3 shadow-md shadow-primary/25 transition-all duration-200"
           >
             Matricular
           </a>

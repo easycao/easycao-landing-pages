@@ -9,16 +9,13 @@ interface FAQ {
 
 export default function FAQAccordion({ faqs }: { faqs: FAQ[] }) {
   return (
-    <div className="my-12">
+    <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(faqSchema(faqs)),
         }}
       />
-      <h2 className="text-2xl lg:text-3xl font-bold text-black mb-6">
-        Perguntas Frequentes
-      </h2>
       <div className="divide-y divide-gray-border">
         {faqs.map((faq, i) => (
           <details key={i} className="group py-4">

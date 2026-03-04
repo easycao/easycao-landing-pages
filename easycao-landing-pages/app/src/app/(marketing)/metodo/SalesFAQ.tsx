@@ -2,52 +2,52 @@ import FAQAccordion from "../../../components/content/FAQAccordion";
 
 const salesFaqs = [
   {
-    question: "Para quem e o Metodo Easycao?",
-    answer: "Para pilotos (PPL, CPL, ATPL) que precisam ser aprovados na prova ICAO de proficiencia em ingles. Funciona para todos os niveis — de quem esta comecando a estudar ate quem quer subir de Level 4 para 5.",
+    question: "Para quem é o Método Easycao?",
+    answer: "Para pilotos que precisam ser aprovados na prova ICAO de proficiência em inglês. Funciona para todos os níveis — de quem está começando a estudar até quem quer subir de Level 4 para 5.",
   },
   {
     question: "Funciona para quem nunca fez a prova?",
-    answer: "Sim! O metodo foi criado para preparar voce do zero. Os modulos sao progressivos e cobrem tudo que voce precisa saber, desde vocabulario basico de aviacao ate simulados completos.",
+    answer: "Sim! O método foi criado para preparar você do zero. Os módulos são progressivos e cobrem tudo que você precisa saber, desde vocabulário básico de aviação até simulados completos.",
   },
   {
-    question: "E para quem ja reprovou?",
-    answer: "Especialmente. Se voce ja reprovou, o metodo vai identificar exatamente quais descritores precisam de atencao e direcionar sua preparacao para corrigir os pontos fracos.",
+    question: "É para quem já reprovou?",
+    answer: "Especialmente. Se você já reprovou, o método vai identificar exatamente quais descritores precisam de atenção e direcionar sua preparação para corrigir os pontos fracos.",
+  },
+  {
+    question: "Sou iniciante em inglês. Consigo acompanhar?",
+    answer: "Sim. O Módulo Zero foi criado para quem está começando do absoluto zero. As aulas são progressivas e você vai evoluir no seu ritmo, com suporte da comunidade e do professor.",
   },
   {
     question: "Quanto tempo tenho de acesso?",
-    answer: "Acesso vitalicio ao conteudo do metodo. Voce pode assistir e reassistir quantas vezes quiser, no seu ritmo. Atualizacoes futuras tambem estao incluidas.",
+    answer: "A matrícula tem duração de um ano, com acesso completo a todo o conteúdo do método durante esse período.",
   },
   {
     question: "Posso parcelar?",
-    answer: "Sim! Parcelamos em ate 12x no cartao de credito. Tambem aceitamos PIX com desconto de 15%.",
-  },
-  {
-    question: "Tem desconto no PIX?",
-    answer: "Sim! Pagamento via PIX tem desconto de 15% sobre o valor a vista. E a opcao mais economica.",
+    answer: "Sim! Parcelamos em até 12x de R$305,82 no cartão de crédito.",
   },
   {
     question: "Como funciona a garantia?",
-    answer: "Garantia incondicional de 30 dias. Se voce nao gostar por qualquer motivo, devolvemos 100% do seu dinheiro. Sem perguntas. Basta solicitar pelo suporte.",
+    answer: "Garantia incondicional de 7 dias. Se você não gostar por qualquer motivo, devolvemos 100% do seu dinheiro. Sem perguntas. Basta solicitar direto na Hotmart.",
   },
   {
-    question: "Preciso de nivel basico de ingles?",
-    answer: "Um nivel basico de ingles ajuda, mas nao e obrigatorio. O metodo comeca do fundamento e vai progredindo. Se voce consegue entender instrucoes simples em ingles, ja pode comecar.",
+    question: "Preciso de nível básico de inglês?",
+    answer: "Não. Nós ensinamos tudo do zero e a maior parte dos nossos alunos começou do zero. O método foi feito para isso.",
   },
   {
-    question: "Tem suporte para duvidas?",
-    answer: "Sim! Voce tem acesso a comunidade no WhatsApp com suporte do professor Diogo e da equipe. Duvidas sao respondidas diariamente.",
+    question: "Tem suporte para dúvidas?",
+    answer: "Sim! Você tem acesso à comunidade no WhatsApp com suporte do professor Diogo e da equipe. Dúvidas são respondidas diariamente.",
   },
   {
-    question: "Quando comecam as aulas?",
-    answer: "Acesso imediato. Assim que o pagamento e confirmado, voce recebe acesso a plataforma e pode comecar a estudar na mesma hora.",
+    question: "Quando começam as aulas?",
+    answer: "Acesso imediato. Assim que o pagamento é confirmado, você recebe acesso à plataforma e pode começar a estudar na mesma hora.",
   },
   {
-    question: "E diferente de outros cursos de ingles?",
-    answer: "Completamente. O Metodo Easycao nao e um curso de ingles geral. Foi criado especificamente para a prova ICAO, por um examinador credenciado, focando nos 6 descritores que sao avaliados. E pratica oral, nao gramatica.",
+    question: "É diferente de outros cursos de inglês? E de outros preparatórios ICAO?",
+    answer: "Completamente. O Método Easycao não é um curso de inglês geral. Foi criado especificamente para a prova ICAO pelo professor Diogo Verzola, examinador ICAO credenciado e treinado pela ANAC para avaliar pilotos. Ele entende exatamente o que é esperado do piloto na prova e construiu o método em cima disso.",
   },
   {
-    question: "Posso acessar pelo celular?",
-    answer: "Sim! A plataforma funciona em qualquer dispositivo — celular, tablet ou computador. E o app simulador esta disponivel para iOS e Android.",
+    question: "Por onde acesso o curso?",
+    answer: "O curso é acessado pela plataforma Hotmart. Assim que a matrícula é confirmada, você recebe um e-mail com o link de acesso. Pode assistir no computador, celular, tablet ou TV — e as aulas ficam disponíveis para download e acesso offline.",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function SalesFAQ() {
     <section className="bg-white py-16 lg:py-20">
       <div className="max-w-3xl mx-auto px-5">
         <h2 className="text-2xl lg:text-3xl font-bold text-black mb-10 text-center">
-          Perguntas frequentes sobre o Metodo
+          Perguntas frequentes
         </h2>
         <FAQAccordion faqs={salesFaqs} />
       </div>

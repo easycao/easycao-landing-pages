@@ -1,12 +1,34 @@
 "use client";
 
 import Image from "next/image";
-import { useInView } from "@/components/useInView";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 
 export default function ApprovalCarousel() {
-  const { ref, isVisible } = useInView(0.1);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    let timer: ReturnType<typeof setTimeout>;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          timer = setTimeout(() => setIsVisible(true), 700);
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, []);
 
   // Placeholder: using same image repeated. Replace with actual images later.
   const approvals = Array.from({ length: 20 }, (_, i) => ({
@@ -24,9 +46,9 @@ export default function ApprovalCarousel() {
   }, []);
 
   return (
-    <section ref={ref} className="py-16 lg:py-20 bg-gray-light overflow-hidden">
+    <section ref={sectionRef} className="py-16 lg:py-20 bg-gray-light overflow-hidden">
       <h2 className="text-2xl lg:text-4xl font-bold text-black text-center mb-4">
-        +1000 aprovações de alunos Easycao
+        Aprovações de Alunos Easycao
       </h2>
 
       <div className="marquee-container mt-10">

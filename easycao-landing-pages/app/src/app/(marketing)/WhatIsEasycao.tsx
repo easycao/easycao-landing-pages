@@ -6,26 +6,30 @@ export default function WhatIsEasycao() {
           Sobre a Easycao
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-black mb-6">
-          A escola que prepara pilotos para o ICAO de verdade
+          A escola com mais aprovações ICAO no Brasil
         </h2>
         <div className="space-y-4 text-black/70 leading-relaxed">
           <p>
-            A Easycao nao e apenas um curso de ingles — e um metodo completo de
-            preparacao para a prova ICAO criado pelo unico examinador
-            credenciado que ensina no Brasil. O professor Diogo Verzola combina
-            20 anos de experiencia em aviacao com certificacao Cambridge e
-            vivencia como controlador de trafego aereo para preparar pilotos de
-            forma pratica e eficiente.
+            A Easycao é uma escola especializada exclusivamente na preparação
+            para a prova ICAO. Fundada por Diogo Verzola — examinador
+            credenciado, com mais de 20 anos de experiência na aviação e
+            vivência como controlador de tráfego aéreo — nasceu com um
+            propósito claro: elevar o padrão da comunicação aeronáutica no
+            Brasil.
           </p>
           <p>
-            Nosso metodo vai alem das aulas tradicionais: voce pratica com o
-            unico simulador ICAO do mercado, participa de uma comunidade ativa
-            de pilotos e tem acesso a lives gratuitas toda semana com simulados
-            e correcoes ao vivo.
+            Acreditamos que aprovação não vem de respostas decoradas, mas de
+            preparo sólido, estrutura bem construída e domínio real do idioma
+            dentro dos critérios oficiais da ICAO (Doc 9835).
           </p>
           <p>
-            Mais de 1000 pilotos ja foram aprovados com o metodo Easycao.
-            Seja Level 4, 5 ou 6 — temos o caminho certo para a sua aprovacao.
+            Nosso método combina base técnica, prática orientada e o único
+            Simulador ICAO completo do mercado, além de uma comunidade ativa de
+            pilotos e mentorias semanais ao vivo.
+          </p>
+          <p>
+            Na Easycao, não preparamos apenas para passar — preparamos para
+            estar pronto.
           </p>
         </div>
       </div>

@@ -45,50 +45,52 @@ export default function ProfessorSection() {
               Diogo Verzola
             </h2>
 
-            <p className="text-black/70 text-base lg:text-lg mt-6 leading-relaxed">
-              Examinador ICAO credenciado e criador do Método Easycao.
-              Especialista em preparação para a prova ICAO, já ajudou
-              milhares de pilotos a alcançarem a certificação necessária
-              para avançarem em suas carreiras.
-            </p>
+            <div className="space-y-4 text-black/70 text-base lg:text-lg mt-6 leading-relaxed">
+              <p>
+                A Easycao foi construída a partir da experiência real de quem
+                conhece a prova por dentro. Diogo Verzola atua diretamente com
+                avaliação linguística ICAO e há mais de duas décadas ensina
+                inglês com foco em performance sob pressão.
+              </p>
+              <p>
+                Com formação internacional e vivência operacional na aviação,
+                desenvolveu um método próprio que combina estrutura, estratégia
+                e segurança comunicativa — exatamente dentro dos critérios
+                exigidos pela ICAO.
+              </p>
+            </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <div className="bg-sky-50 border border-primary/20 rounded-lg px-5 py-3 flex items-center gap-2">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F96F7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            <div className="flex flex-wrap gap-2.5 mt-8">
+              {[
+                "Examinador ICAO Credenciado",
+                "Certificações Cambridge",
+                "Professor de Inglês +20 anos",
+                "Writer de Questões de Exame",
+                "Controlador de Tráfego Aéreo",
+                "Criador do Método Easycao",
+              ].map((tag) => (
+                <div
+                  key={tag}
+                  className="bg-sky-50 border border-primary/20 rounded-lg px-4 py-2 flex items-center gap-2"
                 >
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-                <span className="text-primary-dark font-medium text-sm">
-                  Examinador ICAO Credenciado
-                </span>
-              </div>
-              <div className="bg-sky-50 border border-primary/20 rounded-lg px-5 py-3 flex items-center gap-2">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#1F96F7"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-                <span className="text-primary-dark font-medium text-sm">
-                  Criador do Método Easycao
-                </span>
-              </div>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#1F96F7"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                  <span className="text-primary-dark font-medium text-sm">
+                    {tag}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

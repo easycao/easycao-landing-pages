@@ -91,7 +91,14 @@ export default function ContentPageLayout({
         </div>
 
         {/* FAQ section */}
-        {faqs.length > 0 && <FAQAccordion faqs={faqs} />}
+        {faqs.length > 0 && (
+          <div className="my-12">
+            <h2 className="text-2xl lg:text-3xl font-bold text-black mb-6">
+              Perguntas Frequentes
+            </h2>
+            <FAQAccordion faqs={faqs} />
+          </div>
+        )}
 
         {/* Author box */}
         <div className="my-12">

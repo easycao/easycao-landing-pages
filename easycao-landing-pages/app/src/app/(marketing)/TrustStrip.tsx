@@ -1,7 +1,7 @@
 export default function TrustStrip() {
   const badges = [
     {
-      label: "+1000 pilotos aprovados",
+      label: "+1000 alunos Easycao",
       icon: (
         <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

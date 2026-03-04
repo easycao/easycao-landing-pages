@@ -8,12 +8,12 @@ export default function GuaranteeSection() {
           </svg>
         </div>
         <h2 className="text-2xl lg:text-3xl font-bold text-black mb-4">
-          Garantia incondicional de 30 dias
+          Garantia incondicional de 7 dias
         </h2>
         <p className="text-black/70 leading-relaxed max-w-lg mx-auto">
-          Se voce nao gostar do metodo por qualquer motivo, devolvemos 100% do
-          seu dinheiro em ate 30 dias. Sem perguntas, sem burocracia. O risco
-          e todo nosso.
+          Se você não gostar do método por qualquer motivo, devolvemos 100% do
+          seu dinheiro em até 7 dias. Sem perguntas, sem burocracia. O risco
+          é todo nosso.
         </p>
       </div>
     </section>

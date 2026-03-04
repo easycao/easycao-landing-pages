@@ -7,7 +7,7 @@ export default function ProblemSection() {
         </svg>
       ),
       title: "Trava na hora de falar",
-      description: "Voce sabe o ingles, mas na pressao da prova as palavras simplesmente nao saem.",
+      description: "Você sabe o inglês, mas na pressão da prova as palavras simplesmente não saem.",
     },
     {
       icon: (
@@ -15,8 +15,8 @@ export default function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      title: "Nao entende o audio com sotaque",
-      description: "O examinador fala com sotaque diferente e voce perde informacoes cruciais.",
+      title: "Não entende o áudio com sotaque",
+      description: "O examinador fala com sotaque diferente e você perde informações cruciais.",
     },
     {
       icon: (
@@ -25,8 +25,8 @@ export default function ProblemSection() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
-      title: "Nao sabe descrever imagens",
-      description: "Na Parte 4 da prova, voce fica sem vocabulario para descrever a cena.",
+      title: "Não sabe descrever imagens",
+      description: "Na Parte 4 da prova, você fica sem vocabulário para descrever a cena.",
     },
     {
       icon: (
@@ -35,7 +35,7 @@ export default function ProblemSection() {
         </svg>
       ),
       title: "Decora respostas mas o examinador percebe",
-      description: "O examinador muda a abordagem e suas respostas prontas nao funcionam.",
+      description: "O examinador muda a abordagem e suas respostas prontas não funcionam.",
     },
   ];
 
@@ -46,7 +46,7 @@ export default function ProblemSection() {
           O problema
         </p>
         <h2 className="text-2xl lg:text-3xl font-bold text-black mb-10 text-center">
-          Voce estuda mas na hora da prova...
+          Você estuda mas na hora da prova...
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {painPoints.map((point) => (

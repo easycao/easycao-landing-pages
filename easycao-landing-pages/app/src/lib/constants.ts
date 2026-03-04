@@ -8,14 +8,14 @@ export const SITE_DESCRIPTION =
 // External URLs
 export const WHATSAPP_GROUP_URL =
   "https://chat.whatsapp.com/BqNohPkBOY4DAD2T95vxpu";
-export const WHATSAPP_SUPPORT_URL = WHATSAPP_GROUP_URL; // placeholder — same as group for now
+export const WHATSAPP_SUPPORT_URL = "https://wa.me/5541998875555";
 export const HOTMART_CHECKOUT_URL = "https://pay.hotmart.com/Y27990783F";
 export const APP_STORE_URL = "#";
 export const PLAY_STORE_URL = "#";
 
 // Social
-export const INSTAGRAM_URL = "https://www.instagram.com/easycao";
-export const YOUTUBE_URL = "https://www.youtube.com/@easycao";
+export const INSTAGRAM_URL = "https://www.instagram.com/easycao.official";
+export const YOUTUBE_URL = "https://www.youtube.com/@easycaofficial";
 
 // Analytics
 export const GTM_WEB_ID = "GTM-PDLS5SL";

@@ -23,9 +23,10 @@ export default function LivesBanner() {
         </div>
         <Link
           href="/lives"
-          className="inline-block bg-primary hover:bg-primary-dark text-white font-bold rounded-xl px-8 py-4 transition-all hover:scale-[1.02]"
+          className="group/cta relative inline-flex items-center overflow-hidden bg-primary hover:bg-[#1888e0] text-white font-bold text-[15px] rounded-full px-8 py-3 shadow-[0_2px_8px_rgba(31,150,247,0.3)] hover:shadow-[0_4px_16px_rgba(31,150,247,0.45)] active:scale-[0.97] transition-all duration-300 ease-out"
         >
-          Participar
+          <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
+          <span className="relative">Participar</span>
         </Link>
       </div>
     </section>
