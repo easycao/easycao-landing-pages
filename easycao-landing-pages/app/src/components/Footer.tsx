@@ -29,7 +29,7 @@ export default function Footer() {
               <span className="font-bold text-white text-lg">Easycao</span>
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-4">
-              A maior escola de preparacao para a prova ICAO do Brasil.
+              A maior escola de preparação para a prova ICAO do Brasil.
             </p>
             <div className="flex gap-3">
               <a

@@ -76,7 +76,7 @@ export default function ContentPageLayout({
                 Pronto para ser aprovado?
               </p>
               <p className="text-white/70 text-sm mb-4">
-                Conheca o metodo do unico examinador ICAO que ensina.
+                Conheça o método do único examinador ICAO que ensina.
               </p>
               <a
                 href={HOTMART_CHECKOUT_URL}

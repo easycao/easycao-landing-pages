@@ -34,7 +34,7 @@ export default function CTABand({ variant = "metodo" }: CTABandProps) {
           Pronto para ser aprovado?
         </h2>
         <p className="text-white/70 mb-6">
-          Conheca o metodo criado pelo unico examinador ICAO credenciado que ensina.
+          Conheça o método criado pelo único examinador ICAO credenciado que ensina.
         </p>
         <a
           href={HOTMART_CHECKOUT_URL}

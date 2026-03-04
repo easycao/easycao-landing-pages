@@ -16,71 +16,71 @@ export const metadata: Metadata = {
 };
 
 const headings: { id: string; text: string; level: 2 | 3 }[] = [
-  { id: "mesma-prova", text: "E a mesma prova de asa fixa?", level: 2 },
-  { id: "diferencas", text: "Diferencas nos cenarios", level: 2 },
-  { id: "vocabulario", text: "Vocabulario especifico de helicoptero", level: 2 },
-  { id: "operacoes", text: "Operacoes tipicas de asa rotativa", level: 2 },
+  { id: "mesma-prova", text: "É a mesma prova de asa fixa?", level: 2 },
+  { id: "diferencas", text: "Diferenças nos cenários", level: 2 },
+  { id: "vocabulario", text: "Vocabulário específico de helicóptero", level: 2 },
+  { id: "operacoes", text: "Operações típicas de asa rotativa", level: 2 },
   { id: "preparacao", text: "Como se preparar", level: 2 },
 ];
 
 const faqs = [
-  { question: "A prova ICAO para helicoptero e diferente?", answer: "A estrutura e os criterios de avaliacao sao identicos. A diferenca esta nos cenarios: o examinador pode usar situacoes especificas de operacoes de helicoptero durante a prova." },
-  { question: "Preciso de ICAO para voar helicoptero offshore?", answer: "Sim. Operacoes offshore sao internacionais por natureza (plataformas em aguas internacionais), exigindo proficiencia ICAO Level 4 ou superior." },
-  { question: "Posso estudar com material de asa fixa?", answer: "Sim, a base e a mesma. Porem, complemente com vocabulario especifico de helicoptero e cenarios de operacoes de asa rotativa." },
-  { question: "O examinador sabe que sou piloto de helicoptero?", answer: "Sim, essa informacao consta no seu cadastro. O examinador pode adaptar cenarios para incluir situacoes mais relevantes a sua operacao." },
+  { question: "A prova ICAO para helicóptero é diferente?", answer: "A estrutura e os critérios de avaliação são idênticos. A diferença está nos cenários: o examinador pode usar situações específicas de operações de helicóptero durante a prova." },
+  { question: "Preciso de ICAO para voar helicóptero offshore?", answer: "Sim. Operações offshore são internacionais por natureza (plataformas em águas internacionais), exigindo proficiência ICAO Level 4 ou superior." },
+  { question: "Posso estudar com material de asa fixa?", answer: "Sim, a base é a mesma. Porém, complemente com vocabulário específico de helicóptero e cenários de operações de asa rotativa." },
+  { question: "O examinador sabe que sou piloto de helicóptero?", answer: "Sim, essa informação consta no seu cadastro. O examinador pode adaptar cenários para incluir situações mais relevantes à sua operação." },
 ];
 
 export default function HelicopteroPage() {
   return (
     <ContentPageLayout slug={PAGE_SLUG} headings={headings} faqs={faqs}>
-      <h2 id="mesma-prova">E a mesma prova de asa fixa?</h2>
-      <p>Sim. A prova ICAO (<Link href="/sdea-santos-dumont-english-assessment">SDEA</Link>) para pilotos de helicoptero segue exatamente o mesmo formato, criterios e <Link href="/descritores-da-prova-icao">descritores</Link> da prova para pilotos de asa fixa.</p>
-      <p>A <Link href="/como-funciona-a-prova-icao">estrutura da prova</Link> e identica: 4 partes, avaliacao por 6 descritores holisticos, escala de <Link href="/niveis-icao">niveis 1 a 6</Link>. O que muda sao os cenarios e o vocabulario utilizado durante a avaliacao.</p>
+      <h2 id="mesma-prova">É a mesma prova de asa fixa?</h2>
+      <p>Sim. A prova ICAO (<Link href="/sdea-santos-dumont-english-assessment">SDEA</Link>) para pilotos de helicóptero segue exatamente o mesmo formato, critérios e <Link href="/descritores-da-prova-icao">descritores</Link> da prova para pilotos de asa fixa.</p>
+      <p>A <Link href="/como-funciona-a-prova-icao">estrutura da prova</Link> é idêntica: 4 partes, avaliação por 6 descritores holísticos, escala de <Link href="/niveis-icao">níveis 1 a 6</Link>. O que muda são os cenários e o vocabulário utilizado durante a avaliação.</p>
 
-      <CalloutBox variant="info" title="Criterios identicos">
-        Os 6 descritores (Pronunciation, Structure, Vocabulary, Fluency, Comprehension, Interaction) sao avaliados da mesma forma para pilotos de helicoptero e aviao.
+      <CalloutBox variant="info" title="Critérios idênticos">
+        Os 6 descritores (Pronunciation, Structure, Vocabulary, Fluency, Comprehension, Interaction) são avaliados da mesma forma para pilotos de helicóptero e avião.
       </CalloutBox>
 
-      <h2 id="diferencas">Diferencas nos cenarios</h2>
-      <p>O examinador pode adaptar os cenarios para incluir situacoes tipicas de operacoes de asa rotativa:</p>
+      <h2 id="diferencas">Diferenças nos cenários</h2>
+      <p>O examinador pode adaptar os cenários para incluir situações típicas de operações de asa rotativa:</p>
       <ul>
-        <li><strong>Parte 1 (Aviation Topics):</strong> Perguntas sobre sua experiencia como piloto de helicoptero, tipos de operacao, rotinas</li>
-        <li><strong>Parte 2 (Interacting):</strong> Cenarios de comunicacao ATC especificos de helicoptero (operacoes em helipontos, FATO, helipads)</li>
-        <li><strong>Parte 3 (Unexpected):</strong> Emergencias tipicas de asa rotativa (autorotacao, perda de cauda, brownout/whiteout)</li>
-        <li><strong>Parte 4 (Pictures):</strong> Fotos de operacoes de helicoptero, offshore, HEMS, montanha</li>
+        <li><strong>Parte 1 (Aviation Topics):</strong> Perguntas sobre sua experiência como piloto de helicóptero, tipos de operação, rotinas</li>
+        <li><strong>Parte 2 (Interacting):</strong> Cenários de comunicação ATC específicos de helicóptero (operações em helipontos, FATO, helipads)</li>
+        <li><strong>Parte 3 (Unexpected):</strong> Emergências típicas de asa rotativa (autorrotação, perda de cauda, brownout/whiteout)</li>
+        <li><strong>Parte 4 (Pictures):</strong> Fotos de operações de helicóptero, offshore, HEMS, montanha</li>
       </ul>
 
-      <h2 id="vocabulario">Vocabulario especifico de helicoptero</h2>
-      <p>Alem do <Link href="/vocabulario-aviacao-ingles">vocabulario geral de aviacao</Link>, domine estes termos:</p>
+      <h2 id="vocabulario">Vocabulário específico de helicóptero</h2>
+      <p>Além do <Link href="/vocabulario-aviacao-ingles">vocabulário geral de aviação</Link>, domine estes termos:</p>
       <ul>
         <li><strong>Componentes:</strong> main rotor, tail rotor, collective, cyclic, skids, floats</li>
-        <li><strong>Operacoes:</strong> hover, autorotation, sling load, hoist, winch, rappelling</li>
-        <li><strong>Areas de pouso:</strong> helipad, heliport, FATO (Final Approach and Takeoff area), TLOF (Touchdown and Liftoff area)</li>
-        <li><strong>Emergencias:</strong> tail rotor failure, mast bumping, ground resonance, vortex ring state, loss of tail rotor effectiveness (LTE)</li>
-        <li><strong>Condicoes:</strong> brownout, whiteout, recirculation, downdraft, windshear in confined areas</li>
-        <li><strong>Operacoes especiais:</strong> offshore operations, HEMS (Helicopter Emergency Medical Service), SAR (Search and Rescue), firefighting</li>
+        <li><strong>Operações:</strong> hover, autorotation, sling load, hoist, winch, rappelling</li>
+        <li><strong>Áreas de pouso:</strong> helipad, heliport, FATO (Final Approach and Takeoff area), TLOF (Touchdown and Liftoff area)</li>
+        <li><strong>Emergências:</strong> tail rotor failure, mast bumping, ground resonance, vortex ring state, loss of tail rotor effectiveness (LTE)</li>
+        <li><strong>Condições:</strong> brownout, whiteout, recirculation, downdraft, windshear in confined areas</li>
+        <li><strong>Operações especiais:</strong> offshore operations, HEMS (Helicopter Emergency Medical Service), SAR (Search and Rescue), firefighting</li>
       </ul>
 
-      <h2 id="operacoes">Operacoes tipicas de asa rotativa</h2>
-      <p>Esteja preparado para discutir estas operacoes em ingles:</p>
+      <h2 id="operacoes">Operações típicas de asa rotativa</h2>
+      <p>Esteja preparado para discutir estas operações em inglês:</p>
       <ul>
-        <li><strong>Offshore (petroleo e gas):</strong> Operacoes em plataformas, deck procedures, passenger briefing, fuel management</li>
-        <li><strong>HEMS (resgate aereo):</strong> Medical emergencies, landing zone assessment, crew resource management</li>
+        <li><strong>Offshore (petróleo e gás):</strong> Operações em plataformas, deck procedures, passenger briefing, fuel management</li>
+        <li><strong>HEMS (resgate aéreo):</strong> Medical emergencies, landing zone assessment, crew resource management</li>
         <li><strong>SAR (busca e salvamento):</strong> Search patterns, survivor recovery, coordination with ground teams</li>
         <li><strong>Utilidade:</strong> Sling load operations, power line inspection, aerial survey, agriculture</li>
         <li><strong>Executivo:</strong> VIP transport, urban heliports, noise abatement procedures</li>
       </ul>
 
       <h2 id="preparacao">Como se preparar</h2>
-      <p>A preparacao para pilotos de helicoptero segue os mesmos principios da <Link href="/como-se-preparar-para-a-prova-icao">preparacao geral</Link>, com estas adicoes:</p>
+      <p>A preparação para pilotos de helicóptero segue os mesmos princípios da <Link href="/como-se-preparar-para-a-prova-icao">preparação geral</Link>, com estas adições:</p>
       <ul>
-        <li>Estude vocabulario especifico de asa rotativa em ingles</li>
-        <li>Pratique descrevendo operacoes de helicoptero que voce realiza no dia a dia</li>
-        <li>Prepare-se para discutir emergencias especificas (autorotacao, tail rotor failure)</li>
-        <li>Familiarize-se com cenarios offshore se essa e sua area de atuacao</li>
+        <li>Estude vocabulário específico de asa rotativa em inglês</li>
+        <li>Pratique descrevendo operações de helicóptero que você realiza no dia a dia</li>
+        <li>Prepare-se para discutir emergências específicas (autorrotação, tail rotor failure)</li>
+        <li>Familiarize-se com cenários offshore se essa é sua área de atuação</li>
         <li>Use o <Link href="/simulado-prova-icao">simulador Easycao</Link> para praticar todos os descritores</li>
       </ul>
-      <p>Evite os <Link href="/erros-comuns-prova-icao">erros mais comuns</Link> e saiba <Link href="/quanto-tempo-preparar-prova-icao">quanto tempo investir na preparacao</Link>.</p>
+      <p>Evite os <Link href="/erros-comuns-prova-icao">erros mais comuns</Link> e saiba <Link href="/quanto-tempo-preparar-prova-icao">quanto tempo investir na preparação</Link>.</p>
     </ContentPageLayout>
   );
 }

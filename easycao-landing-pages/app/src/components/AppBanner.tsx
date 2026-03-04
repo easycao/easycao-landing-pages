@@ -66,14 +66,14 @@ function SectionVariant() {
               Simulador ICAO
             </p>
             <h2 className="text-2xl lg:text-4xl font-bold text-white mb-4">
-              Pratique com o unico simulador ICAO do mercado
+              Pratique com o único simulador ICAO do mercado
             </h2>
             <ul className="space-y-3 mb-6">
               {[
                 "Grave suas respostas e receba feedback por descritor",
                 "Banco de perguntas, áudios e imagens completo",
                 "Baseado no Doc 9835 da ICAO",
-                "Disponivel para iOS e Android",
+                "Disponível para iOS e Android",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3 text-white/80">
                   <svg className="w-5 h-5 text-[#7DCCFF] mt-0.5 shrink-0" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -116,7 +116,7 @@ function InlineVariant() {
           Baixe o App Easycao e pratique com simulados reais
         </p>
         <p className="text-sm text-black/60 mb-3">
-          Grave suas respostas e receba feedback automatico por descritor.
+          Grave suas respostas e receba feedback automático por descritor.
         </p>
         <StoreBadges />
       </div>

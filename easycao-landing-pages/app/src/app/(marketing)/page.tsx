@@ -14,7 +14,7 @@ import CTAFinal from "./CTAFinal";
 export const metadata: Metadata = {
   title: "Easycao — Tudo sobre a Prova ICAO",
   description:
-    "A maior escola de preparacao para a prova ICAO do Brasil. Metodo criado pelo unico examinador ICAO credenciado que ensina. Simulador, comunidade e lives gratuitas.",
+    "A maior escola de preparação para a prova ICAO do Brasil. Método criado pelo único examinador ICAO credenciado que ensina. Simulador, comunidade e lives gratuitas.",
   alternates: {
     canonical: "/",
   },

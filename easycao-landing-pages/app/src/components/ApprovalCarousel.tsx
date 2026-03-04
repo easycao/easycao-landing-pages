@@ -30,11 +30,10 @@ export default function ApprovalCarousel() {
     };
   }, []);
 
-  // Placeholder: using same image repeated. Replace with actual images later.
-  const approvals = Array.from({ length: 20 }, (_, i) => ({
-    id: i + 1,
-    src: "/aprovacoes/1.png",
-    alt: `Aprovação ICAO ${i + 1}`,
+  const approvals = Array.from({ length: 160 }, (_, i) => ({
+    id: 160 - i,
+    src: `/aprovacoes/${160 - i}.webp`,
+    alt: `Aprovação ICAO ${160 - i}`,
   }));
 
   const pause = useCallback(() => {
@@ -56,7 +55,7 @@ export default function ApprovalCarousel() {
           ref={trackRef}
           className="flex animate-marquee gap-5 w-max"
           style={{
-            "--marquee-duration": "40s",
+            "--marquee-duration": "300s",
             animationPlayState: isVisible ? "running" : "paused",
           } as React.CSSProperties}
           onTouchStart={pause}
@@ -70,8 +69,8 @@ export default function ApprovalCarousel() {
               <Image
                 src={img.src}
                 alt={img.alt}
-                width={260}
-                height={468}
+                width={540}
+                height={960}
                 className="w-full h-auto"
               />
             </div>
