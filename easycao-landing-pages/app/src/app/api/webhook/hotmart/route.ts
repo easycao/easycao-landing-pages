@@ -31,17 +31,14 @@ function emptyStages(): Record<StageName, null> {
 
 export async function POST(request: NextRequest) {
   try {
-    // Validate hottok (temporarily disabled for testing)
+    // Validate hottok
     const hottok = request.headers.get("x-hotmart-hottok");
-    console.log("Webhook received — hottok:", hottok);
-    console.log("Webhook headers:", JSON.stringify(Object.fromEntries(request.headers.entries())));
-    // if (!hottok || hottok !== WEBHOOK_SECRET) {
-    //   console.error("Webhook: invalid hottok");
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
+    if (!hottok || hottok !== WEBHOOK_SECRET) {
+      console.error("Webhook: invalid hottok");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const payload = await request.json();
-    console.log("Webhook payload:", JSON.stringify(payload, null, 2));
     const event = payload.event;
     const data = payload.data;
 
@@ -172,9 +169,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, event });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);
-    const errStack = error instanceof Error ? error.stack : "";
     console.error("Webhook error:", errMsg);
-    console.error("Webhook stack:", errStack);
     // Always return 200 to prevent Hotmart retries on our errors
     return NextResponse.json({ received: true, error: errMsg });
   }
