@@ -170,8 +170,11 @@ export async function POST(request: NextRequest) {
     // Unknown event — acknowledge
     return NextResponse.json({ received: true, event });
   } catch (error) {
-    console.error("Webhook error:", error);
+    const errMsg = error instanceof Error ? error.message : String(error);
+    const errStack = error instanceof Error ? error.stack : "";
+    console.error("Webhook error:", errMsg);
+    console.error("Webhook stack:", errStack);
     // Always return 200 to prevent Hotmart retries on our errors
-    return NextResponse.json({ received: true, error: "Internal error" });
+    return NextResponse.json({ received: true, error: errMsg });
   }
 }
