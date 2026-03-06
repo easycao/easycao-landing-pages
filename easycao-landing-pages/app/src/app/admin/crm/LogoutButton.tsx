@@ -13,7 +13,7 @@ export default function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="text-sm text-black/50 hover:text-black transition-colors duration-200"
+      className="text-sm text-white/80 hover:text-white transition-colors duration-200"
     >
       Sair
     </button>

@@ -59,8 +59,16 @@ const STAGE_LABELS: Record<string, string> = {
 };
 
 const ENGAGEMENT_COLORS: Record<string, string> = {
-  NONE: "bg-gray-400", LOW: "bg-yellow-500", MEDIUM: "bg-green-500",
-  HIGH: "bg-blue-500", VERY_HIGH: "bg-purple-500",
+  NONE: "bg-gray-100 text-gray-600",
+  LOW: "bg-red-100 text-red-700",
+  MEDIUM: "bg-amber-100 text-amber-700",
+  HIGH: "bg-emerald-100 text-emerald-700",
+  VERY_HIGH: "bg-violet-100 text-violet-700",
+};
+
+const ENGAGEMENT_DOT_COLORS: Record<string, string> = {
+  NONE: "bg-gray-400", LOW: "bg-red-500", MEDIUM: "bg-amber-500",
+  HIGH: "bg-emerald-500", VERY_HIGH: "bg-violet-500",
 };
 
 const ENGAGEMENT_LABELS: Record<string, string> = {
@@ -69,6 +77,23 @@ const ENGAGEMENT_LABELS: Record<string, string> = {
 };
 
 const MESSAGE_STAGE_ORDER = ["dia_10", "mes_2", "mes_4", "mes_7", "mes_10"];
+
+function formatPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 13 && digits.startsWith("55")) {
+    return `(${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`;
+  }
+  if (digits.length === 12 && digits.startsWith("55")) {
+    return `(${digits.slice(2, 4)}) ${digits.slice(4, 8)}-${digits.slice(8)}`;
+  }
+  return phone;
+}
 
 export default function StudentDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -109,7 +134,6 @@ export default function StudentDetailPage() {
   const { student, enrollments, ltv, currentStage, currentDaysRemaining } = data;
   const currentEnrollment = enrollments.find((e) => e.id === student.currentEnrollmentId);
 
-  // Compute latest engagement from stages
   const latestEngagement = (() => {
     if (!currentEnrollment?.stages) return null;
     for (const s of ["mes_10", "mes_7", "mes_4", "mes_2", "dia_10"]) {
@@ -196,58 +220,73 @@ export default function StudentDetailPage() {
       </button>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-border p-6 lg:p-8 mb-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div className="rounded-2xl p-6 lg:p-8 mb-6 bg-gray-light border border-gray-border">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-black">{student.name}</h1>
-            <p className="text-black/60 mt-1">{student.email}</p>
+            <p className="text-black/50 mt-1">{student.email}</p>
+            {student.phone && (
+              <p className="text-black/50 mt-0.5">{formatPhone(student.phone)}</p>
+            )}
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
-            <button
-              onClick={toggleHotmartStatus}
-              disabled={togglingStatus}
-              className={`text-sm font-medium px-3 py-1.5 rounded-full transition-colors cursor-pointer disabled:opacity-50 ${
-                student.hotmartStatus === "ACTIVE"
-                  ? "text-green-700 bg-green-100 hover:bg-green-200"
-                  : "text-red-700 bg-red-100 hover:bg-red-200"
-              }`}
-              title="Clique para alterar o status"
-            >
-              {student.hotmartStatus === "ACTIVE" ? "Ativo" : "Bloqueado"}
-            </button>
-            {(student.courseProgress != null || latestEngagement) && (
-              <span className="text-sm text-black/50 flex items-center gap-2">
-                {student.courseProgress != null && <>Progresso: {student.courseProgress}%</>}
+          <div className="flex flex-col items-end gap-2">
+            {/* Row 1: Status + Stage */}
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <button
+                onClick={toggleHotmartStatus}
+                disabled={togglingStatus}
+                className={`text-sm font-medium px-3 py-1.5 rounded-full transition-colors cursor-pointer disabled:opacity-50 ${
+                  student.hotmartStatus === "ACTIVE"
+                    ? "text-emerald-700 bg-emerald-100 border border-emerald-200"
+                    : "text-red-700 bg-red-100 border border-red-200"
+                }`}
+                title="Clique para alterar o status"
+              >
+                {student.hotmartStatus === "ACTIVE" ? "Ativo" : "Bloqueado"}
+              </button>
+              {currentStage && (
+                <span className="text-sm font-medium text-primary px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                  {STAGE_LABELS[currentStage] || currentStage}
+                </span>
+              )}
+              {student.tags?.length > 0 && student.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs font-medium text-amber-700 px-2.5 py-1 rounded-full bg-amber-100 border border-amber-200"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            {/* Row 2: LTV + Days remaining */}
+            <div className="flex items-center gap-2 flex-wrap justify-end">
+              <span className="text-sm font-bold text-primary px-3 py-1.5 rounded-full bg-primary/10">
+                LTV: R$ {ltv.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </span>
+              {currentDaysRemaining > 0 && (
+                <span className="text-sm text-black/50">{currentDaysRemaining} dias restantes</span>
+              )}
+            </div>
+            {/* Row 3: Engagement + Progress */}
+            {(latestEngagement || student.courseProgress != null) && (
+              <div className="flex items-center gap-2 flex-wrap justify-end">
                 {latestEngagement && (
-                  <span className={`text-xs text-white font-medium px-2 py-0.5 rounded-full ${ENGAGEMENT_COLORS[latestEngagement] || "bg-gray-400"}`}>
+                  <span className={`text-xs font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${ENGAGEMENT_COLORS[latestEngagement] || "bg-gray-100 text-gray-600"}`}>
                     {ENGAGEMENT_LABELS[latestEngagement] || latestEngagement}
                   </span>
                 )}
-              </span>
+                {student.courseProgress != null && (
+                  <span className="text-sm text-black/50">Progresso: {student.courseProgress}%</span>
+                )}
+              </div>
             )}
-            {student.tags?.length > 0 && student.tags.map((tag) => (
-              <span key={tag} className="text-xs font-medium text-amber-700 bg-amber-100 px-2.5 py-1 rounded-full">
-                {tag}
-              </span>
-            ))}
-            {currentStage && (
-              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">
-                {STAGE_LABELS[currentStage] || currentStage}
-              </span>
-            )}
-            {currentDaysRemaining > 0 && (
-              <span className="text-sm text-black/50">{currentDaysRemaining} dias restantes</span>
-            )}
-            <span className="text-sm font-bold text-primary-dark bg-primary/5 px-3 py-1.5 rounded-full">
-              LTV: R$ {ltv.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Personal data */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-border p-6">
+        <div className="rounded-2xl p-6 bg-gray-light border border-gray-border">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-black">Dados Pessoais</h2>
             {!editing ? (
@@ -306,7 +345,7 @@ export default function StudentDetailPage() {
                     type="text"
                     value={editForm[field]}
                     onChange={(e) => setEditForm((f) => ({ ...f, [field]: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-gray-border bg-gray-light text-sm text-black focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-border bg-white text-sm text-black placeholder:text-black/30 focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
                   />
                 </div>
               ))}
@@ -316,7 +355,7 @@ export default function StudentDetailPage() {
 
         {/* Current enrollment */}
         {currentEnrollment && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-border p-6">
+          <div className="rounded-2xl p-6 bg-gray-light border border-gray-border">
             <h2 className="font-bold text-black mb-4">Matrícula Atual</h2>
             <dl className="space-y-3 text-sm">
               <div className="flex justify-between items-center">
@@ -326,7 +365,7 @@ export default function StudentDetailPage() {
                     type="date"
                     value={editForm.enrolledAt}
                     onChange={(e) => setEditForm((f) => ({ ...f, enrolledAt: e.target.value }))}
-                    className="px-2 py-1 rounded-lg border border-gray-border bg-gray-light text-sm text-black focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                    className="px-2 py-1 rounded-lg border border-gray-border bg-white text-sm text-black focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
                   />
                 ) : (
                   <dd className="text-black font-medium">
@@ -343,7 +382,7 @@ export default function StudentDetailPage() {
                   {currentEnrollment.needsManualPrice && (
                     <button
                       onClick={() => setShowPriceModal(true)}
-                      className="text-xs font-medium text-orange-700 bg-orange-100 px-2 py-0.5 rounded-full hover:bg-orange-200 transition-colors"
+                      className="text-xs font-medium text-amber-700 px-2 py-0.5 rounded-full bg-amber-100 border border-amber-200 hover:bg-amber-50 transition-colors"
                     >
                       Editar valor
                     </button>
@@ -362,9 +401,13 @@ export default function StudentDetailPage() {
                 <dt className="text-black/50">Pagamento</dt>
                 <dd>
                   {currentEnrollment.status === "refunded" ? (
-                    <span className="text-xs font-medium text-red-700 bg-red-100 px-2.5 py-0.5 rounded-full">Reembolsado</span>
+                    <span className="text-xs font-medium text-red-700 px-2.5 py-0.5 rounded-full bg-red-100">
+                      Reembolsado
+                    </span>
                   ) : (
-                    <span className="text-xs font-medium text-green-700 bg-green-100 px-2.5 py-0.5 rounded-full">Processado</span>
+                    <span className="text-xs font-medium text-emerald-700 px-2.5 py-0.5 rounded-full bg-emerald-100">
+                      Processado
+                    </span>
                   )}
                 </dd>
               </div>
@@ -375,7 +418,7 @@ export default function StudentDetailPage() {
               {currentStage === "mes_12" && (
                 <button
                   onClick={() => setEnrollmentAction("renew")}
-                  className="flex-1 py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-xl transition-all duration-300"
+                  className="flex-1 py-2.5 text-white font-bold text-sm rounded-xl transition-all duration-300 bg-primary hover:bg-primary-dark"
                 >
                   Renovar
                 </button>
@@ -383,7 +426,7 @@ export default function StudentDetailPage() {
               {currentStage === "antigo_aluno" && (
                 <button
                   onClick={() => setEnrollmentAction("re-enroll")}
-                  className="flex-1 py-2.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-xl transition-all duration-300"
+                  className="flex-1 py-2.5 text-white font-bold text-sm rounded-xl transition-all duration-300 bg-primary hover:bg-primary-dark"
                 >
                   Rematricular
                 </button>
@@ -394,7 +437,7 @@ export default function StudentDetailPage() {
 
         {/* CS Timeline */}
         {currentEnrollment && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-border p-6 lg:col-span-2">
+          <div className="rounded-2xl p-6 lg:col-span-2 bg-gray-light border border-gray-border">
             <h2 className="font-bold text-black mb-4">Timeline de CS</h2>
             <div className="space-y-3">
               {MESSAGE_STAGE_ORDER.map((stageName) => {
@@ -406,11 +449,15 @@ export default function StudentDetailPage() {
                 return (
                   <div
                     key={stageName}
-                    className={`flex items-center gap-4 p-3 rounded-xl border ${
-                      isSent ? "border-green-200 bg-green-50" : isMigrated ? "border-gray-200 bg-gray-50" : "border-gray-border bg-white opacity-50"
+                    className={`flex items-start gap-4 p-3 rounded-xl border ${
+                      isSent
+                        ? "bg-emerald-50 border-emerald-200"
+                        : isMigrated
+                        ? "bg-white border-gray-border"
+                        : "bg-white border-gray-border opacity-60"
                     }`}
                   >
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${isSent ? "bg-green-500" : isMigrated ? "bg-gray-400" : "bg-gray-300"}`} />
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isSent ? "bg-emerald-500" : isMigrated ? "bg-black/20" : "bg-black/10"}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm text-black">
@@ -420,7 +467,7 @@ export default function StudentDetailPage() {
                           <span className="text-xs text-black/40">Migrado</span>
                         )}
                         {isSent && stage?.sentAt && (
-                          <span className="text-xs text-black/40">
+                          <span className="text-xs text-black/60">
                             Enviado em {new Date(stage.sentAt).toLocaleDateString("pt-BR")}
                           </span>
                         )}
@@ -428,29 +475,25 @@ export default function StudentDetailPage() {
                           <span className="text-xs text-black/30">Pendente</span>
                         )}
                       </div>
-                      {/* Stage details */}
-                      {stage && (stage.engagement || stage.template || stage.progress != null) && (
-                        <div className="flex items-center gap-3 mt-1">
-                          {stage.engagement && (
-                            <span className="text-xs text-black/50">
-                              Engajamento: <span className="font-medium text-black/70">{ENGAGEMENT_LABELS[stage.engagement] || stage.engagement}</span>
-                            </span>
-                          )}
-                          {stage.progress != null && (
-                            <span className="text-xs text-black/50">
-                              Progresso: <span className="font-medium text-black/70">{stage.progress}%</span>
-                            </span>
-                          )}
-                          {stage.template && (
-                            <span className="text-xs text-black/40 font-mono truncate max-w-[200px]">
-                              {stage.template}
-                            </span>
-                          )}
-                        </div>
+                      {stage?.template && (
+                        <span className="text-xs text-black font-mono truncate max-w-[280px] block mt-1">
+                          {stage.template}
+                        </span>
                       )}
                     </div>
-                    {stage?.engagement && (
-                      <span className={`flex-shrink-0 w-2.5 h-2.5 rounded-full ${ENGAGEMENT_COLORS[stage.engagement] || "bg-gray-400"}`} title={ENGAGEMENT_LABELS[stage.engagement] || stage.engagement} />
+                    {stage && (stage.engagement || stage.progress != null) && (
+                      <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                        {stage.engagement && (
+                          <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full ${ENGAGEMENT_COLORS[stage.engagement] || "bg-gray-100 text-gray-600"}`}>
+                            {ENGAGEMENT_LABELS[stage.engagement] || stage.engagement}
+                          </span>
+                        )}
+                        {stage.progress != null && (
+                          <span className="text-xs text-black">
+                            {stage.progress}%
+                          </span>
+                        )}
+                      </div>
                     )}
                   </div>
                 );
@@ -461,14 +504,16 @@ export default function StudentDetailPage() {
 
         {/* Enrollment History */}
         {enrollments.length >= 1 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-border p-6 lg:col-span-2">
+          <div className="rounded-2xl p-6 lg:col-span-2 bg-gray-light border border-gray-border">
             <h2 className="font-bold text-black mb-4">Histórico de Matrículas</h2>
             <div className="space-y-3">
               {enrollments.map((e) => (
                 <div
                   key={e.id}
                   className={`flex items-center justify-between p-4 rounded-xl border ${
-                    e.id === student.currentEnrollmentId ? "border-primary/30 bg-primary/5" : "border-gray-border"
+                    e.id === student.currentEnrollmentId
+                      ? "bg-primary/5 border-primary/20"
+                      : "bg-white border-gray-border"
                   }`}
                 >
                   <div>
@@ -485,9 +530,13 @@ export default function StudentDetailPage() {
                       R$ {(e.realPricePaid ?? e.pricePaid).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
                     {e.status === "refunded" ? (
-                      <span className="text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full">Reembolsado</span>
+                      <span className="text-xs text-red-700 px-2 py-0.5 rounded-full bg-red-100">
+                        Reembolsado
+                      </span>
                     ) : (
-                      <span className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Processado</span>
+                      <span className="text-xs text-emerald-700 px-2 py-0.5 rounded-full bg-emerald-100">
+                        Processado
+                      </span>
                     )}
                   </div>
                 </div>

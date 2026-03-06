@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import Link from "next/link";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface PipelineStudent {
   id: string;
@@ -15,6 +15,9 @@ interface PipelineStudent {
   hotmartStatus: string | null;
   courseProgress: number | null;
   tags: string[];
+  enrolledAt: string;
+  pricePaid: number;
+  ltv: number;
 }
 
 interface StageData {
@@ -30,11 +33,19 @@ interface Filters {
 }
 
 const ENGAGEMENT_COLORS: Record<string, string> = {
-  NONE: "bg-gray-400",
-  LOW: "bg-yellow-500",
-  MEDIUM: "bg-green-500",
-  HIGH: "bg-blue-500",
-  VERY_HIGH: "bg-purple-500",
+  NONE: "bg-gray-100 text-gray-600",
+  LOW: "bg-red-100 text-red-700",
+  MEDIUM: "bg-amber-100 text-amber-700",
+  HIGH: "bg-emerald-100 text-emerald-700",
+  VERY_HIGH: "bg-violet-100 text-violet-700",
+};
+
+const ENGAGEMENT_LABELS: Record<string, string> = {
+  NONE: "NENHUM",
+  LOW: "BAIXO",
+  MEDIUM: "MEDIO",
+  HIGH: "ALTO",
+  VERY_HIGH: "MUITO ALTO",
 };
 
 const STAGE_ORDER = [
@@ -71,35 +82,95 @@ const STAGE_LABELS: Record<string, string> = {
   antigo_aluno: "Antigo Aluno",
 };
 
+function formatPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+  if (digits.length === 10) {
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  }
+  if (digits.length === 13 && digits.startsWith("55")) {
+    return `(${digits.slice(2, 4)}) ${digits.slice(4, 9)}-${digits.slice(9)}`;
+  }
+  if (digits.length === 12 && digits.startsWith("55")) {
+    return `(${digits.slice(2, 4)}) ${digits.slice(4, 8)}-${digits.slice(8)}`;
+  }
+  return phone;
+}
+
 function FilterSelect({
   label,
   value,
   onChange,
   options,
+  icon,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
+  icon?: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const selectedLabel = options.find((o) => o.value === value)?.label;
+
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="text-xs border border-gray-border rounded-lg px-2.5 py-2 bg-white text-black outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all cursor-pointer"
-      title={label}
-    >
-      <option value="">{label}</option>
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-xl border transition-all duration-200 cursor-pointer ${
+          value
+            ? "border-primary/30 text-primary bg-primary/5"
+            : "border-gray-border text-black bg-white hover:border-gray-300"
+        }`}
+      >
+        {icon}
+        <span>{selectedLabel || label}</span>
+        <svg className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full left-0 mt-1.5 min-w-[160px] rounded-xl border border-gray-border bg-white py-1 z-50 shadow-lg">
+          <button
+            onClick={() => { onChange(""); setOpen(false); }}
+            className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+              !value ? "text-primary font-medium" : "text-black/50 hover:text-black hover:bg-gray-light"
+            }`}
+          >
+            {label}
+          </button>
+          {options.map((o) => (
+            <button
+              key={o.value}
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                value === o.value ? "text-primary font-medium bg-primary/5" : "text-black/70 hover:text-black hover:bg-gray-light"
+              }`}
+            >
+              {o.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
 export default function CrmDashboard() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [stages, setStages] = useState<Record<string, StageData> | null>(null);
   const [loading, setLoading] = useState(true);
@@ -198,14 +269,14 @@ export default function CrmDashboard() {
     filters.hotmartStatus || filters.engagement || filters.enrollmentStatus || filters.tag;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)]">
+    <div className="flex flex-col h-full">
       {/* Search + Filters */}
       <div className="mb-4 flex-shrink-0 space-y-3">
         <div className="flex items-center gap-3">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
             <svg
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black/40"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -218,7 +289,7 @@ export default function CrmDashboard() {
               placeholder="Filtrar por nome, email ou telefone..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-gray-border bg-white text-black placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200 shadow-sm text-sm"
+              className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-gray-border bg-white text-black placeholder:text-black/40 focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none transition-all duration-200 text-sm"
             />
           </div>
 
@@ -277,7 +348,7 @@ export default function CrmDashboard() {
 
           {/* Count */}
           {!loading && (
-            <span className="text-sm text-black/50 flex-shrink-0 ml-auto">
+            <span className="text-base text-black font-semibold flex-shrink-0 ml-auto">
               {activeCount} ativos{hasActiveFilters || query ? ` / ${filteredTotal}` : ""}
             </span>
           )}
@@ -288,7 +359,7 @@ export default function CrmDashboard() {
       {loading && (
         <div className="flex items-center justify-center flex-1">
           <svg
-            className="animate-spin h-8 w-8 text-primary"
+            className="animate-spin h-8 w-8 text-[#7DCCFF]"
             viewBox="0 0 24 24"
             fill="none"
           >
@@ -311,75 +382,112 @@ export default function CrmDashboard() {
 
       {/* Kanban board */}
       {!loading && filteredStages && (
-        <div className="flex-1 overflow-x-auto overflow-y-hidden">
-          <div className="flex gap-3 h-full min-w-max pb-2">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden crm-scroll-h">
+          <div className="flex gap-4 h-full min-w-max pb-2">
             {STAGE_ORDER.map((stageKey) => {
               const data = filteredStages[stageKey];
               if (!data) return null;
               return (
                 <div
                   key={stageKey}
-                  className="flex flex-col min-w-[240px] max-w-[240px] bg-gray-50 rounded-2xl border border-gray-border"
+                  className="flex flex-col min-w-[320px] max-w-[320px] rounded-2xl border border-gray-border bg-gray-light"
                 >
                   {/* Column header */}
-                  <div className="sticky top-0 z-10 bg-gray-50 rounded-t-2xl px-3 py-3 border-b border-gray-border">
+                  <div className="sticky top-0 z-10 rounded-t-2xl px-3 py-3 border-b border-gray-border bg-gray-light">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold text-black">
+                      <h3 className="text-base font-bold text-black">
                         {STAGE_LABELS[stageKey] || stageKey}
                       </h3>
-                      <span className="text-xs font-medium text-black/50 bg-white border border-gray-border px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-medium text-black/70 px-2 py-0.5 rounded-full bg-gray-light border border-gray-border">
                         {data.count}
                       </span>
                     </div>
                   </div>
 
                   {/* Cards */}
-                  <div className="flex-1 overflow-y-auto p-2 space-y-2">
+                  <div className="flex-1 overflow-y-auto p-2 space-y-2 crm-scroll">
                     {data.students.map((s) => (
-                      <Link
+                      <div
                         key={s.id}
-                        href={`/admin/crm/${s.id}`}
-                        className="block bg-white rounded-xl border border-gray-border p-3 hover:shadow-md transition-all duration-200 group"
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => {
+                          if (window.getSelection()?.toString()) return;
+                          e.preventDefault();
+                          router.push(`/admin/crm/${s.id}`);
+                        }}
+                        onKeyDown={(e) => { if (e.key === "Enter") router.push(`/admin/crm/${s.id}`); }}
+                        className="rounded-2xl border border-gray-border bg-white p-4 transition-all duration-200 group hover:border-gray-300 cursor-pointer select-text"
                       >
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="text-sm font-semibold text-black group-hover:text-primary transition-colors leading-tight truncate">
+                        {/* Name + Engagement badge */}
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <p className="text-sm font-semibold text-black leading-tight truncate">
                             {s.name}
                           </p>
                           {s.engagement && (
                             <span
-                              className={`flex-shrink-0 w-2 h-2 rounded-full mt-1.5 ${ENGAGEMENT_COLORS[s.engagement] || "bg-gray-400"}`}
-                              title={s.engagement}
-                            />
+                              className={`flex-shrink-0 text-[10px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full ${ENGAGEMENT_COLORS[s.engagement] || "bg-gray-100 text-gray-600"}`}
+                            >
+                              {ENGAGEMENT_LABELS[s.engagement] || s.engagement}
+                            </span>
                           )}
                         </div>
 
-                        <p className="text-xs text-black/50 truncate">
+                        {/* Email */}
+                        <p className="text-xs text-black/60 truncate">
                           {s.email}
                         </p>
+
+                        {/* Phone */}
+                        {s.phone && (
+                          <p className="text-xs text-black/50 truncate mt-1">
+                            {formatPhone(s.phone)}
+                          </p>
+                        )}
+
+                        {/* Enrolled date + Price */}
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-[13px] text-black/70">
+                            {s.enrolledAt ? new Date(s.enrolledAt).toLocaleDateString("pt-BR") : "—"}
+                          </span>
+                          <span className="text-[13px] font-semibold text-black/70">
+                            R$ {s.pricePaid.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+
+                        {/* LTV + Progress number */}
+                        <div className="flex items-center justify-between mt-2.5">
+                          <span className="text-[13px] font-bold text-primary px-2.5 py-1 rounded-full bg-primary/10">
+                            LTV R$ {s.ltv.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </span>
+                          {s.courseProgress != null && (
+                            <span className="text-[13px] text-black/70">Progresso: {s.courseProgress}%</span>
+                          )}
+                        </div>
 
                         {/* Flags */}
                         {(s.needsManualPrice ||
                           s.enrollmentStatus === "refunded" ||
                           s.hotmartStatus?.startsWith("BLOCKED")) && (
-                          <div className="flex flex-wrap gap-1 mt-2">
+                          <div className="flex flex-wrap gap-1 mt-3">
                             {s.hotmartStatus?.startsWith("BLOCKED") && (
-                              <span className="text-[10px] font-medium text-gray-700 bg-gray-200 px-1.5 py-0.5 rounded-full">
+                              <span className="text-[11px] font-bold text-gray-600 px-2 py-0.5 rounded-full bg-gray-100">
                                 Bloqueado
                               </span>
                             )}
                             {s.needsManualPrice && (
-                              <span className="text-[10px] font-medium text-orange-700 bg-orange-100 px-1.5 py-0.5 rounded-full">
+                              <span className="text-[11px] font-bold text-amber-600 px-2 py-0.5 rounded-full bg-amber-50">
                                 Valor pendente
                               </span>
                             )}
                             {s.enrollmentStatus === "refunded" && (
-                              <span className="text-[10px] font-medium text-red-700 bg-red-100 px-1.5 py-0.5 rounded-full">
+                              <span className="text-[11px] font-bold text-red-600 px-2 py-0.5 rounded-full bg-red-50">
                                 Reembolsado
                               </span>
                             )}
                           </div>
                         )}
-                      </Link>
+                      </div>
                     ))}
 
                     {data.students.length === 0 && (

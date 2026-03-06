@@ -50,23 +50,23 @@ export default function EditPriceModal({ studentId, enrollmentId, onClose, onSuc
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="relative rounded-2xl shadow-xl p-8 w-full max-w-md bg-white border border-gray-border">
         <h2 className="text-lg font-bold text-black mb-6">Editar Valor Real</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-black/60 mb-1 block">Valor pago (R$)</label>
+            <label className="text-sm text-black/50 mb-1 block">Valor pago (R$)</label>
             <input
               type="text"
               placeholder="0,00"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black placeholder:text-black/30 focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
               autoFocus
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <div className="flex gap-3">
             <button
@@ -79,7 +79,7 @@ export default function EditPriceModal({ studentId, enrollmentId, onClose, onSuc
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 disabled:opacity-50"
+              className="flex-1 py-3 text-white font-bold rounded-xl transition-all duration-300 disabled:opacity-50 bg-primary hover:bg-primary-dark"
             >
               {loading ? "Salvando..." : "Salvar"}
             </button>

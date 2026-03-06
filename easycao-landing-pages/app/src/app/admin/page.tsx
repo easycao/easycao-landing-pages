@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a3d6b] via-primary-dark to-primary flex items-center justify-center px-5 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0a3d6b] via-primary-dark to-primary hero-noise flex items-center justify-center px-5 py-12 relative overflow-hidden">
       {/* Decorative orbs */}
       <div className="absolute top-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-white/5 pointer-events-none" />
       <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/[0.03] pointer-events-none" />

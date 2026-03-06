@@ -8,6 +8,17 @@ import { updateEnrollmentStage, updateStudent } from "@/lib/crm/students";
 import { Timestamp } from "firebase-admin/firestore";
 import type { StageName, EngagementLevel } from "@/lib/crm/types";
 
+interface CronMessageLog {
+  name: string;
+  email: string;
+  phone: string;
+  stage: string;
+  template: string;
+  engagement: string;
+  progress: number | null;
+  success: boolean;
+}
+
 export async function GET(request: NextRequest) {
   // Verify cron secret
   const authHeader = request.headers.get("authorization");
@@ -17,39 +28,78 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const startTime = Date.now();
   let processed = 0;
   let sent = 0;
   let skippedBlocked = 0;
   let autoBlocked = 0;
   let errors = 0;
+  const messageLogs: CronMessageLog[] = [];
+  const autoBlockedEmails: string[] = [];
 
   try {
     const db = getFirestoreDb();
 
-    // Get all students
+    // Step 1: Load all students (single query)
     const studentsSnap = await db.collection("students").get();
+    const studentDocs = studentsSnap.docs;
 
-    for (const studentDoc of studentsSnap.docs) {
-      const student = studentDoc.data();
-      const studentId = studentDoc.id;
-      const currentEnrollmentId = student.currentEnrollmentId;
+    // Step 2: Build enrollment refs for batch read
+    const studentsWithEnrollment: {
+      doc: FirebaseFirestore.QueryDocumentSnapshot;
+      enrollmentId: string;
+    }[] = [];
 
-      if (!currentEnrollmentId) continue;
+    for (const doc of studentDocs) {
+      const enrollmentId = doc.data().currentEnrollmentId;
+      if (enrollmentId) {
+        studentsWithEnrollment.push({ doc, enrollmentId });
+      }
+    }
 
-      // Get current enrollment
-      const enrollmentDoc = await db
+    // Step 3: Batch read all enrollments at once (instead of N sequential reads)
+    const enrollmentRefs = studentsWithEnrollment.map(({ doc, enrollmentId }) =>
+      db
         .collection("students")
-        .doc(studentId)
+        .doc(doc.id)
         .collection("enrollments")
-        .doc(currentEnrollmentId)
-        .get();
+        .doc(enrollmentId)
+    );
 
-      if (!enrollmentDoc.exists) continue;
+    // Firestore getAll supports up to 500 refs — chunk if needed
+    const BATCH_SIZE = 500;
+    const enrollmentSnaps: FirebaseFirestore.DocumentSnapshot[] = [];
+    for (let i = 0; i < enrollmentRefs.length; i += BATCH_SIZE) {
+      const chunk = enrollmentRefs.slice(i, i + BATCH_SIZE);
+      const results = await db.getAll(...chunk);
+      enrollmentSnaps.push(...results);
+    }
 
-      const enrollment = enrollmentDoc.data();
+    // Step 4: Pre-filter — find students that actually need processing
+    const candidates: {
+      studentId: string;
+      student: FirebaseFirestore.DocumentData;
+      enrollmentId: string;
+      enrollment: FirebaseFirestore.DocumentData;
+      stageName: StageName;
+    }[] = [];
+
+    const autoBlockCandidates: {
+      studentId: string;
+      student: FirebaseFirestore.DocumentData;
+    }[] = [];
+
+    for (let i = 0; i < studentsWithEnrollment.length; i++) {
+      const { doc, enrollmentId } = studentsWithEnrollment[i];
+      const enrollSnap = enrollmentSnaps[i];
+      const student = doc.data();
+      const studentId = doc.id;
+
+      if (!enrollSnap.exists) continue;
+      const enrollment = enrollSnap.data();
       if (!enrollment || enrollment.status !== "active") continue;
 
-      // Skip already blocked students early (BLOCKED, BLOCKED_BY_OWNER, etc.)
+      // Skip already blocked
       if (student.hotmartStatus?.startsWith("BLOCKED")) {
         skippedBlocked++;
         continue;
@@ -57,32 +107,50 @@ export async function GET(request: NextRequest) {
 
       processed++;
 
-      // Compute stage
       const enrolledAt = enrollment.enrolledAt?.toDate?.() || new Date();
       const currentStage = computeStage(enrolledAt);
 
-      // Auto-block students entering antigo_aluno (skip tagged exceptions)
+      // Auto-block check
       if (currentStage === "antigo_aluno" && student.hotmartStatus === "ACTIVE") {
         const tags: string[] = student.tags || [];
-        const isException = tags.includes("Ativos 7 anos") || tags.includes("Ativos antigos");
+        const isException =
+          tags.includes("Ativos 7 anos") || tags.includes("Ativos antigos");
         if (!isException) {
-          await updateStudent(studentId, { hotmartStatus: "BLOCKED" });
-          autoBlocked++;
+          autoBlockCandidates.push({ studentId, student });
         }
         continue;
       }
 
-      // Check if this stage has a message trigger
+      // Only keep students in a message stage with unsent messages
       if (!MESSAGE_STAGES.includes(currentStage as StageName)) continue;
-
       const stageName = currentStage as StageName;
-      const stageData = enrollment.stages?.[stageName];
+      if (enrollment.stages?.[stageName]?.sentAt) continue;
 
-      // Skip if already sent
-      if (stageData?.sentAt) continue;
+      candidates.push({ studentId, student, enrollmentId, enrollment, stageName });
+    }
 
+    console.log(
+      `Cron: ${studentsSnap.size} students, ${processed} active, ${candidates.length} eligible, ${autoBlockCandidates.length} auto-block`
+    );
+
+    // Step 5: Auto-block (parallel writes)
+    if (autoBlockCandidates.length > 0) {
+      await Promise.all(
+        autoBlockCandidates.map(({ studentId }) =>
+          updateStudent(studentId, { hotmartStatus: "BLOCKED" })
+        )
+      );
+      autoBlocked = autoBlockCandidates.length;
+      for (const { student } of autoBlockCandidates) {
+        autoBlockedEmails.push(student.email);
+        console.log(`Cron: auto-blocked ${student.email}`);
+      }
+    }
+
+    // Step 6: Process eligible students (only a handful per day)
+    for (const { studentId, student, enrollmentId, enrollment, stageName } of candidates) {
       try {
-        // Fetch engagement, status, and progress
+        // Fetch live engagement from Hotmart
         const hotmartInfo = await getHotmartUserInfo(student.email);
         const currentEngagement = hotmartInfo.engagement;
 
@@ -92,20 +160,20 @@ export async function GET(request: NextRequest) {
           courseProgress: hotmartInfo.progress,
         });
 
-        // Skip blocked students — they should not receive messages
+        // Skip if Hotmart says blocked
         if (hotmartInfo.status?.startsWith("BLOCKED")) {
           skippedBlocked++;
+          console.log(`Cron: skipped ${student.email} — blocked on Hotmart`);
           continue;
         }
 
-        // For mes_4, get previous engagement from mes_2
+        // Previous engagement for mes_4
         let prevEngagement: EngagementLevel | null = null;
         if (stageName === "mes_4") {
           prevEngagement =
             (enrollment.stages?.mes_2?.engagement as EngagementLevel) || null;
         }
 
-        // Select template
         const templateName = selectTemplate(
           stageName,
           currentEngagement,
@@ -115,34 +183,80 @@ export async function GET(request: NextRequest) {
         // Send WhatsApp message
         const success = await sendTemplate(student.phone, templateName);
 
+        // Log the message attempt
+        messageLogs.push({
+          name: student.name || "",
+          email: student.email,
+          phone: student.phone,
+          stage: stageName,
+          template: templateName,
+          engagement: currentEngagement,
+          progress: hotmartInfo.progress,
+          success,
+        });
+
         if (success) {
-          // Update stage record with progress snapshot
-          await updateEnrollmentStage(studentId, currentEnrollmentId, stageName, {
+          await updateEnrollmentStage(studentId, enrollmentId, stageName, {
             engagement: currentEngagement,
             sentAt: Timestamp.now(),
             template: templateName,
             progress: hotmartInfo.progress,
           });
           sent++;
+          console.log(
+            `Cron: sent to ${student.email} | phone=${student.phone} | stage=${stageName} | template=${templateName} | engagement=${currentEngagement} | progress=${hotmartInfo.progress ?? "N/A"}%`
+          );
         } else {
-          // Don't update sentAt — will retry next day
           errors++;
+          console.log(`Cron: WhatsApp failed for ${student.email} | stage=${stageName} | template=${templateName}`);
         }
       } catch (error) {
-        console.error(
-          `Cron: error processing student ${student.email}:`,
-          error
-        );
+        console.error(`Cron: error processing ${student.email}:`, error);
         errors++;
       }
     }
 
+    const durationMs = Date.now() - startTime;
+
+    // Step 7: Persist cron log to Firestore
+    await db.collection("cronLogs").add({
+      executedAt: Timestamp.now(),
+      durationMs,
+      processed,
+      sent,
+      skippedBlocked,
+      autoBlocked,
+      errors,
+      messages: messageLogs,
+      autoBlockedList: autoBlockedEmails,
+    });
+
     console.log(
-      `Cron complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, autoBlocked=${autoBlocked}, errors=${errors}`
+      `Cron complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, autoBlocked=${autoBlocked}, errors=${errors}, duration=${durationMs}ms`
     );
-    return NextResponse.json({ processed, sent, skippedBlocked, autoBlocked, errors });
+    return NextResponse.json({ processed, sent, skippedBlocked, autoBlocked, errors, durationMs });
   } catch (error) {
     console.error("Cron fatal error:", error);
+
+    // Try to persist even on fatal error
+    try {
+      const db = getFirestoreDb();
+      await db.collection("cronLogs").add({
+        executedAt: Timestamp.now(),
+        durationMs: Date.now() - startTime,
+        processed,
+        sent,
+        skippedBlocked,
+        autoBlocked,
+        errors: errors + 1,
+        messages: messageLogs,
+        autoBlockedList: autoBlockedEmails,
+        fatalError: String(error),
+      });
+    } catch {
+      // If even logging fails, just console.error
+    }
+
     return NextResponse.json(
       { error: "Cron failed", details: String(error) },
       { status: 500 }

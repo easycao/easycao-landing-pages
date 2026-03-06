@@ -59,32 +59,34 @@ export default function EnrollmentModal({ studentId, action, onClose, onSuccess 
     }
   }
 
+  const inputClasses = "w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black placeholder:text-black/30 focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-5">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="relative rounded-2xl shadow-xl p-8 w-full max-w-md bg-white border border-gray-border">
         <h2 className="text-lg font-bold text-black mb-6">{title}</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-black/60 mb-1 block">Valor (R$)</label>
+            <label className="text-sm text-black/50 mb-1 block">Valor (R$)</label>
             <input
               type="text"
               placeholder="0,00"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+              className={inputClasses}
               autoFocus
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-sm text-black/60 mb-1 block">Pagamento</label>
+              <label className="text-sm text-black/50 mb-1 block">Pagamento</label>
               <select
                 value={paymentType}
                 onChange={(e) => setPaymentType(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                className={inputClasses}
               >
                 <option value="pix">PIX</option>
                 <option value="credit_card">Cartão</option>
@@ -93,29 +95,29 @@ export default function EnrollmentModal({ studentId, action, onClose, onSuccess 
               </select>
             </div>
             <div>
-              <label className="text-sm text-black/60 mb-1 block">Parcelas</label>
+              <label className="text-sm text-black/50 mb-1 block">Parcelas</label>
               <input
                 type="number"
                 min="1"
                 max="12"
                 value={installments}
                 onChange={(e) => setInstallments(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                className={inputClasses}
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm text-black/60 mb-1 block">Observações (opcional)</label>
+            <label className="text-sm text-black/50 mb-1 block">Observações (opcional)</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
-              className="w-full px-4 py-3 rounded-xl border border-gray-border bg-gray-light text-black placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none"
+              className={`${inputClasses} resize-none`}
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <div className="flex gap-3">
             <button
@@ -128,7 +130,7 @@ export default function EnrollmentModal({ studentId, action, onClose, onSuccess 
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-3 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl transition-all duration-300 disabled:opacity-50"
+              className="flex-1 py-3 text-white font-bold rounded-xl transition-all duration-300 disabled:opacity-50 bg-primary hover:bg-primary-dark"
             >
               {loading ? "Salvando..." : isRenew ? "Renovar" : "Rematricular"}
             </button>

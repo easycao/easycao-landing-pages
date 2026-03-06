@@ -32,6 +32,9 @@ interface PipelineStudent {
   hotmartStatus: string | null;
   courseProgress: number | null;
   tags: string[];
+  enrolledAt: string;
+  pricePaid: number;
+  ltv: number;
 }
 
 interface StageData {
@@ -98,6 +101,13 @@ export async function GET() {
     stages[stage] = { count: 0, students: [] };
   }
 
+  // Batch fetch all enrollments subcollections for LTV computation
+  const allEnrollmentSnaps = await Promise.all(
+    studentDocs.map((s) =>
+      db.collection("students").doc(s.id).collection("enrollments").get()
+    )
+  );
+
   // Process each student + enrollment pair
   for (let i = 0; i < studentDocs.length; i++) {
     const student = studentDocs[i];
@@ -111,12 +121,22 @@ export async function GET() {
     const days = daysRemaining(enrolledAt);
     const enrollmentStatus: string = enrollData.status || "";
     const needsManualPrice: boolean = enrollData.needsManualPrice || false;
+    const price: number = enrollData.realPricePaid ?? enrollData.pricePaid ?? 0;
 
     // Refunded or BLOCKED students go to "antigo_aluno"
     const isBlocked = student.hotmartStatus?.startsWith("BLOCKED");
     if (enrollmentStatus === "refunded" || isBlocked) {
       stage = "antigo_aluno";
     }
+
+    // Compute LTV: sum of all non-refunded enrollments
+    let ltv = 0;
+    allEnrollmentSnaps[i].forEach((eDoc) => {
+      const e = eDoc.data();
+      if (e.status !== "refunded") {
+        ltv += e.realPricePaid ?? e.pricePaid ?? 0;
+      }
+    });
 
     // Get latest engagement from stages
     let engagement = "";
@@ -140,6 +160,9 @@ export async function GET() {
       hotmartStatus: student.hotmartStatus,
       courseProgress: student.courseProgress,
       tags: student.tags,
+      enrolledAt: enrolledAt.toISOString(),
+      pricePaid: price,
+      ltv,
     };
 
     if (stages[stage]) {
