@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       const email = buyer.email.toLowerCase();
 
       // Idempotency: check if transaction already exists
-      const existing = await findEnrollmentByTransaction(transaction);
+      const existing = await findEnrollmentByTransaction(transaction, email);
       if (existing) {
         return NextResponse.json({ received: true, duplicate: true });
       }
@@ -155,7 +155,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ received: true });
       }
 
-      const found = await findEnrollmentByTransaction(transaction);
+      const buyerEmail = data.buyer?.email?.toLowerCase();
+      const found = await findEnrollmentByTransaction(transaction, buyerEmail);
       if (found) {
         await updateEnrollmentStatus(
           found.studentId,

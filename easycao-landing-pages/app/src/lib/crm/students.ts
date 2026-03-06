@@ -154,19 +154,46 @@ export async function updateEnrollmentStatus(
 }
 
 export async function findEnrollmentByTransaction(
-  transaction: string
+  transaction: string,
+  email?: string
 ): Promise<{ studentId: string; enrollmentId: string } | null> {
+  if (!transaction) return null;
   const db = getFirestoreDb();
-  // collectionGroup query across all enrollment subcollections
-  const snapshot = await db
-    .collectionGroup(ENROLLMENTS_SUBCOLLECTION)
-    .where("transaction", "==", transaction)
-    .limit(1)
-    .get();
 
-  if (snapshot.empty) return null;
-  const doc = snapshot.docs[0];
-  const studentId = doc.ref.parent.parent?.id;
-  if (!studentId) return null;
-  return { studentId, enrollmentId: doc.id };
+  // If email is provided, find student first then check their enrollments (fast)
+  if (email) {
+    const student = await getStudentByEmail(email);
+    if (!student) return null;
+
+    const enrollSnap = await db
+      .collection(STUDENTS_COLLECTION)
+      .doc(student.id)
+      .collection(ENROLLMENTS_SUBCOLLECTION)
+      .where("transaction", "==", transaction)
+      .limit(1)
+      .get();
+
+    if (!enrollSnap.empty) {
+      return { studentId: student.id, enrollmentId: enrollSnap.docs[0].id };
+    }
+    return null;
+  }
+
+  // Fallback: scan all students (slow, but works without email)
+  const studentsSnap = await db.collection(STUDENTS_COLLECTION).get();
+  for (const studentDoc of studentsSnap.docs) {
+    const enrollSnap = await db
+      .collection(STUDENTS_COLLECTION)
+      .doc(studentDoc.id)
+      .collection(ENROLLMENTS_SUBCOLLECTION)
+      .where("transaction", "==", transaction)
+      .limit(1)
+      .get();
+
+    if (!enrollSnap.empty) {
+      return { studentId: studentDoc.id, enrollmentId: enrollSnap.docs[0].id };
+    }
+  }
+
+  return null;
 }
