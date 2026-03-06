@@ -4,55 +4,48 @@ import { useRef, useState, useCallback } from "react";
 
 const cases = [
   {
-    name: "Renato",
-    result: "Level 4",
-    duration: "4 meses",
-    quote: "Reprovei duas vezes estudando por conta. Com o método, entendi exatamente o que o examinador avalia e passei na terceira tentativa.",
-    role: "Piloto Comercial",
+    role: "Comandante de Jato",
+    result: "ICAO 4",
+    quote: "Eu já voava um jato, mas faltava o ICAO para poder realizar voos internacionais. Entrando na Easycao eu vi um Curso que ensina você O QUE e COMO estudar, eu saí do Inglês zero ao ICAO 4 e hoje já tenho 4 voos internacionais realizados!",
+    videoId: "P4gQYttI34o",
   },
   {
-    name: "Piloto FlightSafety",
-    result: "Level 4",
-    duration: "3 meses",
-    quote: "O Diogo me mostrou que eu estava estudando inglês geral, não inglês de prova ICAO. Essa mudança de foco fez toda a diferença.",
-    role: "Piloto FlightSafety",
-  },
-  {
-    name: "Cmte. Faria",
-    result: "Level 5",
-    duration: "6 meses",
-    quote: "Fiquei anos estagnado no Level 4. Com os módulos Advanced, finalmente consegui o Level 5 e garanti mais tempo sem renovação.",
     role: "Comandante",
+    result: "ICAO 4",
+    quote: "O ICAO era quase impossível pra mim, até que conheci a Easycao, foram 6 meses de muita dedicação e empenho, tanto por parte de mim quanto do Diogo e fui aprovado! A melhor notícia ainda estava pra vir: em menos de 1 mês a oportunidade bateu na porta, um novo emprego e uma nova máquina. Se você ainda não tem o ICAO na carteira, matricule-se na Easycao",
+    videoId: "9aXmc7Rxie0",
   },
   {
-    name: "Lucas",
-    result: "Level 4",
-    duration: "5 meses",
-    quote: "Comecei do zero em inglês de aviação. O Módulo Zero me deu a base e em 5 meses eu já estava aprovado na primeira tentativa.",
-    role: "Piloto Privado",
+    role: "FlightSafety",
+    result: "ICAO 4",
+    quote: "Eu passei por vários instrutores de inglês, cada um deles me ajudou de certa forma, mas eu encontrei no Diogo tudo que precisava, ele consegue juntar todos os elementos e te levar pro ICAO. Hoje eu só estou aqui na FlightSafety porque no início do ano eu fiz o ICAO com ele. O Curso da Easycao realmente é perfeito e eu recomendo a Easycao",
+    videoId: "DuVvMBT82Wk",
+  },
+  {
+    role: "Comandante",
+    result: "ICAO 4",
+    quote: "Eu tinha muita dificuldade no Inglês, gastei uma grana com professor particular e infelizmente sem resultado... Conheci a Easycao e depois de alguns meses consegui o ICAO 4 na carteira. O diferencial do método foram as mentorias ao vivo, me fizeram perder o medo de falar em público e ainda ser corrigido por um avaliador da prova fez muita diferença",
+    videoId: "bYrz-gPBWus",
   },
 ];
 
 export default function CaseStudies() {
   const [active, setActive] = useState(0);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [playing, setPlaying] = useState<string | null>(null);
+  const [paused, setPaused] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const touchStartX = useRef(0);
-
-  const pauseAllVideos = useCallback(() => {
-    videoRefs.current.forEach((v) => {
-      if (v && !v.paused) v.pause();
-    });
-  }, []);
 
   const goTo = useCallback(
     (index: number) => {
       const clamped = Math.max(0, Math.min(cases.length - 1, index));
       if (clamped !== active) {
-        pauseAllVideos();
+        setPlaying(null);
+        setPaused(false);
         setActive(clamped);
       }
     },
-    [active, pauseAllVideos]
+    [active]
   );
 
   const onTouchStart = (e: React.TouchEvent) => {
@@ -102,38 +95,73 @@ export default function CaseStudies() {
               {c.result}
             </span>
 
-            {/* Video placeholder — 9:16 */}
+            {/* Video — thumbnail + lazy iframe on click */}
             <div
-              className="w-full sm:w-72 shrink-0 aspect-[9/12] sm:aspect-[9/16] rounded-xl flex items-center justify-center overflow-hidden"
+              className="relative w-full sm:w-72 shrink-0 aspect-[9/12] sm:aspect-[9/16] rounded-xl p-1 sm:p-1.5 cursor-pointer group/video"
               style={{
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(255,255,255,0.10)",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+              }}
+              onClick={() => {
+                if (!playing) {
+                  setPlaying(c.videoId);
+                  setPaused(false);
+                } else if (iframeRef.current?.contentWindow) {
+                  const cmd = paused ? "playVideo" : "pauseVideo";
+                  iframeRef.current.contentWindow.postMessage(
+                    JSON.stringify({ event: "command", func: cmd, args: "" }),
+                    "*"
+                  );
+                  setPaused(!paused);
+                }
               }}
             >
-              <div className="text-center text-white/30">
-                <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                <p className="text-sm">Vídeo em breve</p>
+              <div className="relative w-full h-full rounded-lg overflow-hidden">
+                {playing === c.videoId ? (
+                  <>
+                    <iframe
+                      ref={iframeRef}
+                      src={`https://www.youtube-nocookie.com/embed/${c.videoId}?rel=0&autoplay=1&controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&playsinline=1&disablekb=1&fs=0&enablejsapi=1`}
+                      title={`Depoimento ${c.role}`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      className="w-full h-full"
+                    />
+                    {/* Transparent overlay — blocks all YouTube UI interaction */}
+                    <div className="absolute inset-0" />
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={`https://img.youtube.com/vi/${c.videoId}/hqdefault.jpg`}
+                      alt={`Depoimento ${c.role}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover/video:bg-black/30 transition-colors">
+                      <div
+                        className="w-14 h-14 rounded-full flex items-center justify-center group-hover/video:scale-110 transition-transform"
+                        style={{
+                          background: "rgba(255,255,255,0.20)",
+                          backdropFilter: "blur(16px)",
+                          WebkitBackdropFilter: "blur(16px)",
+                          border: "1px solid rgba(255,255,255,0.28)",
+                        }}
+                      >
+                        <svg className="w-6 h-6 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-              {/* Hidden video elements for future use */}
-              {cases.map((_, i) => (
-                <video
-                  key={i}
-                  ref={(el) => { videoRefs.current[i] = el; }}
-                  className="hidden"
-                  playsInline
-                />
-              ))}
             </div>
 
             {/* Text content */}
             <div className="flex flex-col flex-1 justify-start min-w-0">
-              <p className="font-semibold text-xl lg:text-2xl text-white mb-2">{c.name}</p>
-
-              <span className="text-base text-white/65 block mb-2 sm:mb-5">
-                {c.duration} de preparação &middot; {c.role}
-              </span>
+              <p className="font-semibold text-xl lg:text-2xl text-white mb-3 sm:mb-5">{c.role}</p>
 
               <p className="text-sm sm:text-lg lg:text-xl text-white/75 leading-relaxed italic">
                 &ldquo;{c.quote}&rdquo;

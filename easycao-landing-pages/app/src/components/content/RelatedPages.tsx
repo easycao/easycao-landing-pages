@@ -16,7 +16,7 @@ export default function RelatedPages({ currentSlug }: { currentSlug: string }) {
           <Link
             key={page.slug}
             href={`/${page.slug}`}
-            className="border border-gray-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/30 transition-all group"
+            className="relative border border-gray-border rounded-2xl p-6 hover:shadow-lg hover:border-primary/30 hover:border-l-4 hover:border-l-primary hover:scale-[1.01] transition-all duration-200 group"
           >
             <h3 className="font-semibold text-black group-hover:text-primary transition-colors mb-2 line-clamp-2">
               {page.title.replace(/:.*/,"").trim()}
@@ -24,9 +24,14 @@ export default function RelatedPages({ currentSlug }: { currentSlug: string }) {
             <p className="text-sm text-black/60 line-clamp-2 mb-3">
               {page.description}
             </p>
-            <span className="text-sm text-primary font-medium">
-              Ler mais &rarr;
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-primary font-medium">
+                Ler mais &rarr;
+              </span>
+              <span className="text-xs text-black/40">
+                {page.readingTime} min
+              </span>
+            </div>
           </Link>
         ))}
       </div>

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: page.seoTitle,
   description: page.description,
   alternates: { canonical: `/${PAGE_SLUG}` },
-  openGraph: { title: page.seoTitle, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
+  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
 };
 
 const headings: { id: string; text: string; level: 2 | 3 }[] = [
@@ -59,14 +59,14 @@ export default function SimuladoPage() {
 
       <h3 id="recursos">Recursos do simulador</h3>
       <ul>
-        <li><strong>283 trilhões+ de combinações:</strong> Cenários nunca se repetem</li>
+        <li><strong>Banco de perguntas, áudios e imagens completo do Exame:</strong> Cenários nunca se repetem</li>
         <li><strong>Feedback por descritor:</strong> Saiba exatamente onde melhorar</li>
         <li><strong>Baseado no Doc 9835:</strong> Critérios idênticos aos da prova real</li>
         <li><strong>iOS e Android:</strong> Disponível para ambas as plataformas</li>
         <li><strong>Prática diária:</strong> Sessões de 10-15 minutos por dia já fazem diferença</li>
       </ul>
 
-      <AppBanner variant="section" />
+      <AppBanner variant="section" rounded />
 
       <h2 id="sem-app">Como praticar sem o app</h2>
       <p>Se você ainda não tem acesso ao simulador, existem alternativas gratuitas:</p>

@@ -11,7 +11,7 @@ export default function MuralAprovados() {
           Mural de aprovados
         </h2>
         <p className="text-black/60 text-center mb-10">
-          Mais de 1000 pilotos ja foram aprovados com o Metodo Easycao
+          Mais de 1000 pilotos já foram aprovados com o Método Easycao
         </p>
         <ApprovalCarousel />
       </div>

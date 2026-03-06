@@ -47,7 +47,7 @@ const ICONS = [
 ];
 
 export default function ContentHub() {
-  const corePages = getPagesByCategory("core").slice(0, 4);
+  const corePages = getPagesByCategory("understand").slice(0, 4);
   const { containerRef, progress } = useScrollProgress();
 
   return (
@@ -167,7 +167,7 @@ export default function ContentHub() {
               e.currentTarget.style.boxShadow = "0 0 16px rgba(31,150,247,0.2)";
             }}
           >
-            Ver todos os conteudos
+            Ver todos os conteúdos
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>

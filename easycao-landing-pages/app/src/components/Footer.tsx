@@ -1,15 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  HOTMART_CHECKOUT_URL,
   INSTAGRAM_URL,
   YOUTUBE_URL,
   WHATSAPP_SUPPORT_URL,
 } from "../lib/constants";
 import { getPagesByCategory } from "../lib/content-pages";
 
-const corePages = getPagesByCategory("core");
-const gapPages = getPagesByCategory("gap");
+const corePages = getPagesByCategory("understand");
+const gapPages = getPagesByCategory("prepare");
 
 export default function Footer() {
   return (
@@ -24,7 +23,7 @@ export default function Footer() {
                 alt="Easycao"
                 width={32}
                 height={32}
-                className="brightness-200"
+                className=""
               />
               <span className="font-bold text-white text-lg">Easycao</span>
             </Link>
@@ -76,10 +75,10 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Mais Conteudos + Metodo */}
+          {/* Column 3: Mais Conteúdos + Método */}
           <div>
             <h3 className="font-bold text-sm uppercase tracking-widest text-white/80 mb-4">
-              Mais Conteudos
+              Mais Conteúdos
             </h3>
             <ul className="space-y-2">
               {gapPages.slice(0, 5).map((page) => (
@@ -103,7 +102,7 @@ export default function Footer() {
             </ul>
 
             <h3 className="font-bold text-sm uppercase tracking-widest text-white/80 mb-4 mt-6">
-              Metodo
+              Método
             </h3>
             <ul className="space-y-2">
               <li>
@@ -111,7 +110,7 @@ export default function Footer() {
                   href="/metodo"
                   className="text-sm text-white/50 hover:text-white transition-colors"
                 >
-                  Conhecer o Metodo
+                  Conhecer o Método
                 </Link>
               </li>
               <li>
@@ -123,14 +122,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href={HOTMART_CHECKOUT_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/metodo"
                   className="text-sm text-white/50 hover:text-white transition-colors"
                 >
                   Matricular
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

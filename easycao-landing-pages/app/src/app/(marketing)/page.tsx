@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_DESCRIPTION, SITE_URL } from "../../lib/constants";
+import { SITE_URL } from "../../lib/constants";
 import { organizationSchema, personSchema, mobileApplicationSchema } from "../../lib/schema";
 import HomepageHero from "./HomepageHero";
 import TrustStrip from "./TrustStrip";
@@ -14,13 +14,14 @@ import CTAFinal from "./CTAFinal";
 export const metadata: Metadata = {
   title: "Easycao — Tudo sobre a Prova ICAO",
   description:
-    "A maior escola de preparação para a prova ICAO do Brasil. Método criado pelo único examinador ICAO credenciado que ensina. Simulador, comunidade e lives gratuitas.",
+    "Tudo que você precisa para ser aprovado na Prova ICAO. A maior escola preparatória para a Prova ICAO no Brasil, com método criado por examinador credenciado.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Easycao — Tudo sobre a Prova ICAO",
-    description: SITE_DESCRIPTION,
+    title: "Easycao — Tudo que Você Precisa para Ser Aprovado na Prova ICAO",
+    description:
+      "A maior escola preparatória para a Prova ICAO no Brasil. Simulador, comunidade e lives gratuitas com examinador ICAO credenciado.",
     url: SITE_URL,
     siteName: "Easycao",
     images: [

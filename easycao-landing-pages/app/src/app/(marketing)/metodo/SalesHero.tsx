@@ -227,20 +227,25 @@ export default function SalesHero() {
           ))}
         </div>
 
-        {/* VSL placeholder — full width */}
+        {/* VSL — YouTube embed with glass frame */}
         <div
-          className="hero-animate w-full aspect-video rounded-2xl flex items-center justify-center cursor-pointer mb-10 transition-colors"
+          className="hero-animate w-full rounded-2xl p-1 sm:p-1.5 mb-10"
           style={{
             animationDelay: "0.52s",
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.12)",
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
           }}
         >
-          <div className="text-center text-white/40">
-            <svg className="w-16 h-16 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            <p className="text-sm">Vídeo em breve</p>
+          <div className="w-full aspect-video rounded-xl overflow-hidden">
+            <iframe
+              src="https://www.youtube.com/embed/dmyW0MU7_Xo?rel=0"
+              title="Método Easycao — Como ser aprovado no Exame ICAO"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+              loading="lazy"
+            />
           </div>
         </div>
 

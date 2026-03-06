@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_URL, SITE_DESCRIPTION } from "../../../lib/constants";
+import { SITE_URL } from "../../../lib/constants";
 import {
   courseSchema,
   personSchema,
@@ -28,13 +28,14 @@ import FinalCTA from "./FinalCTA";
 
 
 export const metadata: Metadata = {
-  title: "Método Easycao — Seja Aprovado na Prova ICAO | Easycao",
+  title: "Método Easycao — Como Ser Aprovado no Exame ICAO | Easycao",
   description:
-    "O método que já aprovou mais de 1000 pilotos na prova ICAO. 300+ aulas, simulador exclusivo, comunidade e suporte do único examinador credenciado que ensina. Garantia de 7 dias.",
+    "Descubra os 3 fatores que levam qualquer piloto do zero ao ICAO em 6 meses. +1000 pilotos aprovados, simulador exclusivo e garantia de 7 dias.",
   alternates: { canonical: "/metodo" },
   openGraph: {
-    title: "Método Easycao — Seja Aprovado na Prova ICAO",
-    description: SITE_DESCRIPTION,
+    title: "Método Easycao — Como Ser Aprovado no Exame ICAO",
+    description:
+      "Descubra os 3 fatores que levam qualquer piloto do zero ao ICAO em 6 meses. +1000 pilotos aprovados, simulador exclusivo e garantia de 7 dias.",
     url: `${SITE_URL}/metodo`,
     siteName: "Easycao",
     type: "website",

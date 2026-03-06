@@ -34,7 +34,10 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="sticky top-24" aria-label="Indice do artigo">
+    <nav
+      className="sticky top-24 bg-gray-light/50 rounded-xl p-4 border border-gray-border/50"
+      aria-label="Indice do artigo"
+    >
       <p className="text-xs font-medium text-black/40 uppercase tracking-widest mb-3">
         Neste artigo
       </p>
@@ -43,11 +46,11 @@ export default function TableOfContents({ headings }: { headings: Heading[] }) {
           <li key={h.id}>
             <a
               href={`#${h.id}`}
-              className={`block text-sm py-1 transition-colors ${
+              className={`block text-sm py-1 rounded-lg transition-colors ${
                 h.level === 3 ? "pl-4" : ""
               } ${
                 activeId === h.id
-                  ? "text-primary font-semibold border-l-2 border-primary pl-3"
+                  ? "text-primary font-semibold bg-primary/5 border-l-2 border-primary pl-3"
                   : "text-black/50 hover:text-black/80"
               }`}
             >

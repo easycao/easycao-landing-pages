@@ -1,7 +1,7 @@
 import { DIOGO } from "../../lib/constants";
 
 const MONTHS_PT = [
-  "janeiro", "fevereiro", "marco", "abril", "maio", "junho",
+  "janeiro", "fevereiro", "março", "abril", "maio", "junho",
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
 ];
 

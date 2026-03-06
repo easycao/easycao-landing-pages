@@ -4,6 +4,7 @@ import { getPageBySlug } from "../../../lib/content-pages";
 import { SITE_URL } from "../../../lib/constants";
 import ContentPageLayout from "../../../components/content/ContentPageLayout";
 import CalloutBox from "../../../components/content/CalloutBox";
+import AppBanner from "../../../components/AppBanner";
 
 const PAGE_SLUG = "prova-icao-helicoptero";
 const page = getPageBySlug(PAGE_SLUG)!;
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
   title: page.seoTitle,
   description: page.description,
   alternates: { canonical: `/${PAGE_SLUG}` },
-  openGraph: { title: page.seoTitle, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
+  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
 };
 
 const headings: { id: string; text: string; level: 2 | 3 }[] = [
@@ -21,6 +22,7 @@ const headings: { id: string; text: string; level: 2 | 3 }[] = [
   { id: "vocabulario", text: "Vocabulário específico de helicóptero", level: 2 },
   { id: "operacoes", text: "Operações típicas de asa rotativa", level: 2 },
   { id: "preparacao", text: "Como se preparar", level: 2 },
+  { id: "simulador", text: "Simulador ICAO para helicóptero", level: 2 },
 ];
 
 const faqs = [
@@ -81,6 +83,12 @@ export default function HelicopteroPage() {
         <li>Use o <Link href="/simulado-prova-icao">simulador Easycao</Link> para praticar todos os descritores</li>
       </ul>
       <p>Evite os <Link href="/erros-comuns-prova-icao">erros mais comuns</Link> e saiba <Link href="/quanto-tempo-preparar-prova-icao">quanto tempo investir na preparação</Link>.</p>
+
+      <h2 id="simulador">Simulador ICAO para helicóptero</h2>
+      <p>O <Link href="/simulado-prova-icao">Simulador Easycao</Link> inclui todas as provas de helicóptero: cenários de operações offshore, HEMS, SAR, sling load e muito mais. Você pratica com situações reais de asa rotativa e recebe feedback automático por descritor.</p>
+      <p>É a melhor forma de treinar o vocabulário específico de helicóptero em contexto real de prova, com áudios, imagens e perguntas baseadas no Doc 9835 da ICAO.</p>
+
+      <AppBanner variant="inline" />
     </ContentPageLayout>
   );
 }

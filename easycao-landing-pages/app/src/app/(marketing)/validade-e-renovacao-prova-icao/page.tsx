@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: page.seoTitle,
   description: page.description,
   alternates: { canonical: `/${PAGE_SLUG}` },
-  openGraph: { title: page.seoTitle, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
+  openGraph: { title: page.title, description: page.description, url: `${SITE_URL}/${PAGE_SLUG}`, siteName: "Easycao", type: "article", locale: "pt_BR" },
 };
 
 const headings: { id: string; text: string; level: 2 | 3 }[] = [

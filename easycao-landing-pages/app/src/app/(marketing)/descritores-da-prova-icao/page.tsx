@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: page.description,
   alternates: { canonical: `/${PAGE_SLUG}` },
   openGraph: {
-    title: page.seoTitle,
+    title: page.title,
     description: page.description,
     url: `${SITE_URL}/${PAGE_SLUG}`,
     siteName: "Easycao",

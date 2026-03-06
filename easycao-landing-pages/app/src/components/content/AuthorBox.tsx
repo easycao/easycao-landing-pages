@@ -3,12 +3,12 @@ import { DIOGO } from "../../lib/constants";
 
 export default function AuthorBox() {
   return (
-    <div className="bg-gray-light rounded-2xl p-6 flex gap-4 items-start">
+    <div className="bg-white border border-gray-border border-l-4 border-l-primary rounded-2xl shadow-sm p-6 flex gap-4 items-start">
       <Image
         src={DIOGO.photo}
         alt={DIOGO.name}
-        width={64}
-        height={64}
+        width={80}
+        height={80}
         className="rounded-full shrink-0"
       />
       <div>

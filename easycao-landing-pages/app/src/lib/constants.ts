@@ -3,15 +3,15 @@
 export const SITE_NAME = "Easycao";
 export const SITE_URL = "https://easycao.com";
 export const SITE_DESCRIPTION =
-  "A maior escola de preparacao para a prova ICAO do Brasil. Metodo criado pelo unico examinador ICAO credenciado que ensina. Simulador, comunidade e lives gratuitas.";
+  "A maior escola de preparação para a prova ICAO do Brasil. Método criado pelo único examinador ICAO credenciado que ensina. Simulador, comunidade e lives gratuitas.";
 
 // External URLs
 export const WHATSAPP_GROUP_URL =
   "https://chat.whatsapp.com/BqNohPkBOY4DAD2T95vxpu";
 export const WHATSAPP_SUPPORT_URL = "https://wa.me/5541998875555";
 export const HOTMART_CHECKOUT_URL = "https://pay.hotmart.com/Y27990783F";
-export const APP_STORE_URL = "#";
-export const PLAY_STORE_URL = "#";
+export const APP_STORE_URL = "https://apps.apple.com/br/app/easycao/id6502868663";
+export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.mycompany.easycao";
 
 // Social
 export const INSTAGRAM_URL = "https://www.instagram.com/easycao.official";
@@ -27,9 +27,9 @@ export const DIOGO = {
   credentials: [
     "Examinador ICAO credenciado pela ANAC",
     "Certificado Cambridge",
-    "20+ anos de experiencia",
-    "Ex-controlador de trafego aereo",
+    "20+ anos de experiência",
+    "Ex-controlador de tráfego aéreo",
   ],
   photo: "/prof-diogo.webp",
-  bio: "Diogo Verzola e examinador ICAO credenciado pela ANAC, certificado Cambridge, com mais de 20 anos de experiencia em aviacao. Ex-controlador de trafego aereo, criou o Metodo Easycao para preparar pilotos de forma pratica e eficiente para a prova de proficiencia linguistica ICAO.",
+  bio: "Diogo Verzola é examinador ICAO credenciado pela ANAC, certificado Cambridge, com mais de 20 anos de experiência em aviação. Ex-controlador de tráfego aéreo, criou o Método Easycao para preparar pilotos de forma prática e eficiente para a prova de proficiência linguística ICAO.",
 } as const;

@@ -1,7 +1,6 @@
 import { getPageBySlug } from "../../lib/content-pages";
 import { articleSchema } from "../../lib/schema";
-import Breadcrumbs from "./Breadcrumbs";
-import ArticleMeta from "./ArticleMeta";
+import ContentHero from "./ContentHero";
 import TableOfContents from "./TableOfContents";
 import AppBanner from "../AppBanner";
 import FAQAccordion from "./FAQAccordion";
@@ -9,7 +8,6 @@ import AuthorBox from "./AuthorBox";
 import RelatedPages from "./RelatedPages";
 import CTABand from "./CTABand";
 import Link from "next/link";
-import { HOTMART_CHECKOUT_URL } from "../../lib/constants";
 
 interface ContentPageLayoutProps {
   slug: string;
@@ -41,23 +39,11 @@ export default function ContentPageLayout({
       />
 
       {/* Hero Banner */}
-      <section className="bg-gradient-to-r from-[#0a3d6b] via-primary-dark to-primary py-16 lg:py-20">
-        <div className="max-w-7xl mx-auto px-5 lg:px-8">
-          <Breadcrumbs
-            items={[
-              { label: "Home", href: "/" },
-              { label: page.title },
-            ]}
-          />
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight max-w-3xl">
-            {page.title}
-          </h1>
-          <ArticleMeta
-            updatedAt={page.updatedAt}
-            readingTime={page.readingTime}
-          />
-        </div>
-      </section>
+      <ContentHero
+        title={page.title}
+        updatedAt={page.updatedAt}
+        readingTime={page.readingTime}
+      />
 
       {/* Two-column content grid */}
       <div className="max-w-7xl mx-auto px-5 lg:px-8 py-12 lg:py-16">
@@ -69,24 +55,37 @@ export default function ContentPageLayout({
 
           {/* Sidebar */}
           <aside className="space-y-6 lg:col-span-1">
-            <TableOfContents headings={headings} />
             <AppBanner variant="sidebar" />
-            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-5 text-center">
-              <p className="text-white font-semibold mb-2">
+            <div
+              className="hero-noise relative overflow-hidden bg-gradient-to-br from-[#0a3d6b] via-primary-dark to-primary rounded-2xl p-5 text-center"
+            >
+              {/* Radial orb */}
+              <div
+                className="pointer-events-none absolute top-[-30%] right-[-20%] w-[200px] h-[200px] rounded-full opacity-25"
+                aria-hidden="true"
+                style={{ background: "radial-gradient(circle, rgba(52,184,248,0.4) 0%, transparent 70%)" }}
+              />
+              <p className="relative text-white font-semibold mb-2">
                 Pronto para ser aprovado?
               </p>
-              <p className="text-white/70 text-sm mb-4">
+              <p className="relative text-white/70 text-sm mb-4">
                 Conheça o método do único examinador ICAO que ensina.
               </p>
-              <a
-                href={HOTMART_CHECKOUT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-white text-primary font-bold rounded-xl px-6 py-3 text-sm hover:bg-white/90 transition-all hover:scale-[1.02]"
+              <Link
+                href="/metodo"
+                className="relative inline-block font-bold rounded-xl px-6 py-3 text-sm text-white transition-all active:scale-[0.97]"
+                style={{
+                  background: "rgba(255,255,255,0.20)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid rgba(255,255,255,0.28)",
+                  boxShadow: "0 0 20px rgba(31,150,247,0.25), 0 0 60px rgba(31,150,247,0.1)",
+                }}
               >
-                Conhecer o Metodo
-              </a>
+                Conhecer o Método
+              </Link>
             </div>
+            <TableOfContents headings={headings} />
           </aside>
         </div>
 

@@ -4,10 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useRef, useCallback } from "react";
-import { HOTMART_CHECKOUT_URL } from "../lib/constants";
-import { getPagesByCategory } from "../lib/content-pages";
+import { getPageBySlug } from "../lib/content-pages";
 
-const corePages = getPagesByCategory("core");
+const NAV_SLUGS = [
+  "como-funciona-a-prova-icao",
+  "descritores-da-prova-icao",
+  "niveis-icao",
+  "dicas-prova-icao-descricao-imagens",
+  "como-se-preparar-para-a-prova-icao",
+  "quanto-custa-a-prova-icao",
+] as const;
+
+const corePages = NAV_SLUGS.map((s) => getPageBySlug(s)!).filter(Boolean);
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -96,7 +104,7 @@ export default function Navbar() {
                         href="/conteudos"
                         className="flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 rounded-lg transition-all duration-150"
                       >
-                        Ver todos os conteudos
+                        Ver todos os conteúdos
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                         </svg>
@@ -115,7 +123,7 @@ export default function Navbar() {
                   : "text-black/70 hover:text-primary hover:bg-white/80"
               }`}
             >
-              Metodo
+              Método
             </Link>
 
             <Link
@@ -130,16 +138,16 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* CTA button — shine sweep on hover */}
-          <a
-            href={HOTMART_CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group/cta relative overflow-hidden bg-primary hover:bg-[#1888e0] text-white font-bold text-[15px] rounded-full px-7 py-2.5 shadow-[0_2px_8px_rgba(31,150,247,0.3)] hover:shadow-[0_4px_16px_rgba(31,150,247,0.45)] active:scale-[0.97] transition-all duration-300 ease-out"
-          >
-            <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
-            <span className="relative">Matricular</span>
-          </a>
+          {/* CTA button — hidden on /metodo, links to /metodo on other pages */}
+          {pathname !== "/metodo" && (
+            <Link
+              href="/metodo"
+              className="group/cta relative overflow-hidden bg-primary hover:bg-[#1888e0] text-white font-bold text-[15px] rounded-full px-7 py-2.5 shadow-[0_2px_8px_rgba(31,150,247,0.3)] hover:shadow-[0_4px_16px_rgba(31,150,247,0.45)] active:scale-[0.97] transition-all duration-300 ease-out"
+            >
+              <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
+              <span className="relative">Matricular</span>
+            </Link>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -163,7 +171,23 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className="lg:hidden border-t border-gray-border bg-white px-4 pb-4">
-          <div className="py-3">
+          <div className="py-3 space-y-1">
+            <Link
+              href="/metodo"
+              onClick={() => setMenuOpen(false)}
+              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
+            >
+              Método
+            </Link>
+            <Link
+              href="/lives"
+              onClick={() => setMenuOpen(false)}
+              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
+            >
+              Lives
+            </Link>
+          </div>
+          <div className="border-t border-gray-border pt-3">
             <p className="text-xs font-semibold text-black/40 uppercase tracking-widest mb-2">Prova ICAO</p>
             {corePages.map((page) => (
               <Link
@@ -181,33 +205,18 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className="block py-2.5 text-sm font-semibold text-primary"
             >
-              Ver todos os conteudos &rarr;
+              Ver todos os conteúdos &rarr;
             </Link>
           </div>
-          <div className="border-t border-gray-border pt-3 space-y-1">
+          {pathname !== "/metodo" && (
             <Link
               href="/metodo"
               onClick={() => setMenuOpen(false)}
-              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
+              className="block mt-4 text-center bg-primary hover:bg-primary-dark text-white font-bold rounded-full px-6 py-3 shadow-md shadow-primary/25 transition-all duration-200"
             >
-              Metodo
+              Matricular
             </Link>
-            <Link
-              href="/lives"
-              onClick={() => setMenuOpen(false)}
-              className="block py-2.5 font-semibold text-sm text-black/65 hover:text-primary transition-colors"
-            >
-              Lives
-            </Link>
-          </div>
-          <a
-            href={HOTMART_CHECKOUT_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-4 text-center bg-primary hover:bg-primary-dark text-white font-bold rounded-full px-6 py-3 shadow-md shadow-primary/25 transition-all duration-200"
-          >
-            Matricular
-          </a>
+          )}
         </div>
       )}
     </header>

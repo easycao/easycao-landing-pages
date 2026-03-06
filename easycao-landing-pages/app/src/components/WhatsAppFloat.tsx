@@ -1,8 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { WHATSAPP_SUPPORT_URL } from "../lib/constants";
 
 export default function WhatsAppFloat() {
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <a
       href={WHATSAPP_SUPPORT_URL}
