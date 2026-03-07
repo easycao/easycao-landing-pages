@@ -15,7 +15,7 @@ const lives = [
     day: "Terça-feira",
     time: "19h (Brasília)",
     description:
-      "Toda terça eu explico a prova ICAO do zero e tiro todas as suas dúvidas ao vivo. Você vai entender como o exame funciona, o que o examinador avalia e como se preparar do jeito certo — sem decorar respostas, sem métodos ultrapassados. E o melhor: ao vivo, interativo, com espaço pra perguntar.",
+      "Toda terça eu faço uma live explicando assuntos relacionados à prova ICAO e tirando dúvidas de todos. Você vai entender como o exame funciona, o que o examinador avalia e como se preparar do jeito certo — sem decorar respostas, sem métodos ultrapassados. E o melhor: ao vivo, interativo, com espaço pra perguntar.",
     tag: "Instagram Live",
   },
   {
