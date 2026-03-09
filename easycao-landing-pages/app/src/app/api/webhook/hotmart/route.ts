@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
         paymentType: purchase.payment?.type || "UNKNOWN",
         installments: purchase.payment?.installments_number || 1,
         source: "hotmart" as const,
+        extensionDays: 0,
         stages: emptyStages(),
         notes: null,
       };

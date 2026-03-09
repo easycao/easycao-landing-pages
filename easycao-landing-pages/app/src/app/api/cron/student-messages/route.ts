@@ -28,6 +28,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Skip weekends (Saturday=6, Sunday=0) — use BRT (UTC-3)
+  const nowBRT = new Date(Date.now() - 3 * 60 * 60 * 1000);
+  const dayOfWeek = nowBRT.getUTCDay();
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    return NextResponse.json({ skipped: true, reason: "weekend" });
+  }
+
   const startTime = Date.now();
   let processed = 0;
   let sent = 0;
@@ -117,7 +124,8 @@ export async function GET(request: NextRequest) {
       processed++;
 
       const enrolledAt = enrollment.enrolledAt?.toDate?.() || new Date();
-      const currentStage = computeStage(enrolledAt);
+      const extensionDays: number = enrollment.extensionDays || 0;
+      const currentStage = computeStage(enrolledAt, extensionDays);
 
       // Auto-block check
       if (currentStage === "antigo_aluno" && student.hotmartStatus === "ACTIVE") {

@@ -59,6 +59,7 @@ export interface Enrollment {
   paymentType: string;
   installments: number;
   source: EnrollmentSource;
+  extensionDays: number;
   stages: Record<StageName, StageRecord | null>;
   notes: string | null;
 }

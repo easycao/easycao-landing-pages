@@ -37,8 +37,9 @@ export async function GET(
   let currentDaysRemaining = 0;
   if (current) {
     const enrolledAt = current.enrolledAt?.toDate?.() || new Date();
-    currentStage = computeStage(enrolledAt);
-    currentDaysRemaining = daysRemaining(enrolledAt);
+    const extensionDays = current.extensionDays || 0;
+    currentStage = computeStage(enrolledAt, extensionDays);
+    currentDaysRemaining = daysRemaining(enrolledAt, extensionDays);
   }
 
   // Serialize student with approvedAt and defaults for new fields
@@ -53,6 +54,7 @@ export async function GET(
     student: serializedStudent,
     enrollments: enrollments.map((e) => ({
       ...e,
+      extensionDays: e.extensionDays || 0,
       enrolledAt: e.enrolledAt?.toDate?.().toISOString() || null,
       expiredAt: e.expiredAt?.toDate?.().toISOString() || null,
       stages: Object.fromEntries(
@@ -140,17 +142,29 @@ export async function PATCH(
     await updateStudent(id, studentUpdates);
   }
 
-  // Update enrollment date
-  if (body.enrolledAt && body.enrollmentId) {
+  // Update enrollment fields
+  if (body.enrollmentId) {
     const db = getFirestoreDb();
-    const enrolledDate = new Date(body.enrolledAt);
-    if (!isNaN(enrolledDate.getTime())) {
+    const enrollmentUpdates: Record<string, unknown> = {};
+
+    if (body.enrolledAt) {
+      const enrolledDate = new Date(body.enrolledAt);
+      if (!isNaN(enrolledDate.getTime())) {
+        enrollmentUpdates.enrolledAt = Timestamp.fromDate(enrolledDate);
+      }
+    }
+
+    if (body.extensionDays !== undefined) {
+      enrollmentUpdates.extensionDays = body.extensionDays;
+    }
+
+    if (Object.keys(enrollmentUpdates).length > 0) {
       await db
         .collection("students")
         .doc(id)
         .collection("enrollments")
         .doc(body.enrollmentId)
-        .update({ enrolledAt: Timestamp.fromDate(enrolledDate) });
+        .update(enrollmentUpdates);
     }
   }
 

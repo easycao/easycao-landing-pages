@@ -37,6 +37,7 @@ interface PipelineStudent {
   ltv: number;
   approved: boolean;
   csEnabled: boolean;
+  extensionDays: number;
 }
 
 interface StageData {
@@ -123,8 +124,9 @@ export async function GET() {
 
     const enrollData = enrollSnap.data()!;
     const enrolledAt = enrollData.enrolledAt?.toDate?.() || new Date();
-    let stage = computeStage(enrolledAt);
-    const days = daysRemaining(enrolledAt);
+    const extensionDays: number = enrollData.extensionDays || 0;
+    let stage = computeStage(enrolledAt, extensionDays);
+    const days = daysRemaining(enrolledAt, extensionDays);
     const enrollmentStatus: string = enrollData.status || "";
     const needsManualPrice: boolean = enrollData.needsManualPrice || false;
     const price: number = enrollData.realPricePaid ?? enrollData.pricePaid ?? 0;
@@ -171,6 +173,7 @@ export async function GET() {
       ltv,
       approved: student.approved,
       csEnabled: student.csEnabled,
+      extensionDays,
     };
 
     if (stages[stage]) {

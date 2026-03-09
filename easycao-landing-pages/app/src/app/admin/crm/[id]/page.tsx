@@ -22,6 +22,7 @@ interface EnrollmentData {
   paymentType: string;
   installments: number;
   source: string;
+  extensionDays: number;
   stages: Record<string, StageData | null>;
   notes: string | null;
   transaction: string;
@@ -112,6 +113,9 @@ export default function StudentDetailPage() {
   const [showApprovalDatePicker, setShowApprovalDatePicker] = useState(false);
   const [approvalDateInput, setApprovalDateInput] = useState(new Date().toISOString().slice(0, 10));
   const [togglingCs, setTogglingCs] = useState(false);
+  const [showExtensionInput, setShowExtensionInput] = useState(false);
+  const [extensionDaysInput, setExtensionDaysInput] = useState("");
+  const [savingExtension, setSavingExtension] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "", phone: "", document: "", city: "", state: "", enrolledAt: "", approvedAt: "",
   });
@@ -196,6 +200,42 @@ export default function StudentDetailPage() {
       if (res.ok) fetchData();
     } finally {
       setTogglingCs(false);
+    }
+  }
+
+  async function saveExtension() {
+    if (!currentEnrollment) return;
+    const days = parseInt(extensionDaysInput);
+    if (isNaN(days) || days <= 0) return;
+    setSavingExtension(true);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enrollmentId: currentEnrollment.id, extensionDays: days }),
+      });
+      if (res.ok) {
+        setShowExtensionInput(false);
+        setExtensionDaysInput("");
+        fetchData();
+      }
+    } finally {
+      setSavingExtension(false);
+    }
+  }
+
+  async function removeExtension() {
+    if (!currentEnrollment) return;
+    setSavingExtension(true);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enrollmentId: currentEnrollment.id, extensionDays: 0 }),
+      });
+      if (res.ok) fetchData();
+    } finally {
+      setSavingExtension(false);
     }
   }
 
@@ -541,6 +581,83 @@ export default function StudentDetailPage() {
                 </dd>
               </div>
             </dl>
+
+            {/* Extension */}
+            <div className="mt-4 pt-4 border-t border-gray-border">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-black/50">Extensão</span>
+                {currentEnrollment.extensionDays > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-primary">
+                      +{currentEnrollment.extensionDays} dias
+                    </span>
+                    <button
+                      onClick={removeExtension}
+                      disabled={savingExtension}
+                      className="text-xs text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setExtensionDaysInput("");
+                      setShowExtensionInput(!showExtensionInput);
+                    }}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 cursor-pointer ${
+                      showExtensionInput ? "bg-primary" : "bg-black/20"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                        showExtensionInput ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {showExtensionInput && !currentEnrollment.extensionDays && (
+                <div className="flex items-center gap-2 mt-3 bg-primary/5 border border-primary/20 rounded-lg p-3">
+                  <label className="text-xs text-black/50 flex-shrink-0">Quantos dias?</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={extensionDaysInput}
+                    onChange={(e) => setExtensionDaysInput(e.target.value)}
+                    placeholder="60"
+                    className="w-20 px-2 py-1 rounded-lg border border-gray-border bg-white text-sm text-black text-center focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+                  />
+                  <button
+                    onClick={saveExtension}
+                    disabled={savingExtension || !extensionDaysInput}
+                    className="text-xs font-medium text-white bg-primary hover:bg-primary-dark px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={() => setShowExtensionInput(false)}
+                    className="text-xs text-black/50 hover:text-black transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
+
+              {currentEnrollment.extensionDays > 0 && currentEnrollment.enrolledAt && (
+                <div className="flex justify-between mt-2 text-sm">
+                  <span className="text-black/50">Data de extensão</span>
+                  <span className="text-black font-medium">
+                    {(() => {
+                      const d = new Date(currentEnrollment.enrolledAt);
+                      d.setDate(d.getDate() + currentEnrollment.extensionDays);
+                      return d.toLocaleDateString("pt-BR");
+                    })()}
+                  </span>
+                </div>
+              )}
+            </div>
 
             {/* Actions */}
             <div className="flex gap-3 mt-6">

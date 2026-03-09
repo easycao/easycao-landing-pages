@@ -156,6 +156,7 @@ export async function POST() {
               paymentType: sale.purchase?.payment?.type || "UNKNOWN",
               installments: sale.purchase?.payment?.installments_number || 1,
               source: "hotmart",
+              extensionDays: 0,
               stages: isRefunded
                 ? { dia_10: null, mes_2: null, mes_4: null, mes_7: null, mes_10: null }
                 : computeMigratedStages(approvedDate, seedDate),
@@ -182,6 +183,7 @@ export async function POST() {
             paymentType: "UNKNOWN",
             installments: 1,
             source: "hotmart",
+            extensionDays: 0,
             stages: computeMigratedStages(purchaseDate, seedDate),
             notes: "Imported from Club API — no matching sale found",
           });

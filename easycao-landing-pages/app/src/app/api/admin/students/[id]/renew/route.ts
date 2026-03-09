@@ -46,6 +46,7 @@ export async function POST(
     paymentType: paymentType || "manual",
     installments: installments || 1,
     source: "manual",
+    extensionDays: 0,
     stages: emptyStages,
     notes: notes || null,
   });

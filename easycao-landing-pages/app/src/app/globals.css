@@ -179,34 +179,34 @@
   height: 6px;
 }
 .crm-scroll::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.06);
   border-radius: 3px;
 }
 .crm-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.20);
   border-radius: 3px;
 }
 .crm-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.30);
+  background: rgba(0,0,0,0.35);
 }
 .crm-scroll-h::-webkit-scrollbar {
   height: 8px;
 }
 .crm-scroll-h::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.06);
   border-radius: 4px;
 }
 .crm-scroll-h::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.20);
   border-radius: 4px;
 }
 .crm-scroll-h::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.30);
+  background: rgba(0,0,0,0.35);
 }
 /* Firefox scrollbar */
 .crm-scroll, .crm-scroll-h {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.18) rgba(255,255,255,0.04);
+  scrollbar-color: rgba(0,0,0,0.20) rgba(0,0,0,0.06);
 }
 
 /* Intersection Observer: hidden by default, revealed on scroll */
