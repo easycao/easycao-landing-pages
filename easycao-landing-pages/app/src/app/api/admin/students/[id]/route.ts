@@ -41,8 +41,16 @@ export async function GET(
     currentDaysRemaining = daysRemaining(enrolledAt);
   }
 
+  // Serialize student with approvedAt and defaults for new fields
+  const serializedStudent = {
+    ...student,
+    approved: student.approved || false,
+    approvedAt: student.approvedAt?.toDate?.().toISOString() || null,
+    csEnabled: student.csEnabled !== false, // default true
+  };
+
   return NextResponse.json({
-    student,
+    student: serializedStudent,
     enrollments: enrollments.map((e) => ({
       ...e,
       enrolledAt: e.enrolledAt?.toDate?.().toISOString() || null,
@@ -56,6 +64,8 @@ export async function GET(
                 sentAt:
                   v.sentAt === "migrated"
                     ? "migrated"
+                    : v.sentAt === "cs_disabled"
+                    ? "cs_disabled"
                     : v.sentAt?.toDate?.().toISOString() || null,
               }
             : null,
@@ -97,6 +107,21 @@ export async function PATCH(
   // Update hotmartStatus if provided
   if (body.hotmartStatus !== undefined) {
     studentUpdates.hotmartStatus = body.hotmartStatus;
+  }
+
+  // Update approved status
+  if (body.approved !== undefined) {
+    studentUpdates.approved = body.approved;
+    if (body.approved) {
+      studentUpdates.approvedAt = Timestamp.now();
+    } else {
+      studentUpdates.approvedAt = null;
+    }
+  }
+
+  // Update CS enabled
+  if (body.csEnabled !== undefined) {
+    studentUpdates.csEnabled = body.csEnabled;
   }
 
   if (Object.keys(studentUpdates).length > 0) {

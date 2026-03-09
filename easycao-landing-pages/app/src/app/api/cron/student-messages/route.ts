@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
   let processed = 0;
   let sent = 0;
   let skippedBlocked = 0;
+  let skippedApproved = 0;
+  let skippedCsDisabled = 0;
   let autoBlocked = 0;
   let errors = 0;
   const messageLogs: CronMessageLog[] = [];
@@ -82,6 +84,7 @@ export async function GET(request: NextRequest) {
       enrollmentId: string;
       enrollment: FirebaseFirestore.DocumentData;
       stageName: StageName;
+      csEnabled: boolean;
     }[] = [];
 
     const autoBlockCandidates: {
@@ -102,6 +105,12 @@ export async function GET(request: NextRequest) {
       // Skip already blocked
       if (student.hotmartStatus?.startsWith("BLOCKED")) {
         skippedBlocked++;
+        continue;
+      }
+
+      // Skip approved students — they don't need CS automation
+      if (student.approved) {
+        skippedApproved++;
         continue;
       }
 
@@ -126,7 +135,8 @@ export async function GET(request: NextRequest) {
       const stageName = currentStage as StageName;
       if (enrollment.stages?.[stageName]?.sentAt) continue;
 
-      candidates.push({ studentId, student, enrollmentId, enrollment, stageName });
+      const csEnabled = student.csEnabled !== false; // default true
+      candidates.push({ studentId, student, enrollmentId, enrollment, stageName, csEnabled });
     }
 
     console.log(
@@ -148,7 +158,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Step 6: Process eligible students (only a handful per day)
-    for (const { studentId, student, enrollmentId, enrollment, stageName } of candidates) {
+    for (const { studentId, student, enrollmentId, enrollment, stageName, csEnabled } of candidates) {
       try {
         // Fetch live engagement from Hotmart
         const hotmartInfo = await getHotmartUserInfo(student.email);
@@ -179,6 +189,31 @@ export async function GET(request: NextRequest) {
           currentEngagement,
           prevEngagement
         );
+
+        // CS disabled: track engagement/progress but don't send WhatsApp
+        if (!csEnabled) {
+          skippedCsDisabled++;
+          await updateEnrollmentStage(studentId, enrollmentId, stageName, {
+            engagement: currentEngagement,
+            sentAt: "cs_disabled",
+            template: templateName,
+            progress: hotmartInfo.progress,
+          });
+          messageLogs.push({
+            name: student.name || "",
+            email: student.email,
+            phone: student.phone,
+            stage: stageName,
+            template: templateName,
+            engagement: currentEngagement,
+            progress: hotmartInfo.progress,
+            success: false,
+          });
+          console.log(
+            `Cron: CS disabled for ${student.email} | stage=${stageName} | engagement=${currentEngagement} | progress=${hotmartInfo.progress ?? "N/A"}% — message skipped`
+          );
+          continue;
+        }
 
         // Send WhatsApp message
         const success = await sendTemplate(student.phone, templateName);
@@ -225,6 +260,8 @@ export async function GET(request: NextRequest) {
       processed,
       sent,
       skippedBlocked,
+      skippedApproved,
+      skippedCsDisabled,
       autoBlocked,
       errors,
       messages: messageLogs,
@@ -232,9 +269,9 @@ export async function GET(request: NextRequest) {
     });
 
     console.log(
-      `Cron complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, autoBlocked=${autoBlocked}, errors=${errors}, duration=${durationMs}ms`
+      `Cron complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, skippedApproved=${skippedApproved}, skippedCsDisabled=${skippedCsDisabled}, autoBlocked=${autoBlocked}, errors=${errors}, duration=${durationMs}ms`
     );
-    return NextResponse.json({ processed, sent, skippedBlocked, autoBlocked, errors, durationMs });
+    return NextResponse.json({ processed, sent, skippedBlocked, skippedApproved, skippedCsDisabled, autoBlocked, errors, durationMs });
   } catch (error) {
     console.error("Cron fatal error:", error);
 
@@ -247,6 +284,8 @@ export async function GET(request: NextRequest) {
         processed,
         sent,
         skippedBlocked,
+        skippedApproved,
+        skippedCsDisabled,
         autoBlocked,
         errors: errors + 1,
         messages: messageLogs,

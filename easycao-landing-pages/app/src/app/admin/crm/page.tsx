@@ -18,6 +18,8 @@ interface PipelineStudent {
   enrolledAt: string;
   pricePaid: number;
   ltv: number;
+  approved: boolean;
+  csEnabled: boolean;
 }
 
 interface StageData {
@@ -30,6 +32,8 @@ interface Filters {
   engagement: string;
   enrollmentStatus: string;
   tag: string;
+  approved: string;
+  csEnabled: string;
 }
 
 const ENGAGEMENT_COLORS: Record<string, string> = {
@@ -179,6 +183,8 @@ export default function CrmDashboard() {
     engagement: "",
     enrollmentStatus: "",
     tag: "",
+    approved: "",
+    csEnabled: "",
   });
 
   useEffect(() => {
@@ -241,6 +247,10 @@ export default function CrmDashboard() {
           if (filters.enrollmentStatus === "refunded" && s.enrollmentStatus !== "refunded") return false;
         }
         if (filters.tag && (!s.tags || !s.tags.includes(filters.tag))) return false;
+        if (filters.approved === "approved" && !s.approved) return false;
+        if (filters.approved === "not_approved" && s.approved) return false;
+        if (filters.csEnabled === "enabled" && !s.csEnabled) return false;
+        if (filters.csEnabled === "disabled" && s.csEnabled) return false;
 
         return true;
       });
@@ -266,7 +276,7 @@ export default function CrmDashboard() {
   }, [filteredStages]);
 
   const hasActiveFilters =
-    filters.hotmartStatus || filters.engagement || filters.enrollmentStatus || filters.tag;
+    filters.hotmartStatus || filters.engagement || filters.enrollmentStatus || filters.tag || filters.approved || filters.csEnabled;
 
   return (
     <div className="flex flex-col h-full">
@@ -326,6 +336,24 @@ export default function CrmDashboard() {
                 { value: "refunded", label: "Reembolsado" },
               ]}
             />
+            <FilterSelect
+              label="Aprovado"
+              value={filters.approved}
+              onChange={(v) => setFilters((f) => ({ ...f, approved: v }))}
+              options={[
+                { value: "approved", label: "Aprovado" },
+                { value: "not_approved", label: "Não aprovado" },
+              ]}
+            />
+            <FilterSelect
+              label="CS"
+              value={filters.csEnabled}
+              onChange={(v) => setFilters((f) => ({ ...f, csEnabled: v }))}
+              options={[
+                { value: "enabled", label: "CS ativo" },
+                { value: "disabled", label: "CS desativado" },
+              ]}
+            />
             {availableTags.length > 0 && (
               <FilterSelect
                 label="Tag"
@@ -337,7 +365,7 @@ export default function CrmDashboard() {
             {hasActiveFilters && (
               <button
                 onClick={() =>
-                  setFilters({ hotmartStatus: "", engagement: "", enrollmentStatus: "", tag: "" })
+                  setFilters({ hotmartStatus: "", engagement: "", enrollmentStatus: "", tag: "", approved: "", csEnabled: "" })
                 }
                 className="text-xs text-primary hover:text-primary-dark font-medium px-2 py-2 transition-colors"
               >
@@ -417,7 +445,13 @@ export default function CrmDashboard() {
                           router.push(`/admin/crm/${s.id}`);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter") router.push(`/admin/crm/${s.id}`); }}
-                        className="rounded-2xl border border-gray-border bg-white p-4 transition-all duration-200 group hover:border-gray-300 cursor-pointer select-text"
+                        className={`rounded-2xl border bg-white p-4 transition-all duration-200 group cursor-pointer select-text ${
+                          s.approved
+                            ? "border-emerald-400 hover:border-emerald-500"
+                            : !s.csEnabled
+                            ? "border-red-400 hover:border-red-500"
+                            : "border-gray-border hover:border-gray-300"
+                        }`}
                       >
                         {/* Name + Engagement badge */}
                         <div className="flex items-start justify-between gap-2 mb-2">

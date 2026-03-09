@@ -123,6 +123,9 @@ export async function POST() {
           tags: [],
           totalEnrollments: Math.max(sales.length, 1),
           currentEnrollmentId: "",
+          approved: false,
+          approvedAt: null,
+          csEnabled: true,
         };
 
         const studentId = await createStudent(studentData);

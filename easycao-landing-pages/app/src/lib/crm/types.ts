@@ -14,7 +14,7 @@ export type StageName = "dia_10" | "mes_2" | "mes_4" | "mes_7" | "mes_10";
 
 export interface StageRecord {
   engagement: EngagementLevel | null;
-  sentAt: Timestamp | "migrated" | null;
+  sentAt: Timestamp | "migrated" | "cs_disabled" | null;
   template: string | null;
   progress: number | null;
 }
@@ -37,6 +37,9 @@ export interface Student {
   tags: string[];
   totalEnrollments: number;
   currentEnrollmentId: string;
+  approved: boolean;
+  approvedAt: Timestamp | null;
+  csEnabled: boolean;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

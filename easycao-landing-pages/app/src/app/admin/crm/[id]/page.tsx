@@ -44,6 +44,9 @@ interface StudentDetail {
     hotmartStatus: string | null;
     courseProgress: number | null;
     tags: string[];
+    approved: boolean;
+    approvedAt: string | null;
+    csEnabled: boolean;
   };
   enrollments: EnrollmentData[];
   ltv: number;
@@ -105,6 +108,8 @@ export default function StudentDetailPage() {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [togglingApproved, setTogglingApproved] = useState(false);
+  const [togglingCs, setTogglingCs] = useState(false);
   const [editForm, setEditForm] = useState({
     name: "", phone: "", document: "", city: "", state: "", enrolledAt: "",
   });
@@ -155,6 +160,35 @@ export default function StudentDetailPage() {
       if (res.ok) fetchData();
     } finally {
       setTogglingStatus(false);
+    }
+  }
+
+  async function toggleApproved() {
+    setTogglingApproved(true);
+    try {
+      const res = await fetch(`/api/admin/students/${student.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved: !student.approved }),
+      });
+      if (res.ok) fetchData();
+    } finally {
+      setTogglingApproved(false);
+    }
+  }
+
+  async function toggleCsEnabled() {
+    setTogglingCs(true);
+    try {
+      const csEnabled = student.csEnabled !== false; // default true
+      const res = await fetch(`/api/admin/students/${student.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csEnabled: !csEnabled }),
+      });
+      if (res.ok) fetchData();
+    } finally {
+      setTogglingCs(false);
     }
   }
 
@@ -329,6 +363,34 @@ export default function StudentDetailPage() {
                   <dd className="text-black font-medium">{value || "—"}</dd>
                 </div>
               ))}
+              {/* Approved switch */}
+              <div className="flex justify-between items-center">
+                <dt className="text-black/50">Aprovado</dt>
+                <dd>
+                  <button
+                    onClick={toggleApproved}
+                    disabled={togglingApproved}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 disabled:opacity-50 cursor-pointer ${
+                      student.approved ? "bg-emerald-500" : "bg-black/20"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                        student.approved ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </dd>
+              </div>
+              {/* Approval date */}
+              {student.approved && student.approvedAt && (
+                <div className="flex justify-between">
+                  <dt className="text-black/50">Data de aprovação</dt>
+                  <dd className="text-black font-medium">
+                    {new Date(student.approvedAt).toLocaleDateString("pt-BR")}
+                  </dd>
+                </div>
+              )}
             </dl>
           ) : (
             <div className="space-y-3">
@@ -438,11 +500,30 @@ export default function StudentDetailPage() {
         {/* CS Timeline */}
         {currentEnrollment && (
           <div className="rounded-2xl p-6 lg:col-span-2 bg-gray-light border border-gray-border">
-            <h2 className="font-bold text-black mb-4">Timeline de CS</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-black">Timeline de CS</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-black/50">CS ativo</span>
+                <button
+                  onClick={toggleCsEnabled}
+                  disabled={togglingCs}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 disabled:opacity-50 cursor-pointer ${
+                    student.csEnabled !== false ? "bg-primary" : "bg-black/20"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-200 ${
+                      student.csEnabled !== false ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
             <div className="space-y-3">
               {MESSAGE_STAGE_ORDER.map((stageName) => {
                 const stage = currentEnrollment.stages?.[stageName];
-                const isSent = stage?.sentAt && stage.sentAt !== "migrated";
+                const isCsDisabled = stage?.sentAt === "cs_disabled";
+                const isSent = stage?.sentAt && stage.sentAt !== "migrated" && stage.sentAt !== "cs_disabled";
                 const isMigrated = stage?.sentAt === "migrated";
                 const isPending = !stage?.sentAt;
 
@@ -452,17 +533,22 @@ export default function StudentDetailPage() {
                     className={`flex items-start gap-4 p-3 rounded-xl border ${
                       isSent
                         ? "bg-emerald-50 border-emerald-200"
+                        : isCsDisabled
+                        ? "bg-amber-50 border-amber-200"
                         : isMigrated
                         ? "bg-white border-gray-border"
                         : "bg-white border-gray-border opacity-60"
                     }`}
                   >
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isSent ? "bg-emerald-500" : isMigrated ? "bg-black/20" : "bg-black/10"}`} />
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${isSent ? "bg-emerald-500" : isCsDisabled ? "bg-amber-400" : isMigrated ? "bg-black/20" : "bg-black/10"}`} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm text-black">
                           {STAGE_LABELS[stageName] || stageName}
                         </span>
+                        {isCsDisabled && (
+                          <span className="text-xs text-amber-600 font-medium">CS desativado — mensagem não enviada</span>
+                        )}
                         {isMigrated && (
                           <span className="text-xs text-black/40">Migrado</span>
                         )}

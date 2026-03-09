@@ -35,6 +35,8 @@ interface PipelineStudent {
   enrolledAt: string;
   pricePaid: number;
   ltv: number;
+  approved: boolean;
+  csEnabled: boolean;
 }
 
 interface StageData {
@@ -63,6 +65,8 @@ export async function GET() {
     hotmartStatus: string | null;
     courseProgress: number | null;
     tags: string[];
+    approved: boolean;
+    csEnabled: boolean;
   }[] = [];
 
   const enrollmentRefs: FirebaseFirestore.DocumentReference[] = [];
@@ -80,6 +84,8 @@ export async function GET() {
         hotmartStatus: data.hotmartStatus || null,
         courseProgress: data.courseProgress ?? null,
         tags: data.tags || [],
+        approved: data.approved || false,
+        csEnabled: data.csEnabled !== false,
       });
       enrollmentRefs.push(
         db
@@ -163,6 +169,8 @@ export async function GET() {
       enrolledAt: enrolledAt.toISOString(),
       pricePaid: price,
       ltv,
+      approved: student.approved,
+      csEnabled: student.csEnabled,
     };
 
     if (stages[stage]) {

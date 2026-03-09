@@ -128,6 +128,9 @@ export async function POST(request: NextRequest) {
           tags: [],
           totalEnrollments: 1,
           currentEnrollmentId: "", // Will be updated below
+          approved: false,
+          approvedAt: null,
+          csEnabled: true,
         });
 
         const enrollmentId = await createEnrollment(

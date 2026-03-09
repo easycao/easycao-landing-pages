@@ -53,6 +53,7 @@ export async function POST(
   await updateStudent(student.id, {
     currentEnrollmentId: enrollmentId,
     totalEnrollments: student.totalEnrollments + 1,
+    hotmartStatus: "ACTIVE",
   });
 
   return NextResponse.json({ success: true, enrollmentId });
