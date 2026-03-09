@@ -109,9 +109,11 @@ export default function StudentDetailPage() {
   const [saving, setSaving] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [togglingApproved, setTogglingApproved] = useState(false);
+  const [showApprovalDatePicker, setShowApprovalDatePicker] = useState(false);
+  const [approvalDateInput, setApprovalDateInput] = useState(new Date().toISOString().slice(0, 10));
   const [togglingCs, setTogglingCs] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: "", phone: "", document: "", city: "", state: "", enrolledAt: "",
+    name: "", phone: "", document: "", city: "", state: "", enrolledAt: "", approvedAt: "",
   });
 
   const fetchData = useCallback(async () => {
@@ -163,13 +165,18 @@ export default function StudentDetailPage() {
     }
   }
 
-  async function toggleApproved() {
+  async function toggleApproved(approvedAtDate?: string) {
     setTogglingApproved(true);
     try {
+      const newApproved = !student.approved;
+      const body: Record<string, unknown> = { approved: newApproved };
+      if (newApproved && approvedAtDate) {
+        body.approvedAt = new Date(approvedAtDate + "T12:00:00Z").toISOString();
+      }
       const res = await fetch(`/api/admin/students/${student.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approved: !student.approved }),
+        body: JSON.stringify(body),
       });
       if (res.ok) fetchData();
     } finally {
@@ -202,6 +209,9 @@ export default function StudentDetailPage() {
       enrolledAt: currentEnrollment?.enrolledAt
         ? new Date(currentEnrollment.enrolledAt).toISOString().slice(0, 10)
         : "",
+      approvedAt: student.approvedAt
+        ? new Date(student.approvedAt).toISOString().slice(0, 10)
+        : "",
     });
     setEditing(true);
   }
@@ -223,6 +233,16 @@ export default function StudentDetailPage() {
       ) {
         body.enrolledAt = new Date(editForm.enrolledAt + "T12:00:00Z").toISOString();
         body.enrollmentId = currentEnrollment.id;
+      }
+
+      // Update approval date if changed
+      const currentApprovedAt = student.approvedAt
+        ? new Date(student.approvedAt).toISOString().slice(0, 10)
+        : "";
+      if (editForm.approvedAt !== currentApprovedAt) {
+        if (editForm.approvedAt) {
+          body.approvedAt = new Date(editForm.approvedAt + "T12:00:00Z").toISOString();
+        }
       }
 
       const res = await fetch(`/api/admin/students/${student.id}`, {
@@ -368,7 +388,14 @@ export default function StudentDetailPage() {
                 <dt className="text-black/50">Aprovado</dt>
                 <dd>
                   <button
-                    onClick={toggleApproved}
+                    onClick={() => {
+                      if (student.approved) {
+                        toggleApproved();
+                      } else {
+                        setApprovalDateInput(new Date().toISOString().slice(0, 10));
+                        setShowApprovalDatePicker(true);
+                      }
+                    }}
                     disabled={togglingApproved}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 disabled:opacity-50 cursor-pointer ${
                       student.approved ? "bg-emerald-500" : "bg-black/20"
@@ -382,7 +409,35 @@ export default function StudentDetailPage() {
                   </button>
                 </dd>
               </div>
-              {/* Approval date */}
+              {/* Approval date picker (when toggling on) */}
+              {showApprovalDatePicker && !student.approved && (
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                  <label className="text-xs text-black/50 flex-shrink-0">Data de aprovação</label>
+                  <input
+                    type="date"
+                    value={approvalDateInput}
+                    onChange={(e) => setApprovalDateInput(e.target.value)}
+                    className="px-2 py-1 rounded-lg border border-gray-border bg-white text-sm text-black focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+                  />
+                  <button
+                    onClick={() => {
+                      toggleApproved(approvalDateInput);
+                      setShowApprovalDatePicker(false);
+                    }}
+                    disabled={togglingApproved}
+                    className="text-xs font-medium text-white bg-emerald-500 hover:bg-emerald-600 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    Confirmar
+                  </button>
+                  <button
+                    onClick={() => setShowApprovalDatePicker(false)}
+                    className="text-xs text-black/50 hover:text-black transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              )}
+              {/* Approval date display */}
               {student.approved && student.approvedAt && (
                 <div className="flex justify-between">
                   <dt className="text-black/50">Data de aprovação</dt>
@@ -411,6 +466,18 @@ export default function StudentDetailPage() {
                   />
                 </div>
               ))}
+              {/* Approval date edit */}
+              {student.approved && (
+                <div>
+                  <label className="text-xs text-black/50 mb-1 block">Data de aprovação</label>
+                  <input
+                    type="date"
+                    value={editForm.approvedAt}
+                    onChange={(e) => setEditForm((f) => ({ ...f, approvedAt: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-lg border border-gray-border bg-white text-sm text-black focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

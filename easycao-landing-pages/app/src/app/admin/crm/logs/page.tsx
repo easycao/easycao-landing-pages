@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 
 interface CronMessageLog {
@@ -98,10 +98,57 @@ function formatPhone(phone: string): string {
   return phone;
 }
 
+type DateFilter = "last_10" | "today" | "yesterday" | "last_month" | "all" | "custom";
+
+const DATE_FILTER_LABELS: Record<DateFilter, string> = {
+  today: "Hoje",
+  yesterday: "Ontem",
+  last_10: "Últimos 10 dias",
+  last_month: "Último mês",
+  all: "Máximo",
+  custom: "Personalizado",
+};
+
+const DATE_FILTER_OPTIONS: DateFilter[] = ["today", "yesterday", "last_10", "last_month", "all", "custom"];
+
+function getDateRange(filter: DateFilter): { start: Date | null; end: Date | null } {
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  switch (filter) {
+    case "today":
+      return { start: startOfToday, end: null };
+    case "yesterday": {
+      const yesterday = new Date(startOfToday);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return { start: yesterday, end: startOfToday };
+    }
+    case "last_10": {
+      const d = new Date(startOfToday);
+      d.setDate(d.getDate() - 10);
+      return { start: d, end: null };
+    }
+    case "last_month": {
+      const d = new Date(startOfToday);
+      d.setDate(d.getDate() - 30);
+      return { start: d, end: null };
+    }
+    case "all":
+      return { start: null, end: null };
+    case "custom":
+      return { start: null, end: null };
+  }
+}
+
 export default function CronLogsPage() {
   const [logs, setLogs] = useState<CronLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilter>("last_10");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/admin/crm/cron-logs")
@@ -112,6 +159,38 @@ export default function CronLogsPage() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) setFilterOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const filteredLogs = useMemo(() => {
+    if (dateFilter === "all") return logs;
+
+    let start: Date | null;
+    let end: Date | null;
+
+    if (dateFilter === "custom") {
+      start = customStart ? new Date(customStart + "T00:00:00") : null;
+      end = customEnd ? new Date(customEnd + "T23:59:59") : null;
+    } else {
+      const range = getDateRange(dateFilter);
+      start = range.start;
+      end = range.end;
+    }
+
+    return logs.filter((log) => {
+      if (!log.executedAt) return false;
+      const d = new Date(log.executedAt);
+      if (start && d < start) return false;
+      if (end && d > end) return false;
+      return true;
+    });
+  }, [logs, dateFilter, customStart, customEnd]);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -124,20 +203,95 @@ export default function CronLogsPage() {
           &larr; Voltar
         </Link>
         <h1 className="text-xl font-bold text-black">Log de Mensagens</h1>
+
+        <div className="ml-auto flex items-center gap-3">
+          {/* Date filter dropdown */}
+          <div ref={filterRef} className="relative">
+            <button
+              onClick={() => setFilterOpen(!filterOpen)}
+              className="flex items-center gap-2 text-xs font-medium px-3 py-2 rounded-xl border transition-all duration-200 cursor-pointer border-primary/30 text-primary bg-primary/5"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{DATE_FILTER_LABELS[dateFilter]}</span>
+              <svg className={`w-3 h-3 transition-transform ${filterOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {filterOpen && (
+              <div className="absolute top-full right-0 mt-1.5 min-w-[200px] rounded-xl border border-gray-border bg-white py-1 z-50 shadow-lg">
+                {DATE_FILTER_OPTIONS.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => {
+                      setDateFilter(opt);
+                      if (opt !== "custom") setFilterOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-xs transition-colors ${
+                      dateFilter === opt ? "text-primary font-medium bg-primary/5" : "text-black/70 hover:text-black hover:bg-gray-light"
+                    }`}
+                  >
+                    {DATE_FILTER_LABELS[opt]}
+                  </button>
+                ))}
+
+                {/* Custom date inputs */}
+                {dateFilter === "custom" && (
+                  <div className="px-3 py-2 border-t border-gray-border space-y-2">
+                    <div>
+                      <label className="text-[10px] text-black/50 block mb-0.5">Início</label>
+                      <input
+                        type="date"
+                        value={customStart}
+                        onChange={(e) => setCustomStart(e.target.value)}
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-border bg-white text-xs text-black focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-black/50 block mb-0.5">Fim</label>
+                      <input
+                        type="date"
+                        value={customEnd}
+                        onChange={(e) => setCustomEnd(e.target.value)}
+                        className="w-full px-2 py-1.5 rounded-lg border border-gray-border bg-white text-xs text-black focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setFilterOpen(false)}
+                      className="w-full text-xs font-medium text-white bg-primary hover:bg-primary-dark px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      Aplicar
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Count */}
+          {!loading && (
+            <span className="text-xs text-black/50">
+              {filteredLogs.length} log{filteredLogs.length !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
       </div>
 
       {loading ? (
         <div className="text-black/50 text-center py-12">Carregando...</div>
-      ) : logs.length === 0 ? (
+      ) : filteredLogs.length === 0 ? (
         <div className="rounded-2xl p-8 text-center bg-gray-light border border-gray-border">
           <p className="text-black/50">
-            Nenhum log encontrado. Os logs serão criados automaticamente quando
-            o cron rodar.
+            {logs.length === 0
+              ? "Nenhum log encontrado. Os logs serão criados automaticamente quando o cron rodar."
+              : "Nenhum log encontrado para o período selecionado."}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {logs.map((log) => {
+          {filteredLogs.map((log) => {
             const isExpanded = expandedId === log.id;
             const hasErrors = log.errors > 0 || log.fatalError;
 

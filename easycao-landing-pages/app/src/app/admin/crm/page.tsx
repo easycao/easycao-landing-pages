@@ -337,7 +337,7 @@ export default function CrmDashboard() {
               ]}
             />
             <FilterSelect
-              label="Aprovado"
+              label="ICAO"
               value={filters.approved}
               onChange={(v) => setFilters((f) => ({ ...f, approved: v }))}
               options={[
@@ -445,12 +445,12 @@ export default function CrmDashboard() {
                           router.push(`/admin/crm/${s.id}`);
                         }}
                         onKeyDown={(e) => { if (e.key === "Enter") router.push(`/admin/crm/${s.id}`); }}
-                        className={`rounded-2xl border bg-white p-4 transition-all duration-200 group cursor-pointer select-text ${
+                        className={`rounded-2xl bg-white p-4 transition-all duration-200 group cursor-pointer select-text ${
                           s.approved
-                            ? "border-emerald-400 hover:border-emerald-500"
+                            ? "border-2 border-emerald-400 hover:border-emerald-500"
                             : !s.csEnabled
-                            ? "border-red-400 hover:border-red-500"
-                            : "border-gray-border hover:border-gray-300"
+                            ? "border-2 border-red-400 hover:border-red-500"
+                            : "border border-gray-border hover:border-gray-300"
                         }`}
                       >
                         {/* Name + Engagement badge */}

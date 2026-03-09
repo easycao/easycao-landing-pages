@@ -30,6 +30,7 @@ export default function AdminLoginPage() {
         setError(data.error || "Erro ao fazer login");
         setShake(true);
         setTimeout(() => setShake(false), 400);
+        setLoading(false);
         return;
       }
 
@@ -38,7 +39,6 @@ export default function AdminLoginPage() {
       setError("Erro de conexão. Tente novamente.");
       setShake(true);
       setTimeout(() => setShake(false), 400);
-    } finally {
       setLoading(false);
     }
   }

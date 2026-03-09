@@ -113,9 +113,21 @@ export async function PATCH(
   if (body.approved !== undefined) {
     studentUpdates.approved = body.approved;
     if (body.approved) {
-      studentUpdates.approvedAt = Timestamp.now();
+      // Use provided date or default to now
+      if (body.approvedAt) {
+        const date = new Date(body.approvedAt);
+        studentUpdates.approvedAt = !isNaN(date.getTime()) ? Timestamp.fromDate(date) : Timestamp.now();
+      } else {
+        studentUpdates.approvedAt = Timestamp.now();
+      }
     } else {
       studentUpdates.approvedAt = null;
+    }
+  } else if (body.approvedAt) {
+    // Edit approval date without changing approved status
+    const date = new Date(body.approvedAt);
+    if (!isNaN(date.getTime())) {
+      studentUpdates.approvedAt = Timestamp.fromDate(date);
     }
   }
 
