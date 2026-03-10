@@ -190,10 +190,10 @@ export default function DashboardPage() {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
             <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-[-0.02em] leading-tight">
-              Boas-vindas de volta
+              Welcome back to Easycao
             </h1>
             <p className="text-sm text-white/50 mt-2 max-w-md leading-relaxed">
-              Continue sua jornada de aprendizado. Cada aula te aproxima da fluencia no ingles aeronautico.
+              Continue sua jornada ao ICAO. Cada aula te aproxima mais do seu objetivo.
             </p>
           </div>
 
@@ -222,7 +222,7 @@ export default function DashboardPage() {
             </div>
             <div className="hidden sm:block">
               <p className="text-sm font-semibold text-white">{totalCompleted} de {totalLessons}</p>
-              <p className="text-xs text-white/40">aulas concluidas</p>
+              <p className="text-xs text-white/40">aulas concluídas</p>
             </div>
           </div>
         </div>
