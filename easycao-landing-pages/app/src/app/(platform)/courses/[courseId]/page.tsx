@@ -285,7 +285,7 @@ export default function CourseDetailPage({
                           <p
                             className={`text-sm ${
                               isCompleted
-                                ? isDark ? "text-[#606070]" : "text-black/40"
+                                ? isDark ? "text-white/50" : "text-black/60"
                                 : isLastAccessed
                                 ? "text-primary font-medium"
                                 : isDark ? "text-white" : "text-black"
