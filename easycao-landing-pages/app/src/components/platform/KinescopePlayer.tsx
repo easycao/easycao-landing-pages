@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface KinescopePlayerProps {
   videoId: string;
@@ -12,6 +13,8 @@ export default function KinescopePlayer({
   studentEmail,
 }: KinescopePlayerProps) {
   const [loaded, setLoaded] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
 
   // Build embed URL with watermark params
   const params = new URLSearchParams();
@@ -27,14 +30,25 @@ export default function KinescopePlayer({
 
   return (
     <div
-      className="relative rounded-2xl overflow-hidden bg-black shadow-lg"
+      className="relative rounded-2xl overflow-hidden shadow-lg"
       onContextMenu={(e) => e.preventDefault()}
     >
       <div className="relative" style={{ paddingBottom: "56.25%" }}>
-        {/* Loading skeleton */}
+        {/* Loading placeholder */}
         {!loaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black">
-            <div className="w-8 h-8 border-2 border-white/20 border-t-primary rounded-full animate-spin" />
+          <div
+            className={`absolute inset-0 flex items-center justify-center ${
+              isDark
+                ? "rounded-2xl border border-white/[0.09] backdrop-blur-[20px] backdrop-saturate-[1.4]"
+                : "bg-white"
+            }`}
+            style={isDark ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" } : undefined}
+          >
+            <div className={`w-8 h-8 border-2 rounded-full animate-spin ${
+              isDark
+                ? "border-white/10 border-t-primary"
+                : "border-black/10 border-t-primary"
+            }`} />
           </div>
         )}
         <iframe
