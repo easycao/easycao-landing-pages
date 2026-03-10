@@ -126,10 +126,10 @@ export default function CoursesPage() {
               href={`/courses/${course.id}`}
               className={`group overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 ${
                 isDark
-                  ? "rounded-[16px] border border-white/[0.06] backdrop-blur-[20px] hover:border-white/[0.12] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+                  ? "rounded-[16px] border border-white/[0.09] backdrop-blur-[20px] backdrop-saturate-[1.4] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_0_0_0.5px_rgba(255,255,255,0.03)] hover:border-white/[0.12] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
                   : "rounded-2xl bg-white border border-gray-border/40 hover:border-primary/20 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
               }`}
-              style={isDark ? { background: "rgba(255,255,255,0.03)" } : undefined}
+              style={isDark ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" } : undefined}
             >
               {course.thumbnail ? (
                 <div className="h-40 bg-gray-light overflow-hidden">
