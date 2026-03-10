@@ -17,7 +17,7 @@ export default function KinescopePlayer({
   studentEmail,
 }: KinescopePlayerProps) {
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-black shadow-lg">
+    <div className="relative rounded-2xl overflow-hidden bg-black shadow-lg" onContextMenu={(e) => e.preventDefault()}>
       <div className="relative" style={{ paddingBottom: "56.25%" }}>
         <div className="absolute inset-0">
           <KinescopePlayerComponent
@@ -27,8 +27,8 @@ export default function KinescopePlayer({
                 ? {
                     text: studentEmail,
                     mode: "random" as const,
-                    scale: 0.06,
-                    displayTimeout: { visible: 1000, hidden: 90000 },
+                    scale: 0.07,
+                    displayTimeout: { visible: 1000, hidden: 30000 },
                   }
                 : undefined
             }
