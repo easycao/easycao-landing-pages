@@ -288,7 +288,7 @@ export default function CourseDetailPage({
                                 ? isDark ? "text-[#606070]" : "text-black/40"
                                 : isLastAccessed
                                 ? "text-primary font-medium"
-                                : textPrimary
+                                : isDark ? "text-white" : "text-black"
                             }`}
                           >
                             {lesson.title}
