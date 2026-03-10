@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCachedFetch } from "@/hooks/useCachedFetch";
 
 interface CourseInfo {
   id: string;
@@ -42,28 +43,34 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [courses, setCourses] = useState<CourseInfo[]>([]);
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
+
+  const { data: coursesData, loading: coursesLoading } = useCachedFetch<{ courses: CourseInfo[] }>({
+    key: `courses-${user?.uid}`,
+    url: `/api/platform/courses?uid=${user?.uid}`,
+    enabled: !!user,
+  });
+
+  const { data: dashData, loading: dashLoading } = useCachedFetch<DashboardData>({
+    key: `dashboard-${user?.uid}`,
+    url: `/api/platform/progress/dashboard?uid=${user?.uid}`,
+    enabled: !!user,
+  });
+
+  const courses = coursesData?.courses || [];
+  const dashboard = dashData;
+
   const [lastLesson, setLastLesson] = useState<LastLessonInfo | null>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!dashData?.lastAccessed) return;
+    const { courseId, lessonId } = dashData.lastAccessed;
 
-    async function load() {
-      const [coursesRes, dashRes] = await Promise.all([
-        fetch(`/api/platform/courses?uid=${user!.uid}`),
-        fetch(`/api/platform/progress/dashboard?uid=${user!.uid}`),
-      ]);
-
-      const coursesData = await coursesRes.json();
-      const dashData: DashboardData = await dashRes.json();
-
-      setCourses(coursesData.courses || []);
-      setDashboard(dashData);
-
-      if (dashData.lastAccessed) {
-        const { courseId, lessonId } = dashData.lastAccessed;
+    async function loadLastLesson() {
+      try {
+        const cached = localStorage.getItem(`cache:lastLesson-${courseId}-${lessonId}`);
+        if (cached) {
+          setLastLesson(JSON.parse(cached));
+        }
         const courseRes = await fetch(`/api/platform/courses/${courseId}`);
         const courseDetail = await courseRes.json();
         if (courseDetail.modules) {
@@ -72,30 +79,40 @@ export default function DashboardPage() {
               (l: { id: string }) => l.id === lessonId
             );
             if (lesson) {
-              setLastLesson({
+              const info = {
                 courseId,
                 courseName: courseDetail.course.name,
                 moduleName: mod.name,
                 moduleId: mod.id,
                 lessonId,
                 lessonTitle: lesson.title,
-              });
+              };
+              setLastLesson(info);
+              localStorage.setItem(`cache:lastLesson-${courseId}-${lessonId}`, JSON.stringify(info));
               break;
             }
           }
         }
-      }
-
-      setLoading(false);
+      } catch {}
     }
-    load();
-  }, [user]);
+    loadLastLesson();
+  }, [dashData]);
+
+  const loading = coursesLoading || dashLoading;
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-center py-20">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Skeleton hero */}
+        <div className={`rounded-3xl h-[180px] lg:h-[200px] animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-black/[0.04]"}`} />
+        {/* Skeleton cards */}
+        <div>
+          <div className={`h-4 w-28 rounded mb-4 animate-pulse ${isDark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />
+          <div className="grid gap-5 sm:grid-cols-2">
+            {[1, 2].map((i) => (
+              <div key={i} className={`rounded-2xl h-[280px] animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-black/[0.04]"}`} />
+            ))}
+          </div>
         </div>
       </div>
     );

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCachedFetch } from "@/hooks/useCachedFetch";
 
 interface CourseInfo {
   id: string;
@@ -13,37 +13,33 @@ interface CourseInfo {
   lessonCount: number;
 }
 
-interface ProgressMap {
-  [courseId: string]: {
+interface DashboardData {
+  courseProgress: Record<string, {
     completedLessons: string[];
     progressPercent: number;
-  };
+  }>;
 }
 
 export default function CoursesPage() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const [courses, setCourses] = useState<CourseInfo[]>([]);
-  const [progress, setProgress] = useState<ProgressMap>({});
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) return;
+  const { data: coursesData, loading: coursesLoading } = useCachedFetch<{ courses: CourseInfo[] }>({
+    key: `courses-${user?.uid}`,
+    url: `/api/platform/courses?uid=${user?.uid}`,
+    enabled: !!user,
+  });
 
-    async function load() {
-      const [coursesRes, dashRes] = await Promise.all([
-        fetch(`/api/platform/courses?uid=${user!.uid}`),
-        fetch(`/api/platform/progress/dashboard?uid=${user!.uid}`),
-      ]);
-      const coursesData = await coursesRes.json();
-      const dashData = await dashRes.json();
-      setCourses(coursesData.courses || []);
-      setProgress(dashData.courseProgress || {});
-      setLoading(false);
-    }
-    load();
-  }, [user]);
+  const { data: dashData, loading: dashLoading } = useCachedFetch<DashboardData>({
+    key: `dashboard-${user?.uid}`,
+    url: `/api/platform/progress/dashboard?uid=${user?.uid}`,
+    enabled: !!user,
+  });
+
+  const courses = coursesData?.courses || [];
+  const progress = dashData?.courseProgress || {};
+  const loading = coursesLoading || dashLoading;
 
   const cardClass = isDark
     ? "rounded-[16px] border border-white/[0.09] backdrop-blur-[20px] backdrop-saturate-[1.4] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_0_0_0.5px_rgba(255,255,255,0.03)]"
@@ -60,8 +56,11 @@ export default function CoursesPage() {
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center justify-center py-20">
-          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <div className={`h-4 w-28 rounded mb-5 animate-pulse ${isDark ? "bg-white/[0.06]" : "bg-black/[0.06]"}`} />
+        <div className="grid gap-5 sm:grid-cols-2">
+          {[1, 2].map((i) => (
+            <div key={i} className={`rounded-2xl h-[280px] animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-black/[0.04]"}`} />
+          ))}
         </div>
       </div>
     );
