@@ -323,3 +323,83 @@ body {
   color: var(--color-black);
   overflow-x: hidden;
 }
+
+/* ── Duarte Studio dark background effects (platform dark mode) ── */
+
+/* Grid / quadricular background — dark */
+.platform-grid-dark {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.010) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.010) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 75%);
+}
+
+/* Grid / quadricular background — light */
+.platform-grid-light {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,0,0,0.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.030) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 75%);
+}
+
+/* Ambient light effects — dark (white glows) */
+.platform-lights-dark {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(255,255,255,0.015) 0%, transparent 35%),
+    radial-gradient(circle 300px at 55% 8%, rgba(255,255,255,0.04) 0%, transparent 70%),
+    radial-gradient(circle 200px at 12% 30%, rgba(255,255,255,0.02) 0%, transparent 70%),
+    radial-gradient(circle 150px at 78% 55%, rgba(255,255,255,0.018) 30%, rgba(255,255,255,0.008) 50%, transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%);
+}
+
+/* Ambient light effects — light (blue/primary glows) */
+.platform-lights-light {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(31,150,247,0.04) 0%, transparent 40%),
+    linear-gradient(225deg, rgba(31,150,247,0.025) 0%, transparent 35%),
+    radial-gradient(circle 300px at 55% 8%, rgba(31,150,247,0.05) 0%, transparent 70%),
+    radial-gradient(circle 200px at 12% 30%, rgba(31,150,247,0.03) 0%, transparent 70%),
+    radial-gradient(circle 150px at 78% 55%, rgba(31,150,247,0.025) 30%, rgba(31,150,247,0.01) 50%, transparent 70%),
+    radial-gradient(ellipse 80% 70% at 50% 50%, transparent 50%, rgba(255,255,255,0.6) 100%);
+}
+
+/* Animated light sweep — dark */
+.platform-sweep-dark {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(130deg, transparent 0%, transparent 38%, rgba(255,255,255,0.012) 42%, rgba(255,255,255,0.018) 46%, rgba(255,255,255,0.008) 50%, transparent 54%, transparent 100%);
+  animation: platform-lightSweep 14s ease-in-out infinite alternate;
+}
+
+/* Animated light sweep — light */
+.platform-sweep-light {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(130deg, transparent 0%, transparent 38%, rgba(31,150,247,0.02) 42%, rgba(31,150,247,0.03) 46%, rgba(31,150,247,0.015) 50%, transparent 54%, transparent 100%);
+  animation: platform-lightSweep 14s ease-in-out infinite alternate;
+}
+
+@keyframes platform-lightSweep {
+  0% { transform: translateX(-20%) translateY(-8%) rotate(0deg); opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { transform: translateX(20%) translateY(8%) rotate(1.5deg); opacity: 0.5; }
+}
+
+/* Platform dark scrollbar */
+.platform-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.platform-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+.platform-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 3px; }
+.platform-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.18); }
+.platform-scroll-light::-webkit-scrollbar { width: 6px; height: 6px; }
+.platform-scroll-light::-webkit-scrollbar-track { background: rgba(0,0,0,0.04); }
+.platform-scroll-light::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+.platform-scroll-light::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }

@@ -17,7 +17,7 @@ interface NavSection {
   items: NavItem[];
 }
 
-const ICON_CLASS = "w-5 h-5";
+const ICON_CLASS = "w-[18px] h-[18px]";
 
 function HomeIcon() {
   return (
@@ -115,7 +115,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Dashboard", href: "/dashboard", icon: <HomeIcon />, enabled: true },
       { label: "Meus Cursos", href: "/courses", icon: <BookIcon />, enabled: true },
       { label: "Simulador", href: "/simulator", icon: <MicIcon />, enabled: false },
-      { label: "Exercícios", href: "/exercises", icon: <PencilIcon />, enabled: false },
+      { label: "Exercicios", href: "/exercises", icon: <PencilIcon />, enabled: false },
     ],
   },
   {
@@ -144,25 +144,21 @@ export default function Sidebar({
   const pathname = usePathname();
   const { signOut } = useAuth();
 
-  function handleSignOut() {
-    signOut();
-  }
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gradient-to-br from-[#0e4f85] via-primary-dark to-primary">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5">
+      <div className="flex items-center gap-2.5 px-6 py-6">
         <Image src="/logo.webp" alt="Easycao" width={32} height={32} />
-        <span className="text-lg font-bold text-primary tracking-tight">
+        <span className="text-lg font-bold text-white tracking-tight">
           Easycao
         </span>
       </div>
 
       {/* Nav sections */}
-      <nav className="flex-1 overflow-y-auto px-3 space-y-5">
+      <nav className="flex-1 overflow-y-auto px-3 space-y-6">
         {NAV_SECTIONS.map((section) => (
           <div key={section.title}>
-            <p className="text-[10px] uppercase tracking-widest text-black/40 font-semibold px-3 mb-1.5">
+            <p className="text-[10px] uppercase tracking-[0.15em] text-white font-bold px-3 mb-2">
               {section.title}
             </p>
             <div className="space-y-0.5">
@@ -173,11 +169,11 @@ export default function Sidebar({
                   return (
                     <div
                       key={item.href}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-black/30 cursor-default"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 cursor-default"
                     >
                       {item.icon}
-                      <span className="text-sm">{item.label}</span>
-                      <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-primary/8 text-primary/60 font-medium">
+                      <span className="text-[13px] font-medium">{item.label}</span>
+                      <span className="ml-auto text-[9px] px-2 py-0.5 rounded-full bg-white/8 backdrop-blur-sm border border-white/15 text-white/70 font-medium">
                         Em breve
                       </span>
                     </div>
@@ -191,12 +187,15 @@ export default function Sidebar({
                     onClick={onNavigate}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : "text-black/60 hover:bg-gray-light hover:text-black"
+                        ? "bg-white/10 text-white font-semibold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]"
+                        : "text-white hover:bg-white/5"
                     }`}
                   >
                     {item.icon}
-                    <span className="text-sm">{item.label}</span>
+                    <span className="text-[13px] font-medium">{item.label}</span>
+                    {isActive && (
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-light shadow-[0_0_6px_rgba(52,184,248,0.6)]" />
+                    )}
                   </Link>
                 );
               })}
@@ -206,23 +205,23 @@ export default function Sidebar({
 
         {/* CONTA section */}
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-black/40 font-semibold px-3 mb-1.5">
+          <p className="text-[10px] uppercase tracking-[0.15em] text-white font-bold px-3 mb-2">
             CONTA
           </p>
           <div className="space-y-0.5">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-black/30 cursor-default">
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/60 cursor-default">
               <GearIcon />
-              <span className="text-sm">Configurações</span>
-              <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full bg-primary/8 text-primary/60 font-medium">
+              <span className="text-[13px] font-medium">Configuracoes</span>
+              <span className="ml-auto text-[9px] px-2 py-0.5 rounded-full bg-white/8 backdrop-blur-sm border border-white/15 text-white/70 font-medium">
                 Em breve
               </span>
             </div>
             <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-black/60 hover:bg-red-50 hover:text-red-500 transition-all duration-200"
+              onClick={signOut}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-white hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
             >
               <LogoutIcon />
-              <span className="text-sm">Sair</span>
+              <span className="text-[13px]">Sair</span>
             </button>
           </div>
         </div>
@@ -230,28 +229,35 @@ export default function Sidebar({
         {/* Admin section */}
         {isAdmin && (
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-black/40 font-semibold px-3 mb-1.5">
+            <p className="text-[10px] uppercase tracking-[0.15em] text-white font-bold px-3 mb-2">
               ADMIN
             </p>
             <Link
               href="/admin/crm"
               onClick={onNavigate}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-black/60 hover:bg-gray-light hover:text-black transition-all duration-200"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white hover:bg-white/5 transition-all duration-200"
             >
               <AdminIcon />
-              <span className="text-sm">CRM</span>
+              <span className="text-[13px]">CRM</span>
             </Link>
             <Link
               href="/admin/cms/courses"
               onClick={onNavigate}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-black/60 hover:bg-gray-light hover:text-black transition-all duration-200"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white hover:bg-white/5 transition-all duration-200"
             >
               <BookIcon />
-              <span className="text-sm">CMS</span>
+              <span className="text-[13px]">CMS</span>
             </Link>
           </div>
         )}
       </nav>
+
+      {/* Bottom branding */}
+      <div className="px-6 py-4 border-t border-white/5">
+        <p className="text-[10px] text-white/20">
+          Easycao Platform
+        </p>
+      </div>
     </div>
   );
 }

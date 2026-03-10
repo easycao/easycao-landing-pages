@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface Lesson {
   id: string;
@@ -39,6 +40,8 @@ export default function CourseDetailPage({
 }) {
   const { courseId } = use(params);
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [progress, setProgress] = useState<Progress>({
@@ -88,10 +91,24 @@ export default function CourseDetailPage({
     });
   }
 
+  const cardClass = isDark
+    ? "rounded-[16px] border border-white/[0.09] backdrop-blur-[20px] backdrop-saturate-[1.4] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_0_0_0.5px_rgba(255,255,255,0.03)]"
+    : "rounded-2xl bg-white border border-gray-border/40 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]";
+  const cardBg = isDark
+    ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" }
+    : undefined;
+  const textPrimary = isDark ? "text-[#F0F0F5]" : "text-black";
+  const textSecondary = isDark ? "text-[#9090A0]" : "text-black/50";
+  const textMuted = isDark ? "text-[#606070]" : "text-black/30";
+  const textLabel = isDark ? "text-[#9090A0]" : "text-black/35";
+  const progressBg = isDark ? "bg-white/[0.06]" : "bg-black/[0.04]";
+
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-center py-20">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
@@ -99,7 +116,7 @@ export default function CourseDetailPage({
   if (!course) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
-        <p className="text-black/50">Curso nao encontrado.</p>
+        <p className={textSecondary}>Curso nao encontrado.</p>
       </div>
     );
   }
@@ -115,7 +132,7 @@ export default function CourseDetailPage({
       <div>
         <Link
           href="/courses"
-          className="inline-flex items-center gap-1 text-xs text-black/40 hover:text-primary transition-colors mb-3"
+          className={`inline-flex items-center gap-1 text-xs ${textMuted} hover:text-primary transition-colors mb-3`}
         >
           <svg
             className="w-3.5 h-3.5"
@@ -132,23 +149,23 @@ export default function CourseDetailPage({
           </svg>
           Meus Cursos
         </Link>
-        <h1 className="text-xl font-bold text-black">{course.name}</h1>
+        <h1 className={`text-xl font-bold ${textPrimary}`}>{course.name}</h1>
         {course.description && (
-          <p className="text-sm text-black/50 mt-1">{course.description}</p>
+          <p className={`text-sm ${textSecondary} mt-1`}>{course.description}</p>
         )}
       </div>
 
       {/* Progress bar */}
-      <div className="rounded-2xl bg-white border border-gray-border p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs text-black/40">
+      <div className={`${cardClass} p-5`} style={cardBg}>
+        <div className="flex items-center justify-between mb-2.5">
+          <span className={`text-xs ${textLabel} font-medium`}>
             {completedCount} de {totalLessons} aulas concluidas
           </span>
-          <span className="text-sm font-semibold text-primary">{percent}%</span>
+          <span className="text-sm font-bold text-primary">{percent}%</span>
         </div>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`w-full h-2 ${progressBg} rounded-full overflow-hidden`}>
           <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
+            className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-all duration-700"
             style={{ width: `${percent}%` }}
           />
         </div>
@@ -165,23 +182,30 @@ export default function CourseDetailPage({
           return (
             <div
               key={mod.id}
-              className="rounded-2xl bg-white border border-gray-border shadow-sm overflow-hidden"
+              className={`overflow-hidden ${
+                isDark
+                  ? "rounded-[16px] border border-white/[0.06]"
+                  : "rounded-2xl bg-white border border-gray-border/40 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]"
+              }`}
+              style={isDark ? { background: "rgba(255,255,255,0.03)" } : undefined}
             >
               {/* Module header */}
               <button
                 onClick={() => toggleModule(mod.id)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+                className={`w-full flex items-center justify-between px-5 py-4 text-left transition-colors ${
+                  isDark ? "hover:bg-white/[0.03]" : "hover:bg-gray-50"
+                }`}
               >
                 <div className="min-w-0">
-                  <h3 className="text-sm font-semibold text-black">
+                  <h3 className={`text-sm font-bold ${textPrimary}`}>
                     {mod.name}
                   </h3>
-                  <p className="text-[11px] text-black/40 mt-0.5">
+                  <p className={`text-[11px] ${textLabel} mt-0.5`}>
                     {modCompleted}/{mod.lessonCount} aulas
                   </p>
                 </div>
                 <svg
-                  className={`w-4 h-4 text-black/30 flex-shrink-0 transition-transform duration-200 ${
+                  className={`w-4 h-4 ${textMuted} flex-shrink-0 transition-transform duration-200 ${
                     isExpanded ? "rotate-180" : ""
                   }`}
                   fill="none"
@@ -199,7 +223,7 @@ export default function CourseDetailPage({
 
               {/* Lessons list */}
               {isExpanded && (
-                <div className="border-t border-gray-border">
+                <div className={`border-t ${isDark ? "border-white/[0.06]" : "border-gray-border/40"}`}>
                   {mod.lessons.map((lesson, i) => {
                     const isCompleted = progress.completedLessons.includes(
                       lesson.id
@@ -211,7 +235,11 @@ export default function CourseDetailPage({
                       <Link
                         key={lesson.id}
                         href={`/courses/${courseId}/${mod.id}/${lesson.id}`}
-                        className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors border-b border-gray-border last:border-b-0"
+                        className={`flex items-center gap-3 px-5 py-3 transition-colors border-b last:border-b-0 ${
+                          isDark
+                            ? "border-white/[0.04] hover:bg-white/[0.03]"
+                            : "border-gray-border/30 hover:bg-gray-50"
+                        }`}
                       >
                         {/* Status icon */}
                         <div className="flex-shrink-0">
@@ -232,7 +260,7 @@ export default function CourseDetailPage({
                               </svg>
                             </div>
                           ) : isLastAccessed ? (
-                            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center shadow-[0_0_8px_rgba(31,150,247,0.4)]">
                               <svg
                                 className="w-3 h-3 text-white"
                                 fill="currentColor"
@@ -242,8 +270,10 @@ export default function CourseDetailPage({
                               </svg>
                             </div>
                           ) : (
-                            <div className="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center">
-                              <span className="text-[10px] font-medium text-black/30">
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                              isDark ? "border-white/[0.12]" : "border-gray-200"
+                            }`}>
+                              <span className={`text-[10px] font-medium ${textMuted}`}>
                                 {i + 1}
                               </span>
                             </div>
@@ -255,10 +285,10 @@ export default function CourseDetailPage({
                           <p
                             className={`text-sm ${
                               isCompleted
-                                ? "text-black/40"
+                                ? isDark ? "text-[#606070]" : "text-black/40"
                                 : isLastAccessed
                                 ? "text-primary font-medium"
-                                : "text-black"
+                                : textPrimary
                             }`}
                           >
                             {lesson.title}
@@ -272,7 +302,7 @@ export default function CourseDetailPage({
 
                         {/* Duration */}
                         {lesson.duration && (
-                          <span className="text-[11px] text-black/30 flex-shrink-0">
+                          <span className={`text-[11px] ${textMuted} flex-shrink-0`}>
                             {lesson.duration}
                           </span>
                         )}

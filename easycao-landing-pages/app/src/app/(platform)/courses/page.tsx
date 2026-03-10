@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface CourseInfo {
   id: string;
@@ -21,6 +22,8 @@ interface ProgressMap {
 
 export default function CoursesPage() {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [courses, setCourses] = useState<CourseInfo[]>([]);
   const [progress, setProgress] = useState<ProgressMap>({});
   const [loading, setLoading] = useState(true);
@@ -42,21 +45,35 @@ export default function CoursesPage() {
     load();
   }, [user]);
 
+  const cardClass = isDark
+    ? "rounded-[16px] border border-white/[0.09] backdrop-blur-[20px] backdrop-saturate-[1.4] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.07),0_0_0_0.5px_rgba(255,255,255,0.03)]"
+    : "rounded-2xl bg-white border border-gray-border/40 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]";
+  const cardBg = isDark
+    ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" }
+    : undefined;
+  const textPrimary = isDark ? "text-[#F0F0F5]" : "text-black";
+  const textSecondary = isDark ? "text-[#9090A0]" : "text-black/50";
+  const textMuted = isDark ? "text-[#606070]" : "text-black/30";
+  const textLabel = isDark ? "text-[#9090A0]" : "text-black/35";
+  const progressBg = isDark ? "bg-white/[0.06]" : "bg-black/[0.04]";
+
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto flex items-center justify-center py-16">
-        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="max-w-5xl mx-auto">
+        <div className="flex items-center justify-center py-20">
+          <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
 
   if (courses.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="rounded-2xl bg-white border border-gray-border p-10 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+      <div className="max-w-5xl mx-auto">
+        <div className={`${cardClass} p-12 text-center`} style={cardBg}>
+          <div className={`w-20 h-20 mx-auto mb-5 rounded-2xl flex items-center justify-center ${isDark ? "bg-white/[0.06]" : "bg-gradient-to-br from-primary/10 to-primary/5"}`}>
             <svg
-              className="w-8 h-8 text-primary"
+              className="w-10 h-10 text-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -69,19 +86,21 @@ export default function CoursesPage() {
               />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-black mb-2">
+          <h2 className={`text-xl font-bold ${textPrimary} mb-2`}>
             Nenhum curso disponivel
           </h2>
-          <p className="text-sm text-black/50 mb-6">
-            Voce ainda nao tem acesso a nenhum curso.
+          <p className={`text-sm ${textSecondary} mb-8 max-w-sm mx-auto leading-relaxed`}>
+            Voce ainda nao tem acesso a nenhum curso. Adquira um curso para
+            comecar a estudar.
           </p>
           <a
             href="https://easycao.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-primary text-white text-sm font-semibold hover:bg-[#1888e0] transition-colors"
+            className="group/cta relative overflow-hidden inline-flex items-center gap-2 bg-primary hover:bg-[#1888e0] text-white font-bold text-[15px] rounded-full px-7 py-3 shadow-[0_2px_8px_rgba(31,150,247,0.3)] hover:shadow-[0_4px_16px_rgba(31,150,247,0.45)] active:scale-[0.97] transition-all duration-300"
           >
-            Ver cursos disponiveis
+            <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
+            <span className="relative">Ver cursos disponiveis</span>
           </a>
         </div>
       </div>
@@ -89,8 +108,11 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <div className="max-w-5xl mx-auto">
+      <h2 className={`text-sm font-bold uppercase tracking-[0.08em] mb-5 ${isDark ? "text-white/50" : "text-black/70"}`}>
+        Meus Cursos
+      </h2>
+      <div className="grid gap-5 sm:grid-cols-2">
         {courses.map((course) => {
           const p = progress[course.id];
           const completed = p?.completedLessons.length || 0;
@@ -103,24 +125,30 @@ export default function CoursesPage() {
             <Link
               key={course.id}
               href={`/courses/${course.id}`}
-              className="group rounded-2xl bg-white border border-gray-border overflow-hidden shadow-sm hover:shadow-md hover:border-primary/20 transition-all"
+              className={`group overflow-hidden transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 ${
+                isDark
+                  ? "rounded-[16px] border border-white/[0.06] backdrop-blur-[20px] hover:border-white/[0.12] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
+                  : "rounded-2xl bg-white border border-gray-border/40 hover:border-primary/20 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
+              }`}
+              style={isDark ? { background: "rgba(255,255,255,0.03)" } : undefined}
             >
               {course.thumbnail ? (
-                <div className="h-40 bg-gray-100 overflow-hidden">
+                <div className="h-40 bg-gray-light overflow-hidden">
                   <img
                     src={course.thumbnail}
                     alt={course.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
                   />
                 </div>
               ) : (
-                <div className="h-40 bg-gradient-to-br from-primary/5 to-primary/15 flex items-center justify-center">
+                <div className="h-40 bg-gradient-to-br from-[#0e4f85] via-primary-dark to-primary flex items-center justify-center relative overflow-hidden hero-noise">
+                  <div className="absolute top-0 right-0 w-[150px] h-[150px] rounded-full opacity-20 pointer-events-none" style={{ background: "radial-gradient(circle, rgba(52,184,248,0.5) 0%, transparent 70%)" }} />
                   <svg
-                    className="w-12 h-12 text-primary/30"
+                    className="w-12 h-12 text-white/20 relative z-10"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    strokeWidth={1.5}
+                    strokeWidth={1}
                   >
                     <path
                       strokeLinecap="round"
@@ -131,29 +159,26 @@ export default function CoursesPage() {
                 </div>
               )}
               <div className="p-5">
-                <h3 className="text-base font-semibold text-black group-hover:text-primary transition-colors">
+                <h3 className={`text-[15px] font-bold group-hover:text-primary transition-colors duration-200 ${textPrimary}`}>
                   {course.name}
                 </h3>
                 {course.description && (
-                  <p className="text-xs text-black/50 mt-1 line-clamp-2">
+                  <p className={`text-xs ${textLabel} mt-1 line-clamp-2 leading-relaxed`}>
                     {course.description}
                   </p>
                 )}
-                <p className="text-xs text-black/40 mt-2">
-                  {course.lessonCount} aulas
-                </p>
-                <div className="mt-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] text-black/40">
-                      {completed}/{course.lessonCount} concluidas
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-[11px] ${textLabel} font-medium`}>
+                      {completed} de {course.lessonCount} aulas
                     </span>
-                    <span className="text-[10px] font-medium text-primary">
+                    <span className="text-[11px] font-bold text-primary">
                       {percent}%
                     </span>
                   </div>
-                  <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`w-full h-1.5 ${progressBg} rounded-full overflow-hidden`}>
                     <div
-                      className="h-full bg-primary rounded-full transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-primary to-primary-light rounded-full transition-all duration-700"
                       style={{ width: `${percent}%` }}
                     />
                   </div>
