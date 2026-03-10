@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
           state: buyer.address?.state || existingStudent.state,
           currentEnrollmentId: enrollmentId,
           totalEnrollments: (existingStudent.totalEnrollments || 0) + 1,
+          platformAccess: true,
         });
       } else {
         // Create new student + enrollment
@@ -140,6 +141,7 @@ export async function POST(request: NextRequest) {
         );
         await updateStudent(studentId, {
           currentEnrollmentId: enrollmentId,
+          platformAccess: true,
         });
       }
 
@@ -164,6 +166,8 @@ export async function POST(request: NextRequest) {
           found.enrollmentId,
           "refunded"
         );
+        // Revoke platform access
+        await updateStudent(found.studentId, { platformAccess: false });
       }
 
       return NextResponse.json({ received: true, event });

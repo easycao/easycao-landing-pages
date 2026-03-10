@@ -40,6 +40,8 @@ export interface Student {
   approved: boolean;
   approvedAt: Timestamp | null;
   csEnabled: boolean;
+  platformAccess?: boolean;
+  turmaId?: string | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
