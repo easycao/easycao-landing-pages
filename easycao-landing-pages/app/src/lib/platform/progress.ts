@@ -47,6 +47,7 @@ export async function markLessonComplete(
 
 /**
  * Get student progress for a specific course.
+ * Filters out completed lessons that no longer exist in the course.
  */
 export async function getStudentProgress(uid: string, courseId: string) {
   const db = getFirestoreDb();
@@ -67,11 +68,23 @@ export async function getStudentProgress(uid: string, courseId: string) {
   }
 
   const data = snap.data()!;
+  const rawCompleted: string[] = data.completedLessons || [];
+
+  // Filter against lessons that still exist in the course
+  const validLessonIds = await getValidLessonIds(courseId);
+  const completedLessons = rawCompleted.filter((id) => validLessonIds.has(id));
+
+  const totalLessons = validLessonIds.size;
+  const progressPercent =
+    totalLessons > 0
+      ? Math.round((completedLessons.length / totalLessons) * 100)
+      : 0;
+
   return {
-    completedLessons: data.completedLessons || [],
+    completedLessons,
     lastLessonId: data.lastLessonId || null,
     lastAccessedAt: data.lastAccessedAt?.toDate?.()?.toISOString() || null,
-    progressPercent: data.progressPercent || 0,
+    progressPercent,
   };
 }
 
@@ -128,12 +141,22 @@ export async function getDashboardProgress(uid: string) {
   for (const doc of progressSnap.docs) {
     const data = doc.data();
     const accessedAt = data.lastAccessedAt?.toDate?.() || null;
+    const rawCompleted: string[] = data.completedLessons || [];
+
+    // Filter against lessons that still exist
+    const validLessonIds = await getValidLessonIds(doc.id);
+    const completedLessons = rawCompleted.filter((id) => validLessonIds.has(id));
+    const totalLessons = validLessonIds.size;
+    const progressPercent =
+      totalLessons > 0
+        ? Math.round((completedLessons.length / totalLessons) * 100)
+        : 0;
 
     courseProgress[doc.id] = {
-      completedLessons: data.completedLessons || [],
+      completedLessons,
       lastLessonId: data.lastLessonId || null,
       lastAccessedAt: accessedAt?.toISOString() || null,
-      progressPercent: data.progressPercent || 0,
+      progressPercent,
     };
 
     if (
@@ -177,4 +200,34 @@ export async function countCourseLessons(courseId: string): Promise<number> {
     count += lessonsSnap.size;
   }
   return count;
+}
+
+/**
+ * Get the set of valid (published) lesson IDs for a course.
+ * Used to filter out progress entries for deleted lessons.
+ */
+async function getValidLessonIds(courseId: string): Promise<Set<string>> {
+  const db = getFirestoreDb();
+  const modulesSnap = await db
+    .collection("courses")
+    .doc(courseId)
+    .collection("modules")
+    .where("status", "==", "published")
+    .get();
+
+  const ids = new Set<string>();
+  for (const mod of modulesSnap.docs) {
+    const lessonsSnap = await db
+      .collection("courses")
+      .doc(courseId)
+      .collection("modules")
+      .doc(mod.id)
+      .collection("lessons")
+      .where("status", "==", "published")
+      .get();
+    for (const lesson of lessonsSnap.docs) {
+      ids.add(lesson.id);
+    }
+  }
+  return ids;
 }
