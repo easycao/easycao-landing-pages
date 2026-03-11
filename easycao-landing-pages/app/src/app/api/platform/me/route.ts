@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   }
 
   const db = getFirestoreDb();
-  const doc = await db.collection("students").doc(uid).get();
+  const doc = await db.collection("Users").doc(uid).get();
 
   if (!doc.exists) {
     return NextResponse.json({ name: null, role: "student" });

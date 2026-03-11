@@ -114,8 +114,10 @@ export async function POST(request: NextRequest) {
           platformAccess: true,
         });
       } else {
-        // Create new student + enrollment
+        // Create new user (authLinked: false — no Firebase Auth account yet)
         const studentId = await createStudent({
+          uid: null,
+          authLinked: false,
           name: `${buyer.first_name || ""} ${buyer.last_name || ""}`.trim(),
           firstName: buyer.first_name || "",
           lastName: buyer.last_name || "",

@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const db = getFirestoreDb();
-  const studentsSnap = await db.collection("students").get();
+  const studentsSnap = await db.collection("Users").where("totalEnrollments", ">", 0).get();
 
   // Collect all enrollment refs
   const pairs: { doc: FirebaseFirestore.QueryDocumentSnapshot; enrollmentId: string }[] = [];
@@ -20,7 +20,7 @@ export async function GET() {
   }
 
   const enrollmentRefs = pairs.map(({ doc, enrollmentId }) =>
-    db.collection("students").doc(doc.id).collection("enrollments").doc(enrollmentId)
+    db.collection("Users").doc(doc.id).collection("enrollments").doc(enrollmentId)
   );
 
   // Batch read

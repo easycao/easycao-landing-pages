@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
     // Step 3: Fetch all Firebase students
     console.log("Pipedrive sync: fetching Firebase students...");
     const db = getFirestoreDb();
-    const studentsSnap = await db.collection("students").get();
+    const studentsSnap = await db.collection("Users").where("totalEnrollments", ">", 0).get();
     console.log(`Pipedrive sync: ${studentsSnap.size} students in Firebase`);
 
     let matched = 0;
@@ -167,14 +167,14 @@ export async function GET(request: NextRequest) {
         }
 
         if (Object.keys(updates).length > 0) {
-          await db.collection("students").doc(doc.id).update(updates);
+          await db.collection("Users").doc(doc.id).update(updates);
         }
 
         // Update enrollment price if needsManualPrice
         const currentEnrollmentId = data.currentEnrollmentId;
         if (currentEnrollmentId) {
           const enrollDoc = await db
-            .collection("students")
+            .collection("Users")
             .doc(doc.id)
             .collection("enrollments")
             .doc(currentEnrollmentId)

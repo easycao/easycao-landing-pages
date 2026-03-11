@@ -160,7 +160,7 @@ export async function PATCH(
 
     if (Object.keys(enrollmentUpdates).length > 0) {
       await db
-        .collection("students")
+        .collection("Users")
         .doc(id)
         .collection("enrollments")
         .doc(body.enrollmentId)

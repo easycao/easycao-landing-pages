@@ -6,7 +6,7 @@ import { getFirestoreDb } from "@/lib/firebase-admin";
  */
 export async function checkPlatformAccess(uid: string): Promise<boolean> {
   const db = getFirestoreDb();
-  const doc = await db.collection("students").doc(uid).get();
+  const doc = await db.collection("Users").doc(uid).get();
   if (!doc.exists) return false;
   return doc.data()?.platformAccess === true;
 }
@@ -30,7 +30,7 @@ export async function checkPlatformAccessClient(
  */
 export async function getAccessibleCourseIds(uid: string): Promise<string[]> {
   const db = getFirestoreDb();
-  const studentDoc = await db.collection("students").doc(uid).get();
+  const studentDoc = await db.collection("Users").doc(uid).get();
   if (!studentDoc.exists) return [];
 
   const turmaId = studentDoc.data()?.turmaId;
@@ -54,31 +54,56 @@ export async function hasCourseAccess(
 }
 
 /**
- * Link any pending enrollments (purchased before registering) to a newly registered student.
+ * Link an authLinked:false Users doc (Hotmart pre-created) to a newly registered user.
+ * Merges data and subcollections from the old doc into the new Users/{uid} doc.
  */
-export async function linkPendingEnrollments(
+export async function linkPreCreatedUser(
   uid: string,
   email: string
-): Promise<void> {
+): Promise<boolean> {
   const db = getFirestoreDb();
-  const pendingSnap = await db
-    .collection("pending-enrollments")
+  const existingSnap = await db
+    .collection("Users")
     .where("email", "==", email.toLowerCase())
+    .where("authLinked", "==", false)
+    .limit(1)
     .get();
 
-  if (pendingSnap.empty) return;
+  if (existingSnap.empty) return false;
 
-  for (const pending of pendingSnap.docs) {
-    const data = pending.data();
-    // Set platform access on the student
-    await db
-      .collection("students")
-      .doc(uid)
-      .update({
-        platformAccess: true,
-        turmaId: data.turmaId || null,
-      });
-    // Delete the pending enrollment
-    await pending.ref.delete();
+  const oldDoc = existingSnap.docs[0];
+  if (oldDoc.id === uid) return false; // Already the same doc
+
+  const oldData = oldDoc.data();
+
+  // Merge CRM fields into the new Users/{uid} doc
+  await db
+    .collection("Users")
+    .doc(uid)
+    .set(
+      {
+        ...oldData,
+        uid,
+        authLinked: true,
+      },
+      { merge: true }
+    );
+
+  // Move subcollections (enrollments, progress)
+  for (const subcol of ["enrollments", "progress"]) {
+    const subSnap = await oldDoc.ref.collection(subcol).get();
+    for (const subDoc of subSnap.docs) {
+      await db
+        .collection("Users")
+        .doc(uid)
+        .collection(subcol)
+        .doc(subDoc.id)
+        .set(subDoc.data());
+      await subDoc.ref.delete();
+    }
   }
+
+  // Delete the old doc
+  await oldDoc.ref.delete();
+  return true;
 }

@@ -126,6 +126,8 @@ export async function POST() {
           approved: false,
           approvedAt: null,
           csEnabled: true,
+          uid: null,
+          authLinked: false,
         };
 
         const studentId = await createStudent(studentData);

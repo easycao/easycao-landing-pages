@@ -8,7 +8,7 @@ import type {
   EnrollmentStatus,
 } from "./types";
 
-const STUDENTS_COLLECTION = "students";
+const STUDENTS_COLLECTION = "Users";
 const ENROLLMENTS_SUBCOLLECTION = "enrollments";
 
 // --- Student CRUD ---
@@ -41,8 +41,11 @@ export async function searchStudents(query: string): Promise<Student[]> {
   if (!q) return [];
 
   // Firestore doesn't support full-text search natively.
-  // We query all students and filter in memory (acceptable for ~1000 docs).
-  const snapshot = await db.collection(STUDENTS_COLLECTION).get();
+  // Filter by totalEnrollments > 0 to exclude freemium app users with no purchases.
+  const snapshot = await db
+    .collection(STUDENTS_COLLECTION)
+    .where("totalEnrollments", ">", 0)
+    .get();
   const results: Student[] = [];
 
   for (const doc of snapshot.docs) {
@@ -77,6 +80,22 @@ export async function createStudent(
     updatedAt: FieldValue.serverTimestamp(),
   });
   return docRef.id;
+}
+
+export async function createStudentWithId(
+  id: string,
+  data: Omit<Student, "id" | "createdAt" | "updatedAt">
+): Promise<void> {
+  const db = getFirestoreDb();
+  await db
+    .collection(STUDENTS_COLLECTION)
+    .doc(id)
+    .set({
+      ...data,
+      email: data.email.toLowerCase(),
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
 }
 
 export async function updateStudent(
@@ -179,8 +198,11 @@ export async function findEnrollmentByTransaction(
     return null;
   }
 
-  // Fallback: scan all students (slow, but works without email)
-  const studentsSnap = await db.collection(STUDENTS_COLLECTION).get();
+  // Fallback: scan students with enrollments (slow, but works without email)
+  const studentsSnap = await db
+    .collection(STUDENTS_COLLECTION)
+    .where("totalEnrollments", ">", 0)
+    .get();
   for (const studentDoc of studentsSnap.docs) {
     const enrollSnap = await db
       .collection(STUDENTS_COLLECTION)

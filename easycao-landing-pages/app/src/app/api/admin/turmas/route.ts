@@ -10,7 +10,7 @@ export async function GET() {
       const data = doc.data();
       // Count students in this turma
       const studentsSnap = await db
-        .collection("students")
+        .collection("Users")
         .where("turmaId", "==", doc.id)
         .get();
       return {

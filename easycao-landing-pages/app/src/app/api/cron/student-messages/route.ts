@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
   try {
     const db = getFirestoreDb();
 
-    // Step 1: Load all students (single query)
-    const studentsSnap = await db.collection("students").get();
+    // Step 1: Load all users with enrollments (filtered — excludes freemium app users)
+    const studentsSnap = await db.collection("Users").where("totalEnrollments", ">", 0).get();
     const studentDocs = studentsSnap.docs;
 
     // Step 2: Build enrollment refs for batch read
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     // Step 3: Batch read all enrollments at once (instead of N sequential reads)
     const enrollmentRefs = studentsWithEnrollment.map(({ doc, enrollmentId }) =>
       db
-        .collection("students")
+        .collection("Users")
         .doc(doc.id)
         .collection("enrollments")
         .doc(enrollmentId)

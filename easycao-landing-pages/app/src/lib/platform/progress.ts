@@ -13,7 +13,7 @@ export async function markLessonComplete(
 ) {
   const db = getFirestoreDb();
   const progressRef = db
-    .collection("students")
+    .collection("Users")
     .doc(uid)
     .collection("progress")
     .doc(courseId);
@@ -52,7 +52,7 @@ export async function markLessonComplete(
 export async function getStudentProgress(uid: string, courseId: string) {
   const db = getFirestoreDb();
   const snap = await db
-    .collection("students")
+    .collection("Users")
     .doc(uid)
     .collection("progress")
     .doc(courseId)
@@ -98,7 +98,7 @@ export async function updateLastAccessed(
 ) {
   const db = getFirestoreDb();
   await db
-    .collection("students")
+    .collection("Users")
     .doc(uid)
     .collection("progress")
     .doc(courseId)
@@ -117,7 +117,7 @@ export async function updateLastAccessed(
 export async function getDashboardProgress(uid: string) {
   const db = getFirestoreDb();
   const progressSnap = await db
-    .collection("students")
+    .collection("Users")
     .doc(uid)
     .collection("progress")
     .get();

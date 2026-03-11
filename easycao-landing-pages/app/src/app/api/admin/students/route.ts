@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
       if (student.currentEnrollmentId) {
         const enrollDoc = await db
-          .collection("students")
+          .collection("Users")
           .doc(student.id)
           .collection("enrollments")
           .doc(student.currentEnrollmentId)

@@ -38,6 +38,7 @@ interface PipelineStudent {
   approved: boolean;
   csEnabled: boolean;
   extensionDays: number;
+  authLinked: boolean;
 }
 
 interface StageData {
@@ -53,8 +54,8 @@ export async function GET() {
 
   const db = getFirestoreDb();
 
-  // Fetch all students
-  const studentsSnap = await db.collection("students").get();
+  // Fetch all users with enrollments (excludes freemium app users)
+  const studentsSnap = await db.collection("Users").where("totalEnrollments", ">", 0).get();
 
   // Build enrollment document references for batch fetch
   const studentDocs: {
@@ -68,6 +69,7 @@ export async function GET() {
     tags: string[];
     approved: boolean;
     csEnabled: boolean;
+    authLinked: boolean;
   }[] = [];
 
   const enrollmentRefs: FirebaseFirestore.DocumentReference[] = [];
@@ -87,10 +89,11 @@ export async function GET() {
         tags: data.tags || [],
         approved: data.approved || false,
         csEnabled: data.csEnabled !== false,
+        authLinked: data.authLinked !== false,
       });
       enrollmentRefs.push(
         db
-          .collection("students")
+          .collection("Users")
           .doc(doc.id)
           .collection("enrollments")
           .doc(currentEnrollmentId)
@@ -111,7 +114,7 @@ export async function GET() {
   // Batch fetch all enrollments subcollections for LTV computation
   const allEnrollmentSnaps = await Promise.all(
     studentDocs.map((s) =>
-      db.collection("students").doc(s.id).collection("enrollments").get()
+      db.collection("Users").doc(s.id).collection("enrollments").get()
     )
   );
 
@@ -174,6 +177,7 @@ export async function GET() {
       approved: student.approved,
       csEnabled: student.csEnabled,
       extensionDays,
+      authLinked: student.authLinked,
     };
 
     if (stages[stage]) {

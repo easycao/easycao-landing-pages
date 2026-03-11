@@ -23,6 +23,8 @@ export interface StageRecord {
 
 export interface Student {
   id: string;
+  uid: string | null;
+  authLinked: boolean;
   name: string;
   firstName: string;
   lastName: string;

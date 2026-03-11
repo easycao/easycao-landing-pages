@@ -21,6 +21,7 @@ interface PipelineStudent {
   approved: boolean;
   csEnabled: boolean;
   extensionDays: number;
+  authLinked: boolean;
 }
 
 interface StageData {
@@ -504,8 +505,14 @@ export default function CrmDashboard() {
                         {(s.needsManualPrice ||
                           s.enrollmentStatus === "refunded" ||
                           s.hotmartStatus?.startsWith("BLOCKED") ||
-                          s.extensionDays > 0) && (
+                          s.extensionDays > 0 ||
+                          !s.authLinked) && (
                           <div className="flex flex-wrap gap-1 mt-3">
+                            {!s.authLinked && (
+                              <span className="text-[11px] font-bold text-orange-600 px-2 py-0.5 rounded-full bg-orange-50">
+                                Sem conta
+                              </span>
+                            )}
                             {s.extensionDays > 0 && (
                               <span className="text-[11px] font-bold text-primary px-2 py-0.5 rounded-full bg-primary/10">
                                 Extensão +{s.extensionDays}d

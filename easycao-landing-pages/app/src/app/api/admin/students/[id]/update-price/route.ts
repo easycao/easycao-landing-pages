@@ -21,7 +21,7 @@ export async function PATCH(
 
   const db = getFirestoreDb();
   const enrollmentRef = db
-    .collection("students")
+    .collection("Users")
     .doc(id)
     .collection("enrollments")
     .doc(enrollmentId);

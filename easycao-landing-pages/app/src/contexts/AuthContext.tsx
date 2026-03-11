@@ -66,12 +66,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       password
     );
-    await setDoc(doc(getClientDb(), "students", credential.user.uid), {
+    // Check if a Users doc already exists for this email (e.g., Hotmart pre-created with authLinked: false).
+    // The server-side register API handles the merge. Here we just create the basic doc.
+    await setDoc(doc(getClientDb(), "Users", credential.user.uid), {
       name,
       email,
       role: "student",
+      uid: credential.user.uid,
+      authLinked: true,
       createdAt: serverTimestamp(),
-    });
+    }, { merge: true });
   }
 
   async function signOut() {
