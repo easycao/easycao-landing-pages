@@ -101,7 +101,7 @@ export const CONTENT_PAGES: ContentPage[] = [
     readingTime: 7,
     relatedSlugs: [
       "como-funciona-a-prova-icao",
-      "onde-fazer-a-prova-icao",
+      "como-agendar-a-prova-icao",
       "quem-precisa-fazer-prova-icao",
     ],
     category: "understand",
@@ -280,31 +280,9 @@ export const CONTENT_PAGES: ContentPage[] = [
     updatedAt: "2026-03-03",
     readingTime: 8,
     relatedSlugs: [
-      "onde-fazer-a-prova-icao",
       "como-agendar-a-prova-icao",
-      "reprovado-na-prova-icao",
-    ],
-    category: "logistics",
-    phase: 1,
-  },
-  {
-    slug: "onde-fazer-a-prova-icao",
-    title: "Onde Fazer a Prova ICAO: Centros Credenciados e Como Agendar",
-    seoTitle: "Onde Fazer a Prova ICAO | Easycao",
-    description:
-      "Lista completa de centros credenciados para a prova ICAO no Brasil, organizados por região. Saiba como agendar e o que levar no dia da prova.",
-    keywords: [
-      "onde fazer a prova icao",
-      "entidades credenciadas SDEA",
-      "centros de prova icao",
-      "prova icao são paulo",
-    ],
-    updatedAt: "2026-03-03",
-    readingTime: 10,
-    relatedSlugs: [
-      "como-agendar-a-prova-icao",
-      "quanto-custa-a-prova-icao",
       "sdea-santos-dumont-english-assessment",
+      "reprovado-na-prova-icao",
     ],
     category: "logistics",
     phase: 1,
@@ -324,8 +302,8 @@ export const CONTENT_PAGES: ContentPage[] = [
     updatedAt: "2026-03-03",
     readingTime: 6,
     relatedSlugs: [
-      "onde-fazer-a-prova-icao",
       "quanto-custa-a-prova-icao",
+      "sdea-santos-dumont-english-assessment",
       "como-se-preparar-para-a-prova-icao",
     ],
     category: "logistics",

@@ -90,21 +90,19 @@ export default function ComoFuncionaPage() {
       <p>
         O objetivo é "quebrar o gelo" e avaliar sua capacidade de conversar
         naturalmente sobre temas profissionais. Dica: não dê respostas curtas
-        demais. Desenvolva suas ideias em 3-4 frases.
+        demais.
       </p>
 
       <h3 id="parte-2">Parte 2 — Interacting as a Pilot (~15 minutos)</h3>
       <p>
-        A parte mais longa. Você recebe 5 cenários de voo onde precisa
-        interagir com ATC ou outros pilotos. Os cenários incluem situações
-        como: solicitar autorizações, reportar posição, pedir informações
-        meteorológicas e coordenar com torre de controle.
+        A parte mais longa. Os cenários incluem situações nas quais você
+        deverá cotejar, reportar panes, fazer solicitações, clarificar o
+        controlador de voo e reportar ao examinador o que foi dito no áudio.
       </p>
       <p>
         Aqui o examinador avalia fortemente os descritores de Interaction
         e Comprehension. Você precisa demonstrar que consegue manter um
-        diálogo profissional, pedir clarificações quando necessário e
-        reformular informações.
+        diálogo profissional, como se estivesse voando.
       </p>
 
       <h3 id="parte-3">Parte 3 — Unexpected Situations (~15 minutos)</h3>
@@ -114,26 +112,18 @@ export default function ComoFuncionaPage() {
         bird strike, weather diversions, entre outros.
       </p>
       <p>
-        O examinador quer ver como você comunica problemas, toma decisões
-        e coordena ações sob pressão. Vocabulário técnico de emergências
-        é essencial aqui. Pratique cenários como: "Mayday, Mayday...",
-        "Request immediate landing due to...", "Declaring emergency because...".
+        Será necessário reportar ao examinador o que foi relatado no áudio
+        e reportar a uma pergunta relaciona a algum problema da situação ou
+        do áudio. Ao final dessa parte, será necessário que você faça uma
+        comparação das 3 situações.
       </p>
 
       <h3 id="parte-4">Parte 4 — Picture Description (~10 minutos)</h3>
       <p>
         Você recebe imagens relacionadas à aviação (acidentes, cenários de
-        aeroporto, cockpits, weather phenomena) e deve descrevê-las em
+        aeroporto, simulador de voo) e deve descrevê-las em
         inglês. Após a descrição, o examinador faz perguntas sobre a imagem
-        e pede sua opinião sobre as causas ou consequências do que você vê.
-      </p>
-      <p>
-        Esta parte avalia especialmente Vocabulary e Structure. Dica:
-        organize sua descrição (foreground → background → details → opinion)
-        e use vocabulário descritivo rico. Veja{" "}
-        <Link href="/dicas-prova-icao-descricao-imagens">
-          dicas específicas para descrição de imagens
-        </Link>.
+        e inicia uma discussão sobre temas relacionados à imagem.
       </p>
 
       <AppBanner variant="inline" />
@@ -143,7 +133,7 @@ export default function ComoFuncionaPage() {
         Ao longo das 4 partes, o examinador avalia seus{" "}
         <Link href="/descritores-da-prova-icao">6 descritores</Link> de forma
         independente: Pronunciation, Structure, Vocabulary, Fluency,
-        Comprehension e Interaction. Cada descritor recebe uma nota de 1 a 6.
+        Comprehension e Interaction. Cada descritor recebe uma nota de 1 a 5.
       </p>
       <p>
         Os examinadores são treinados e credenciados pela ANAC seguindo
@@ -183,9 +173,13 @@ export default function ComoFuncionaPage() {
 
       <p>
         A prova deve ser realizada em um dos{" "}
-        <Link href="/onde-fazer-a-prova-icao">
+        <a
+          href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           centros credenciados pela ANAC
-        </Link>{" "}
+        </a>{" "}
         espalhados pelo Brasil. O candidato vai pessoalmente ao centro e
         a avaliação é conduzida face-a-face com o examinador.
       </p>

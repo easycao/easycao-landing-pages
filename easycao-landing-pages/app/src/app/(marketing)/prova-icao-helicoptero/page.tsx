@@ -29,7 +29,7 @@ const faqs = [
   { question: "A prova ICAO para helicóptero é diferente?", answer: "A estrutura e os critérios de avaliação são idênticos. A diferença está nos cenários: o examinador pode usar situações específicas de operações de helicóptero durante a prova." },
   { question: "Preciso de ICAO para voar helicóptero offshore?", answer: "Sim. Operações offshore são internacionais por natureza (plataformas em águas internacionais), exigindo proficiência ICAO Level 4 ou superior." },
   { question: "Posso estudar com material de asa fixa?", answer: "Sim, a base é a mesma. Porém, complemente com vocabulário específico de helicóptero e cenários de operações de asa rotativa." },
-  { question: "O examinador sabe que sou piloto de helicóptero?", answer: "Sim, essa informação consta no seu cadastro. O examinador pode adaptar cenários para incluir situações mais relevantes à sua operação." },
+  { question: "O examinador sabe que sou piloto de helicóptero?", answer: "Sim, essa informação consta no seu cadastro." },
 ];
 
 export default function HelicopteroPage() {

@@ -18,7 +18,7 @@ export default function CommunitySection() {
               Você nunca voa sozinho
             </h2>
             <p className="text-black/70 mb-6">
-              Na aviação, a torre de controle é seu suporte em cada fase do voo.
+              Na aviação, a voz do controlador de tráfego aéreo é seu suporte em cada fase do voo.
               No Método Easycao, a comunidade funciona assim — suporte real,
               em tempo real, para cada etapa da sua preparação.
             </p>

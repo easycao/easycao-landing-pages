@@ -3,7 +3,7 @@ import FAQAccordion from "../../../components/content/FAQAccordion";
 const salesFaqs = [
   {
     question: "Para quem é o Método Easycao?",
-    answer: "Para pilotos que precisam ser aprovados na prova ICAO de proficiência em inglês. Funciona para todos os níveis — de quem está começando a estudar até quem quer subir de Level 4 para 5.",
+    answer: "Para pilotos que precisam ser aprovados na prova ICAO de proficiência em inglês. Funciona para todos os níveis — de quem está começando a estudar até quem quer subir de Level 4 para 5 ou 6.",
   },
   {
     question: "Funciona para quem nunca fez a prova?",
@@ -19,7 +19,7 @@ const salesFaqs = [
   },
   {
     question: "Quanto tempo tenho de acesso?",
-    answer: "A matrícula tem duração de um ano, com acesso completo a todo o conteúdo do método durante esse período.",
+    answer: "A matrícula tem duração de um ano, com acesso completo a todo o conteúdo do método e as atualizações durante todo esse período",
   },
   {
     question: "Posso parcelar?",
@@ -35,7 +35,7 @@ const salesFaqs = [
   },
   {
     question: "Tem suporte para dúvidas?",
-    answer: "Sim! Você tem acesso à comunidade no WhatsApp com suporte do professor Diogo e da equipe. Dúvidas são respondidas diariamente.",
+    answer: "Sim! Você tem acesso à comunidade no WhatsApp com suporte em tempo real.",
   },
   {
     question: "Quando começam as aulas?",
@@ -43,11 +43,11 @@ const salesFaqs = [
   },
   {
     question: "É diferente de outros cursos de inglês? E de outros preparatórios ICAO?",
-    answer: "Completamente. O Método Easycao não é um curso de inglês geral. Foi criado especificamente para a prova ICAO pelo professor Diogo Verzola, examinador ICAO credenciado e treinado pela ANAC para avaliar pilotos. Ele entende exatamente o que é esperado do piloto na prova e construiu o método em cima disso.",
+    answer: "Completamente. O Método de ensino foi desenvolvido com base em neurosciência e segue o caminho didático mais intuitivo, respeitando o processo natural de aprendizagem do idioma, com direcionamento prático para fazer a prova ICAO com segurança e excelência.",
   },
   {
     question: "Por onde acesso o curso?",
-    answer: "O curso é acessado pela plataforma Hotmart. Assim que a matrícula é confirmada, você recebe um e-mail com o link de acesso. Pode assistir no computador, celular, tablet ou TV — e as aulas ficam disponíveis para download e acesso offline.",
+    answer: "O curso é acessado pela plataforma Hotmart. Assim que a matrícula é confirmada, você recebe um e-mail com o link de acesso. Pode assistir no computador, celular, tablet ou TV — e as aulas ficam disponíveis para download e acesso offline. A comunidade você acessa por Whatsapp, as aulas ao vivo pelo Zoom e os simulador pelo aplicativo próprio da Easycao.",
   },
 ];
 

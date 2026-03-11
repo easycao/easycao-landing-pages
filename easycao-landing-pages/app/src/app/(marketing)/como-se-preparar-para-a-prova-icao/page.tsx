@@ -183,7 +183,7 @@ export default function ComoSePreparar() {
         <li>
           <strong>
             <a
-              href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/proficiencia-linguistica"
+              href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas"
               target="_blank"
               rel="noopener noreferrer"
             >

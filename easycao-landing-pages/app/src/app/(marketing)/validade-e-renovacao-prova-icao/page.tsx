@@ -27,7 +27,7 @@ const faqs = [
   { question: "Quanto tempo vale a proficiência ICAO Level 4?", answer: "Level 4 tem validade de 3 anos a partir da data da prova. Após esse período, você precisa refazer a avaliação." },
   { question: "Quanto tempo vale o Level 5?", answer: "Level 5 tem validade de 6 anos. É o dobro do Level 4, o que representa economia significativa em taxas de renovação." },
   { question: "Level 6 realmente não precisa renovar?", answer: "Correto. Level 6 (Expert) tem validade vitalícia segundo as normas da ICAO. É o único nível com validade permanente." },
-  { question: "Posso subir de nível na renovação?", answer: "Sim. A renovação é uma nova avaliação completa. Você pode buscar um nível superior ao que tem atualmente." },
+  { question: "Posso subir de nível na renovação?", answer: "Sim. A renovação é uma nova avaliação completa. Você pode buscar um nível superior ao que tem atualmente. Porém, o nível também pode descer se o desempenho não for suficiente." },
   { question: "O que acontece se minha proficiência vencer?", answer: "Você perde a habilitação para voos internacionais até refazer e ser aprovado na prova." },
 ];
 
@@ -62,7 +62,7 @@ export default function ValidadeRenovacaoPage() {
       <h2 id="processo-renovacao">Processo de renovação</h2>
       <p>A renovação é exatamente igual a primeira avaliação. Não há atalhos:</p>
       <ul>
-        <li>Agendar em um <Link href="/onde-fazer-a-prova-icao">centro credenciado</Link></li>
+        <li>Agendar em um <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">centro credenciado</a></li>
         <li>Pagar a taxa completa (mesma da primeira vez)</li>
         <li>Fazer a prova completa (4 partes)</li>
         <li>Ser avaliado nos 6 descritores</li>
@@ -74,7 +74,7 @@ export default function ValidadeRenovacaoPage() {
       <ul>
         <li>Você <strong>não pode mais realizar voos internacionais</strong></li>
         <li>Precisa refazer a prova e ser aprovado antes de retomar operações internacionais</li>
-        <li>Voos domésticos não são afetados (proficiência não é obrigatória para operações nacionais)</li>
+        <li>Voos domésticos não são afetados, porém, muitas vezes determinados empregos exigem o ICAO e a perda do nível podem ocasionar problemas no seu trabalho</li>
       </ul>
 
       <h2 id="estrategia">Estratégia de renovação</h2>

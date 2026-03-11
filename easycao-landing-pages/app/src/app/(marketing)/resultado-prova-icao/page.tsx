@@ -24,9 +24,9 @@ const headings: { id: string; text: string; level: 2 | 3 }[] = [
 ];
 
 const faqs = [
-  { question: "Quanto tempo demora para sair o resultado?", answer: "Geralmente 5 a 15 dias úteis após a prova, dependendo do centro. Alguns centros mais ágeis divulgam em 5-7 dias." },
+  { question: "Quanto tempo demora para sair o resultado?", answer: "Geralmente 5 a 7 dias úteis após a prova, dependendo do centro. Às vezes sai no mesmo dia." },
   { question: "O resultado sai por email ou no sistema da ANAC?", answer: "O centro geralmente envia o resultado por email. Além disso, o resultado é registrado no sistema da ANAC e fica disponível para consulta." },
-  { question: "Posso contestar meu resultado?", answer: "Sim. Se você discorda do resultado, pode solicitar revisão ao centro ou apresentar recurso à ANAC. Consulte o regulamento do centro para o procedimento." },
+  { question: "Posso contestar meu resultado?", answer: "Sim. Se você discorda do resultado, pode solicitar revisão ao centro ou apresentar recurso à ANAC. Consulte a ANAC para o procedimento." },
   { question: "O resultado fica no meu histórico permanentemente?", answer: "Sim. Todos os resultados ficam registrados no sistema da ANAC. Porém, cada avaliação é independente — um resultado anterior não influencia o próximo." },
   { question: "Como saber meu nível em cada descritor?", answer: "O resultado detalhado mostra o nível obtido em cada um dos 6 descritores individualmente. Sua nota final é o menor nível entre todos os descritores." },
 ];
@@ -35,30 +35,21 @@ export default function ResultadoPage() {
   return (
     <ContentPageLayout slug={PAGE_SLUG} headings={headings} faqs={faqs}>
       <h2 id="quando-sai">Quando sai o resultado</h2>
-      <p>O prazo para divulgação do resultado da prova ICAO varia por centro credenciado:</p>
-      <ul>
-        <li><strong>Prazo médio:</strong> 5 a 15 dias úteis após a data da prova</li>
-        <li><strong>Centros mais ágeis:</strong> Alguns divulgam em 5-7 dias</li>
-        <li><strong>Centros com mais demanda:</strong> Podem levar até 15-20 dias úteis</li>
-      </ul>
+      <p>5-7 dias é o tempo médio para divulgação do resultado. Às vezes sai no mesmo dia da prova.</p>
       <p>O centro deve informar o prazo estimado no momento do agendamento. Se o prazo expirar sem resposta, entre em contato diretamente com o centro.</p>
 
       <h2 id="como-verificar">Como verificar seu resultado</h2>
       <p>Existem duas formas de acessar seu resultado:</p>
       <ol>
         <li><strong>Pelo centro credenciado:</strong> O centro envia o resultado por email ou disponibiliza em portal próprio. Este é geralmente o canal mais rápido</li>
-        <li><strong>Pelo sistema da ANAC:</strong> O resultado é registrado no sistema da <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/proficiencia-linguistica" target="_blank" rel="noopener noreferrer">ANAC</a> e pode ser consultado online</li>
+        <li><strong>Pelo sistema da ANAC:</strong> O resultado é registrado no sistema da <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">ANAC</a> e pode ser consultado online</li>
       </ol>
-
-      <CalloutBox variant="info" title="Guarde seu resultado">
-        Salve o documento oficial do resultado. Você precisará dele para comprovar sua proficiência em processos seletivos, renovação de licença e operações internacionais.
-      </CalloutBox>
 
       <h2 id="interpretar">Como interpretar sua nota</h2>
       <p>O resultado da prova ICAO mostra:</p>
       <ul>
         <li><strong>Nível em cada descritor:</strong> Nota individual (1 a 6) para cada um dos 6 <Link href="/descritores-da-prova-icao">descritores</Link> (Pronunciation, Structure, Vocabulary, Fluency, Comprehension, Interaction)</li>
-        <li><strong>Nível final:</strong> O <strong>menor nível</strong> entre todos os 6 descritores. Se você tirou 5 em cinco descritores e 4 em um, seu nível final é 4</li>
+        <li><strong>Nível final:</strong> O <strong>menor nível</strong> entre todos os 6 descritores. Se você obteve 5 em cinco descritores e 4 em um, seu nível final é 4</li>
       </ul>
       <p>Entenda o que cada <Link href="/niveis-icao">nível ICAO</Link> significa e quanto tempo cada um é válido.</p>
 
@@ -82,7 +73,7 @@ export default function ResultadoPage() {
         <li><strong>Anotação na licença:</strong> Seu nível será anotado na sua CHT/licença de piloto</li>
         <li><strong>Validade:</strong> Level 4 vale 3 anos, Level 5 vale 6 anos, Level 6 é vitalício. Planeje sua <Link href="/validade-e-renovacao-prova-icao">renovação</Link> com antecedência</li>
         <li><strong>Voos internacionais:</strong> Você está autorizado a operar voos internacionais</li>
-        <li><strong>Upgrade opcional:</strong> Se obteve Level 4, pode fazer a prova novamente a qualquer momento para tentar Level 5 (sem espera de 60 dias)</li>
+        <li><strong>Upgrade opcional:</strong> Se obteve Level 4, pode fazer a prova novamente dentro da validade do seu ICAO 4</li>
       </ul>
 
       <h2 id="reprovado">Se você não atingiu Level 4</h2>

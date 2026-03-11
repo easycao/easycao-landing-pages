@@ -46,10 +46,10 @@ const faqs = [
   {
     question: "Qual descritor é mais difícil para pilotos brasileiros?",
     answer:
-      "Interaction costuma ser o mais desafiador, pois envolve habilidades de turn-taking, pedir clarificações e gerenciar a conversa de forma natural — algo que não se pratica em cursos tradicionais de inglês.",
+      "Estrutura, pois vai além da gramática. É necessário que a gramática e a semântica estejam associadas ao contexto do DOC9835.",
   },
   {
-    question: "Posso tirar 6 em um descritor e 4 em outro?",
+    question: "Posso tirar 5 em um descritor e 4 em outro?",
     answer:
       "Sim, mas sua nota final será 4, pois a regra é que o nível final é igual ao menor descritor. Por isso é fundamental não negligenciar nenhum dos 6 descritores na preparação.",
   },
@@ -116,21 +116,16 @@ export default function DescritoresPage() {
         "cleared"), confundir "th" com "f/d", e entonação muito plana.
       </p>
       <p>
-        Para Level 4, a pronúncia deve ser "geralmente compreensível" mesmo com
-        influência da língua materna. Para Level 5, deve ser "consistentemente
-        compreensível" com raríssimas interferências.
+        Para Level 5, deve ser "consistentemente compreensível" com o ritmo e
+        entonação de fala mais fluídos, que não gerem dificuldade para o
+        examinador entender o que você falou.
       </p>
 
       <h3 id="structure">Structure (Estrutura)</h3>
       <p>
-        Avalia o uso de estruturas gramaticais básicas e complexas. Não é um
-        teste de gramática tradicional — o examinador observa se você consegue
-        usar estruturas variadas (condicionais, voz passiva, reported speech)
-        para se comunicar de forma eficaz em situações de aviação.
-      </p>
-      <p>
-        Erros comuns: uso excessivo de frases curtas e simples (limita o score),
-        mistura de tempos verbais, e falta de conectores lógicos.
+        Erros que comprometem a estruturação da frase: tempos verbais,
+        preposições, artigos, etc... Podem ocasionar erros globais fazendo
+        sua nota cair.
       </p>
 
       <h3 id="vocabulary">Vocabulary (Vocabulário)</h3>
@@ -139,23 +134,21 @@ export default function DescritoresPage() {
         <Link href="/vocabulario-aviacao-ingles">
           vocabulário específico de aviação
         </Link>{" "}
-        quanto vocabulário geral. Você precisa dominar termos técnicos
-        (weather phenomena, aircraft systems, emergency procedures) e também
-        conseguir se expressar sobre temas gerais quando necessário.
+        quanto vocabulário geral. Você precisa ter a escolha correta da
+        palavra para cada ocasião necessária.
       </p>
       <p>
         Para Level 4, espera-se vocabulário "suficiente para comunicação sobre
         temas comuns, concretos e relacionados ao trabalho". Para Level 5,
-        "amplo e preciso".
+        "amplo e idiomático".
       </p>
 
       <h3 id="fluency">Fluency (Fluência)</h3>
       <p>
         Avalia a velocidade da fala, a naturalidade e o uso de pausas. Não é
         sobre falar rápido — é sobre manter o fluxo da comunicação sem pausas
-        longas e desnecessárias. Preenchedores de pausa como "uh", "well",
-        "you know" são normais até Level 4, mas devem diminuir em níveis mais
-        altos.
+        longas e desnecessárias. Preenchedores de pausa como "uhnnn", "ehhhh",
+        "ihhh" são chamados "fillers" e também comprometem sua nota de fluência.
       </p>
       <p>
         O examinador observa se você consegue desenvolver ideias sem
@@ -166,14 +159,14 @@ export default function DescritoresPage() {
       <h3 id="comprehension">Comprehension (Compreensão)</h3>
       <p>
         Avalia a capacidade de entender inglês em contextos aeronáuticos.
-        Durante a prova, o examinador testa isso fazendo perguntas,
-        apresentando cenários e verificando se você compreende instruções
-        e informações. Não é um teste de listening separado — a compreensão
-        é avaliada ao longo de toda a prova.
+        Durante a prova, o examinador testa isso apresentando áudios, fazendo
+        perguntas e verificando se você compreende instruções e informações.
+        Não é um teste de listening separado — a compreensão é avaliada ao
+        longo de toda a prova.
       </p>
       <p>
-        Para Level 4, você deve compreender "com precisão" temas relacionados
-        ao trabalho. Dificuldade com sotaques variados ou linguagem figurada
+        Para Level 4, você deve compreender bem temas relacionados ao
+        trabalho. Dificuldade com sotaques variados ou velocidade de áudios
         pode reduzir o score.
       </p>
 
@@ -183,6 +176,10 @@ export default function DescritoresPage() {
         turn-taking (saber quando falar e quando ouvir), pedir clarificações
         quando não entendeu, reformular frases, confirmar informações e
         manter a conversa produtiva.
+      </p>
+      <p>
+        Você precisa ser imediato, apropriado e informativo, respostas
+        decoradas não são apropriadas e frequentemente penalizam em interação.
       </p>
       <p>
         Este é frequentemente o descritor mais desafiador para pilotos
@@ -195,7 +192,7 @@ export default function DescritoresPage() {
       {/* Como funciona a nota final */}
       <h2 id="nota-final">Como funciona a nota final</h2>
       <p>
-        O examinador atribui uma nota de 1 a 6 para cada descritor. Sua nota
+        O examinador atribui uma nota de 1 a 5* para cada descritor. Sua nota
         final é o menor valor entre os 6. Veja um exemplo:
       </p>
 
@@ -251,10 +248,16 @@ export default function DescritoresPage() {
           </thead>
           <tbody>
             <tr>
-              <td>Erros</td>
-              <td>Frequentemente interferem</td>
-              <td>Raramente interferem</td>
-              <td>Quase nunca interferem</td>
+              <td>Pronúncia</td>
+              <td>Erros Frequentemente interferem</td>
+              <td>Erros Raramente interferem</td>
+              <td>Erros Quase nunca interferem</td>
+            </tr>
+            <tr>
+              <td>Estrutura</td>
+              <td>Erros Frequentemente interferem</td>
+              <td>Erros Raramente interferem</td>
+              <td>Erros Quase nunca interferem</td>
             </tr>
             <tr>
               <td>Vocabulário</td>
@@ -298,30 +301,29 @@ export default function DescritoresPage() {
       </p>
       <ul>
         <li>
-          <strong>Pronunciation:</strong> Grave-se lendo NOTAM e ATIS e compare
-          com áudio de controllers nativos. Foque em consoantes finais e
-          entonação.
+          <strong>Pronunciation:</strong> Treine falar em voz alta, além do
+          estudo teórico, inclusa sessões de fala para praticar a habilidade
+          de pronúncia.
         </li>
         <li>
-          <strong>Structure:</strong> Pratique condicionais e reported speech em
-          contextos de aviação. "If the runway had been longer..." vs "The tower
-          said that..."
+          <strong>Structure:</strong> Entenda a lógica de montagem de frases
+          simples e exercite a aplicação dessas frases no contexto prático
+          da prova.
         </li>
         <li>
-          <strong>Vocabulary:</strong> Estude termos de weather, emergencies e
-          systems. Use o{" "}
-          <Link href="/vocabulario-aviacao-ingles">
-            glossário de vocabulário de aviação
-          </Link>
-          .
+          <strong>Vocabulary:</strong> Coloque mais a língua inglesa no seu dia
+          a dia e cada palavra nova aprendida, procure dar um direcionamento
+          prático.
         </li>
         <li>
-          <strong>Fluency:</strong> Pratique respostas longas (1-2 minutos) sobre
-          temas de aviação. Reduza pausas com prática regular.
+          <strong>Fluency:</strong> A fluência só pode ser desenvolvida
+          treinando, sugere-se que você separe pelo menos 30 minutos do seu
+          dia para exercitar a prática.
         </li>
         <li>
-          <strong>Comprehension:</strong> Ouça podcasts e comunicações ATC reais.
-          Exponha-se a sotaques variados.
+          <strong>Comprehension:</strong> Treine seu ouvido com exposição à
+          Língua Inglesa, além de áudios de ATC, filmes, podcasts e músicas
+          ajudam a treinar o ouvido.
         </li>
         <li>
           <strong>Interaction:</strong> Simule diálogos completos. Pratique pedir
@@ -337,7 +339,7 @@ export default function DescritoresPage() {
         faz simulados ao vivo e corrige cada descritor individualmente. É a
         melhor forma gratuita de praticar. Você também pode praticar no{" "}
         <a
-          href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/proficiencia-linguistica"
+          href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas"
           target="_blank"
           rel="noopener noreferrer"
         >

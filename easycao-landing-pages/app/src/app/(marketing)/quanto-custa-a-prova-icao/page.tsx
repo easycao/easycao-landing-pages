@@ -34,19 +34,14 @@ const faqs = [
   {
     question: "Quanto custa a prova ICAO em 2026?",
     answer:
-      "O valor varia por instituição, geralmente entre R$ 800 e R$ 1.500. Os preços dependem do centro credenciado e da região. Consulte diretamente o centro para valores atualizados.",
+      "O valor varia por instituição, geralmente entre R$ 900 e R$ 1.200. Os preços dependem do centro credenciado e da região. Consulte diretamente o centro para valores atualizados.",
   },
   {
     question: "Preciso pagar novamente se reprovar?",
     answer:
       "Sim. Cada tentativa requer o pagamento integral da taxa de avaliação. Por isso, investir em preparação antes da prova pode economizar significativamente a longo prazo.",
   },
-  {
-    question: "Existe taxa da ANAC além da taxa do centro?",
-    answer:
-      "Não. A taxa é cobrada diretamente pelo centro credenciado e já inclui todos os custos da avaliação. Não há taxa separada da ANAC para a prova em si.",
-  },
-  {
+{
     question: "Os centros parcelam o pagamento?",
     answer:
       "Alguns centros aceitam cartão de crédito com parcelamento. As condições variam. É recomendável entrar em contato diretamente com o centro de sua preferência para consultar opções.",
@@ -68,36 +63,10 @@ export default function QuantoCustaPage() {
         referência dos valores praticados em 2026:
       </p>
 
-      <div className="overflow-x-auto my-6">
-        <table>
-          <thead>
-            <tr>
-              <th>Centro / Região</th>
-              <th>Faixa de Preço</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Centros em São Paulo / Rio de Janeiro</td>
-              <td>R$ 900 — R$ 1.500</td>
-            </tr>
-            <tr>
-              <td>Centros em capitais (outras regiões)</td>
-              <td>R$ 800 — R$ 1.200</td>
-            </tr>
-            <tr>
-              <td>Centros em cidades menores</td>
-              <td>R$ 800 — R$ 1.000</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <CalloutBox variant="info" title="Valores são referenciais">
-        Os preços acima são referenciais e podem variar. Consulte diretamente o{" "}
-        <Link href="/onde-fazer-a-prova-icao">centro credenciado</Link> de sua
-        preferência para valores atualizados.
-      </CalloutBox>
+      <p>
+        O preço varia em média de R$ 900 a R$ 1.200, dependendo do centro
+        credenciado e da região.
+      </p>
 
       <h2 id="custos-ocultos">Custos ocultos que você precisa considerar</h2>
       <p>
@@ -106,8 +75,8 @@ export default function QuantoCustaPage() {
       </p>
       <ul>
         <li>
-          <strong>Deslocamento:</strong> Se não há centro credenciado na sua
-          cidade, considere custos de viagem, hospedagem e alimentação
+          <strong>Logística:</strong> Deslocamento, alimentação, hospedagem —
+          se não há centro credenciado na sua cidade
         </li>
         <li>
           <strong>Dia de trabalho perdido:</strong> A prova é presencial e
@@ -115,11 +84,6 @@ export default function QuantoCustaPage() {
         </li>
         <li>
           <strong>Material de preparação:</strong> Cursos, livros e simuladores
-          (embora existam{" "}
-          <Link href="/como-se-preparar-para-a-prova-icao">
-            recursos gratuitos
-          </Link>
-          )
         </li>
         <li>
           <strong>Renovação periódica:</strong> Level 4 exige renovação a cada
@@ -173,7 +137,7 @@ export default function QuantoCustaPage() {
       </div>
 
       <CalloutBox variant="warning" title="Reprovação custa caro">
-        Cada reprovação significa R$ 800-1.500 jogados fora, 60 dias de espera
+        Cada reprovação significa R$ 800-1.200 jogados fora, 60 dias de espera
         obrigatória e potencial atraso na carreira. Investir em preparação
         adequada é quase sempre mais barato do que reprovar.
       </CalloutBox>
@@ -185,7 +149,7 @@ export default function QuantoCustaPage() {
       </p>
       <ul>
         <li>
-          Uma reprovação custa de R$ 800 a R$ 1.500 (só a taxa), mais custos
+          Uma reprovação custa de R$ 800 a R$ 1.200 (só a taxa), mais custos
           indiretos de deslocamento e tempo
         </li>
         <li>
@@ -200,10 +164,9 @@ export default function QuantoCustaPage() {
       </ul>
       <p>
         Saiba mais sobre o{" "}
-        <Link href="/como-se-preparar-para-a-prova-icao">
-          método de preparação
-        </Link>{" "}
-        que já aprovou mais de 1000 pilotos.
+        <Link href="/metodo">
+          método de preparação que mais aprovou pilotos no Brasil
+        </Link>.
       </p>
 
       <h2 id="formas-pagamento">Formas de pagamento aceitas</h2>
@@ -220,9 +183,13 @@ export default function QuantoCustaPage() {
       <p>
         Entre em contato diretamente com o centro de sua escolha para confirmar
         as opções disponíveis. Veja a lista completa de{" "}
-        <Link href="/onde-fazer-a-prova-icao">
+        <a
+          href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           centros credenciados pela ANAC
-        </Link>
+        </a>
         .
       </p>
     </ContentPageLayout>

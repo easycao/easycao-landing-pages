@@ -16,9 +16,9 @@ const cases = [
     videoId: "9aXmc7Rxie0",
   },
   {
-    role: "FlightSafety",
+    role: "Flight Safety",
     result: "ICAO 4",
-    quote: "Eu passei por vários instrutores de inglês, cada um deles me ajudou de certa forma, mas eu encontrei no Diogo tudo que precisava, ele consegue juntar todos os elementos e te levar pro ICAO. Hoje eu só estou aqui na FlightSafety porque no início do ano eu fiz o ICAO com ele. O Curso da Easycao realmente é perfeito e eu recomendo a Easycao",
+    quote: "Eu passei por vários instrutores de inglês, cada um deles me ajudou de certa forma, mas eu encontrei no Diogo tudo que precisava, ele consegue juntar todos os elementos e te levar pro ICAO. Hoje eu só estou aqui na Flight Safety porque no início do ano eu fiz o ICAO com ele. O Curso da Easycao realmente é perfeito e eu recomendo a Easycao",
     videoId: "DuVvMBT82Wk",
   },
   {

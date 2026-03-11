@@ -44,7 +44,7 @@ const faqs = [
       "Level 4 é o mínimo para operar internacionalmente e tem validade de 3 anos. Level 5 demonstra proficiência avançada, com validade de 6 anos, e é mais valorizado pelas companhias aéreas. A diferença está na consistência e naturalidade da comunicação.",
   },
   {
-    question: "É possível tirar Level 6 direto na prova?",
+    question: "É possível obter Level 6 direto na prova?",
     answer:
       "Não diretamente. Se o examinador identificar que você tem potencial para Level 6, você passa para um segundo estágio de avaliação (prova avançada de 45 minutos) dentro de 60 dias. Se não passar no Stage 2, mantém Level 5.",
   },
@@ -66,8 +66,12 @@ export default function NiveisIcaoPage() {
       <h2 id="escala-resumo">A escala ICAO em resumo</h2>
       <p>
         A escala de proficiência linguística da ICAO vai de Level 1 (Pre-Elementary)
-        a Level 6 (Expert). Cada nível descreve um grau diferente de
-        habilidade de comunicação em inglês aeronáutico. Veja a tabela resumo:
+        a Level 6 (Expert), O SDEA avalia apenas até o ICAO 5, caso o candidato
+        demonstre indícios de que ele pode ser ICAO 6, ele será chamado para fazer
+        uma prova complementar para aferir ou não o ICAO 6, caso ele não tenha um
+        bom desempenho, ele ficará com o ICAO 5. Cada nível descreve um grau
+        diferente de habilidade de comunicação em inglês aeronáutico. Veja a
+        tabela resumo:
       </p>
 
       <div className="overflow-x-auto my-6">
@@ -188,8 +192,8 @@ export default function NiveisIcaoPage() {
           <strong>Validade de 6 anos</strong> — o dobro do Level 4
         </li>
         <li>
-          <strong>Diferencial em processos seletivos</strong> — companhias
-          aéreas valorizam Level 5+
+          <strong>Diferencial em processos seletivos</strong> — Algumas
+          empresas dão preferência a ICAO 5
         </li>
         <li>
           <strong>Menor frequência de renovação</strong> — menos burocracia
@@ -220,15 +224,7 @@ export default function NiveisIcaoPage() {
       <p>
         O Stage 2 é mais rigoroso e inclui cenários complexos, discussão de
         temas abstratos relacionados a aviação e demonstração de domínio
-        próximo ao nativo. Segundo dados da{" "}
-        <a
-          href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/proficiencia-linguistica"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          ANAC
-        </a>
-        , menos de 5% dos candidatos atingem Level 6.
+        próximo ao nativo.
       </p>
 
       <h2 id="companhias-aereas">Qual nível as companhias aéreas exigem</h2>

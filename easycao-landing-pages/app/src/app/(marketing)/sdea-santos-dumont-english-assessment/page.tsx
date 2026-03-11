@@ -24,7 +24,7 @@ const headings: { id: string; text: string; level: 2 | 3 }[] = [
 ];
 
 const faqs = [
-  { question: "O que significa SDEA?", answer: "SDEA significa Santos Dumont English Assessment. É o nome oficial dado pela ANAC para a avaliação de proficiência linguística em inglês para profissionais da aviação no Brasil." },
+  { question: "O que significa SDEA?", answer: "SDEA significa Santos Dumont English Assessment. É o nome oficial dado pela ANAC para a avaliação de proficiência linguística em inglês para pilotos no Brasil." },
   { question: "SDEA é a mesma coisa que prova ICAO?", answer: "Sim. SDEA é o nome brasileiro para a avaliação de proficiência em inglês seguindo os padrões da ICAO. Os critérios, descritores e níveis são os mesmos definidos no Doc 9835 da ICAO." },
   { question: "O SDEA mudou recentemente?", answer: "A ANAC faz atualizações periódicas no regulamento, mas os critérios fundamentais de avaliação (6 descritores, níveis 1-6) seguem o padrão internacional da ICAO desde 2010." },
   { question: "Posso fazer o SDEA em qualquer centro?", answer: "Sim, desde que o centro seja credenciado pela ANAC. A lista de centros está disponível no portal da ANAC." },
@@ -35,7 +35,7 @@ export default function SDEAPage() {
   return (
     <ContentPageLayout slug={PAGE_SLUG} headings={headings} faqs={faqs}>
       <h2 id="o-que-e">O que é o SDEA</h2>
-      <p>O SDEA (Santos Dumont English Assessment) é o nome oficial dado pela <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/proficiencia-linguistica" target="_blank" rel="noopener noreferrer">ANAC</a> para a avaliação de proficiência linguística em inglês para pilotos e controladores de tráfego aéreo no Brasil.</p>
+      <p>O SDEA (Santos Dumont English Assessment) é o nome oficial dado pela <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">ANAC</a> para a avaliação de proficiência linguística em inglês para pilotos no Brasil.</p>
       <p>Criado para atender aos requisitos da ICAO (Organização da Aviação Civil Internacional), o SDEA avalia a capacidade do profissional de se comunicar em inglês em contextos aeronáuticos.</p>
 
       <CalloutBox variant="info" title="SDEA = Prova ICAO">
@@ -45,9 +45,9 @@ export default function SDEAPage() {
       <h2 id="sdea-vs-icao">SDEA vs prova ICAO — é a mesma coisa?</h2>
       <p>Sim. "SDEA", "prova ICAO", "prova de proficiência linguística" e "avaliação de inglês da ANAC" são todos nomes para o mesmo exame. A diferença é apenas de nomenclatura:</p>
       <ul>
-        <li><strong>SDEA:</strong> Nome oficial brasileiro (Santos Dumont English Assessment)</li>
+        <li><strong>SDEA:</strong> Nome oficial brasileiro (Santos Dumont English Assessment) para os pilotos</li>
         <li><strong>Prova ICAO:</strong> Nome popular, referenciando o padrão internacional</li>
-        <li><strong>EPLIS:</strong> Sigla em inglês (English Proficiency Language for International Standards)</li>
+        <li><strong>EPLIS:</strong> Sigla em inglês (English Proficiency Language for International Standards) é a prova ICAO para os controladores de tráfego aéreo</li>
       </ul>
       <p>Independente do nome, o exame avalia os mesmos <Link href="/descritores-da-prova-icao">6 descritores holísticos</Link> e segue a mesma escala de <Link href="/niveis-icao">níveis 1 a 6</Link>.</p>
 
@@ -56,8 +56,8 @@ export default function SDEAPage() {
       <p>Resumidamente: é uma prova presencial, 100% oral, com duração de aproximadamente 50 minutos, conduzida por examinadores credenciados pela ANAC.</p>
 
       <h2 id="quem-aplica">Quem aplica o SDEA</h2>
-      <p>O SDEA só pode ser aplicado por entidades credenciadas pela ANAC. Existem cerca de 11 centros espalhados pelo Brasil, concentrados principalmente na região Sudeste.</p>
-      <p>Veja a lista completa de <Link href="/onde-fazer-a-prova-icao">centros credenciados pela ANAC</Link> e saiba como agendar sua avaliação.</p>
+      <p>O SDEA só pode ser aplicado por entidades credenciadas pela ANAC. Existem centros espalhados pelo Brasil.</p>
+      <p>Abaixo está a lista divulgada pela <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">ANAC</a>.</p>
 
       <h2 id="historico">Histórico e mudanças recentes</h2>
       <p>O sistema de avaliação de proficiência linguística no Brasil segue os padrões da ICAO desde 2008, quando os requisitos de proficiência se tornaram obrigatórios mundialmente. Ao longo dos anos, a ANAC fez ajustes regulatórios:</p>

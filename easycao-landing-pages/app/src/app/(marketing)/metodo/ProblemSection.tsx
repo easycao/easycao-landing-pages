@@ -16,7 +16,7 @@ export default function ProblemSection() {
         </svg>
       ),
       title: "Não entende o áudio com sotaque",
-      description: "O examinador fala com sotaque diferente e você perde informações cruciais.",
+      description: "Os áudios da prova vem com sotaques diferentes e você perde informações cruciais.",
     },
     {
       icon: (

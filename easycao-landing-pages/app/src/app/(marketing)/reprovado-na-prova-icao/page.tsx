@@ -22,7 +22,6 @@ const headings: { id: string; text: string; level: 2 | 3 }[] = [
   { id: "entendendo-resultado", text: "Entendendo seu resultado", level: 2 },
   { id: "plano-recuperacao", text: "Plano de recuperação", level: 2 },
   { id: "custo-reprovar", text: "Quanto custa reprovar", level: 2 },
-  { id: "evitar-reprovar", text: "Como evitar reprovar de novo", level: 2 },
 ];
 
 const faqs = [
@@ -49,6 +48,7 @@ export default function ReprovadoPage() {
       <p>Use esse tempo a seu favor: 60 dias é tempo suficiente para uma preparação focada e eficiente se você souber exatamente no que trabalhar.</p>
 
       <h2 id="entendendo-resultado">Entendendo seu resultado</h2>
+      <p>Caso você queira saber exatamente o que errou na prova, solicite o relatório junto à <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">ANAC</a>.</p>
       <p>Ao receber seu resultado, preste atenção em cada <Link href="/descritores-da-prova-icao">descritor individualmente</Link>. Identifique quais foram os mais baixos — são esses que você precisa priorizar na preparação.</p>
       <p>Lembre-se: sua nota final é o menor descritor. Se você tirou 4 em cinco e 3 em um, seu resultado foi Level 3 — reprovado. O foco deve ser subir aquele descritor mais fraco.</p>
 
@@ -66,16 +66,13 @@ export default function ReprovadoPage() {
       <h2 id="custo-reprovar">Quanto custa reprovar</h2>
       <p>Além do impacto emocional, reprovar tem custo financeiro significativo:</p>
       <ul>
-        <li>Nova taxa da prova: R$ 800-1.500</li>
+        <li>Nova taxa da prova: R$ 800-1.200</li>
         <li>Custos de deslocamento (se aplicável)</li>
         <li>60 dias sem poder voar internacionalmente</li>
         <li>Possível atraso em processos seletivos</li>
       </ul>
       <p>Saiba mais sobre os <Link href="/quanto-custa-a-prova-icao">custos completos da prova ICAO</Link>.</p>
 
-      <h2 id="evitar-reprovar">Como evitar reprovar de novo</h2>
-      <p>A melhor forma de evitar uma nova reprovação é investir em <Link href="/como-se-preparar-para-a-prova-icao">preparação adequada</Link>. Evite os 3 erros mais comuns: decorar respostas, estudar inglês geral e não praticar fala.</p>
-      <p>Considere buscar orientação de um especialista. O método Easycao foi criado por um examinador credenciado que sabe exatamente o que é avaliado e como melhorar cada descritor.</p>
     </ContentPageLayout>
   );
 }

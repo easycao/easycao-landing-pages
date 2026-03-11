@@ -1,9 +1,10 @@
 export default function BonusStack() {
   const items = [
-    { title: "Curso Easycao — Do zero ao ICAO", tag: "266+ aulas", detail: "Todos os módulos, do Módulo Zero ao Módulo 6" },
-    { title: "App Simulador ICAO", tag: "Ilimitado", detail: "25 versões de simulado com feedback automático" },
-    { title: "Maior Comunidade de pilotos para ICAO", tag: "+1000 alunos", detail: "Grupo exclusivo com suporte em tempo real" },
-    { title: "Mentorias semanais ao vivo", tag: "Toda semana", detail: "Encontros no Zoom com o professor Diogo" },
+    { title: "Curso Easycao — Do zero ao ICAO", tag: "266+ aulas", detail: "Todos os módulos. Do zero até o ICAO avançado" },
+    { title: "App Simulador ICAO", tag: "Ilimitado", detail: "25 versões de simulado com feedback automático, incluindo as versões de helicóptero" },
+    { title: "Maior Comunidade de pilotos para ICAO", tag: "+1000 alunos", detail: "Grupo exclusivo de estudos com suporte em tempo real" },
+    { title: "Mentorias semanais ao vivo", tag: "Toda semana", detail: "Encontros no Zoom com o professor Diogo pra treinar a prova e tirar dúvidas" },
+    { title: "Mentorias anteriores", tag: "Aprofundamento", detail: "Todas as gravações de mentorias semanais realizadas desde 2023" },
     { title: "Suporte ativo até sua aprovação", tag: "Dedicado", detail: "Acompanhamento personalizado do seu progresso" },
     { title: "Alinhamento particular", tag: "1h exclusiva", detail: "Encontro individual no final do curso para ajustar a proa" },
     { title: "Curso ICAO Advanced", tag: "Nível 5 e 6", detail: "4 módulos avançados de estrutura, fluência, vocabulário e pronúncia" },

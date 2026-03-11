@@ -37,11 +37,11 @@ export default function ComoAgendarPage() {
       <h2 id="passo-a-passo">Passo a passo para agendar</h2>
       <p>Agendar a prova ICAO envolve etapas simples, mas que exigem atenção. Veja o processo completo:</p>
       <ol>
-        <li><strong>Escolha o centro credenciado:</strong> Consulte a lista de <Link href="/onde-fazer-a-prova-icao">centros credenciados pela ANAC</Link> e escolha o mais conveniente para você</li>
+        <li><strong>Escolha o centro credenciado:</strong> Consulte a lista de <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">centros credenciados pela ANAC</a> e escolha o mais conveniente para você</li>
         <li><strong>Entre em contato:</strong> Ligue ou envie email para o centro escolhido. Informe que deseja agendar a avaliação de proficiência linguística (SDEA/ICAO)</li>
         <li><strong>Confirme disponibilidade:</strong> O centro informará as datas disponíveis. Centros maiores costumam ter mais opções</li>
         <li><strong>Envie os documentos:</strong> Alguns centros pedem envio prévio de cópias de documentos</li>
-        <li><strong>Realize o pagamento:</strong> A maioria dos centros exige pagamento antecipado. Valores variam de R$ 800 a R$ 1.500</li>
+        <li><strong>Realize o pagamento:</strong> A maioria dos centros exige pagamento antecipado. Valores variam de R$ 900 a R$ 1.200</li>
         <li><strong>Receba a confirmação:</strong> O centro enviará confirmação com data, horário e local exato</li>
       </ol>
 
@@ -73,7 +73,7 @@ export default function ComoAgendarPage() {
       </CalloutBox>
 
       <h2 id="escolher-centro">Como escolher o centro</h2>
-      <p>Existem cerca de 11 <Link href="/onde-fazer-a-prova-icao">centros credenciados pela ANAC</Link> no Brasil. Considere os seguintes critérios:</p>
+      <p>Existem <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/profissionais-da-aviacao-civil/processo-de-licencas-e-habilitacoes/proficiencia-linguistica/entidades-credenciadas" target="_blank" rel="noopener noreferrer">centros credenciados pela ANAC</a> espalhados pelo Brasil. Considere os seguintes critérios:</p>
       <ul>
         <li><strong>Localização:</strong> Proximidade reduz custos de deslocamento e estresse no dia da prova</li>
         <li><strong>Disponibilidade:</strong> Centros com mais datas disponíveis oferecem maior flexibilidade</li>
