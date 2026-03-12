@@ -38,7 +38,7 @@ export function selectTemplate(
         return "cs_3_meses_low_to_mediumplus";
       if (currentEngagement === "LOW" && isMediumPlus(prevEngagement))
         return "cs_3_meses_other_to_low";
-      return "cs_3meses_mediumplus_to_mediumplus";
+      return "cs_3_meses_medium_plus_to_medium_plus";
     }
 
     case "mes_7":
