@@ -14,6 +14,7 @@ interface CourseData {
 interface ModuleData {
   id: string;
   name: string;
+  thumbnail: string;
   order: number;
   status: string;
   lessonCount: number;
@@ -32,6 +33,8 @@ export default function CourseEditorPage({
   const [newModuleName, setNewModuleName] = useState("");
   const [creating, setCreating] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
+  const [editModuleFields, setEditModuleFields] = useState<{ name: string; thumbnail: string }>({ name: "", thumbnail: "" });
 
   async function fetchData() {
     const res = await fetch(`/api/admin/cms/courses/${courseId}`);
@@ -98,6 +101,27 @@ export default function CourseEditorPage({
         body: JSON.stringify({ order: a.order }),
       }),
     ]);
+    fetchData();
+  }
+
+  async function saveModule(mod: ModuleData) {
+    const update: Record<string, string> = {};
+    if (editModuleFields.name.trim() && editModuleFields.name.trim() !== mod.name) {
+      update.name = editModuleFields.name.trim();
+    }
+    if (editModuleFields.thumbnail !== (mod.thumbnail || "")) {
+      update.thumbnail = editModuleFields.thumbnail;
+    }
+    if (Object.keys(update).length === 0) {
+      setEditingModuleId(null);
+      return;
+    }
+    await fetch(`/api/admin/cms/courses/${courseId}/modules/${mod.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update),
+    });
+    setEditingModuleId(null);
     fetchData();
   }
 
@@ -260,72 +284,124 @@ export default function CourseEditorPage({
               key={mod.id}
               className="rounded-2xl bg-gray-light border border-gray-border hover:border-primary/30 transition-all duration-200"
             >
-              <div className="px-5 py-3.5 flex items-center gap-4">
-                {/* Reorder buttons */}
-                <div className="flex flex-col gap-0.5">
-                  <button
-                    onClick={() => swapOrder(index, -1)}
-                    disabled={index === 0}
-                    className="text-black/30 hover:text-black/60 disabled:opacity-20 text-xs"
-                  >
-                    ▲
-                  </button>
-                  <button
-                    onClick={() => swapOrder(index, 1)}
-                    disabled={index === modules.length - 1}
-                    className="text-black/30 hover:text-black/60 disabled:opacity-20 text-xs"
-                  >
-                    ▼
-                  </button>
-                </div>
-
-                <Link
-                  href={`/admin/cms/courses/${courseId}/modules/${mod.id}`}
-                  className="flex-1 min-w-0"
-                >
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-black font-medium text-sm truncate">
-                      {mod.name}
-                    </h3>
-                    <span
-                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                        mod.status === "published"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
-                    >
-                      {mod.status === "published" ? "Pub" : "Draft"}
-                    </span>
+              <div className="px-5 py-3.5">
+                {editingModuleId === mod.id ? (
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-black/50 block mb-1">Nome</label>
+                        <input
+                          type="text"
+                          value={editModuleFields.name}
+                          onChange={(e) => setEditModuleFields({ ...editModuleFields, name: e.target.value })}
+                          autoFocus
+                          className="w-full px-3 py-2 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-black/50 block mb-1">Thumbnail URL</label>
+                      <input
+                        type="text"
+                        value={editModuleFields.thumbnail}
+                        onChange={(e) => setEditModuleFields({ ...editModuleFields, thumbnail: e.target.value })}
+                        placeholder="https://..."
+                        className="w-full px-3 py-2 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 outline-none"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveModule(mod)}
+                        className="text-xs px-3 py-1.5 rounded-lg bg-primary text-white hover:bg-primary-dark transition-colors"
+                      >
+                        Salvar
+                      </button>
+                      <button
+                        onClick={() => setEditingModuleId(null)}
+                        className="text-xs px-3 py-1.5 rounded-lg border border-gray-border text-black/60 hover:bg-gray-100 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-[10px] text-black/40 mt-0.5">
-                    {mod.lessonCount} aula{mod.lessonCount !== 1 ? "s" : ""}
-                  </p>
-                </Link>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    {/* Reorder buttons */}
+                    <div className="flex flex-col gap-0.5">
+                      <button
+                        onClick={() => swapOrder(index, -1)}
+                        disabled={index === 0}
+                        className="text-black/30 hover:text-black/60 disabled:opacity-20 text-xs"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        onClick={() => swapOrder(index, 1)}
+                        disabled={index === modules.length - 1}
+                        className="text-black/30 hover:text-black/60 disabled:opacity-20 text-xs"
+                      >
+                        ▼
+                      </button>
+                    </div>
 
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <button
-                    onClick={() => toggleModuleStatus(mod)}
-                    className={`text-xs px-2 py-1.5 rounded-lg transition-colors ${
-                      mod.status === "published"
-                        ? "text-amber-600 hover:bg-amber-50"
-                        : "text-emerald-600 hover:bg-emerald-50"
-                    }`}
-                  >
-                    {mod.status === "published" ? "Draft" : "Pub"}
-                  </button>
-                  <Link
-                    href={`/admin/cms/courses/${courseId}/modules/${mod.id}`}
-                    className="text-xs px-3 py-1.5 rounded-lg text-primary hover:bg-primary/5 transition-colors"
-                  >
-                    Aulas
-                  </Link>
-                  <button
-                    onClick={() => handleDeleteModule(mod.id, mod.name)}
-                    className="text-xs px-2 py-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
-                  >
-                    &times;
-                  </button>
-                </div>
+                    <Link
+                      href={`/admin/cms/courses/${courseId}/modules/${mod.id}`}
+                      className="flex-1 min-w-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-black font-medium text-sm truncate">
+                          {mod.name}
+                        </h3>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            mod.status === "published"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-gray-200 text-gray-600"
+                          }`}
+                        >
+                          {mod.status === "published" ? "Pub" : "Draft"}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-black/40 mt-0.5">
+                        {mod.lessonCount} aula{mod.lessonCount !== 1 ? "s" : ""}
+                      </p>
+                    </Link>
+
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => toggleModuleStatus(mod)}
+                        className={`text-xs px-2 py-1.5 rounded-lg transition-colors ${
+                          mod.status === "published"
+                            ? "text-amber-600 hover:bg-amber-50"
+                            : "text-emerald-600 hover:bg-emerald-50"
+                        }`}
+                      >
+                        {mod.status === "published" ? "Draft" : "Pub"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingModuleId(mod.id);
+                          setEditModuleFields({ name: mod.name, thumbnail: mod.thumbnail || "" });
+                        }}
+                        className="text-xs px-3 py-1.5 rounded-lg text-primary hover:bg-primary/5 transition-colors"
+                      >
+                        Editar
+                      </button>
+                      <Link
+                        href={`/admin/cms/courses/${courseId}/modules/${mod.id}`}
+                        className="text-xs px-3 py-1.5 rounded-lg text-primary hover:bg-primary/5 transition-colors"
+                      >
+                        Aulas
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteModule(mod.id, mod.name)}
+                        className="text-xs px-2 py-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}

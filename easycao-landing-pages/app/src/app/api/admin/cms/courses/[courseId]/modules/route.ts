@@ -30,12 +30,13 @@ export async function POST(
   const { courseId } = await params;
   const db = getFirestoreDb();
   const body = await req.json();
-  const { name, order, status } = body;
+  const { name, order, status, thumbnail } = body;
 
   const docRef = await db.collection(`courses/${courseId}/modules`).add({
     name: name || "",
     order: order ?? 0,
     status: status || "draft",
+    thumbnail: thumbnail || "",
     createdAt: new Date(),
     updatedAt: new Date(),
   });

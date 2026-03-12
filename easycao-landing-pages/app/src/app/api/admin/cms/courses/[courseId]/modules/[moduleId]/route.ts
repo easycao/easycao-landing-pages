@@ -8,7 +8,7 @@ export async function PATCH(
   const { courseId, moduleId } = await params;
   const db = getFirestoreDb();
   const body = await req.json();
-  const allowed = ["name", "order", "status"];
+  const allowed = ["name", "order", "status", "thumbnail"];
   const update: Record<string, unknown> = { updatedAt: new Date() };
   for (const key of allowed) {
     if (key in body) update[key] = body[key];

@@ -3,6 +3,11 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 
+interface ModuleInfo {
+  name: string;
+  thumbnail: string;
+}
+
 interface Lesson {
   id: string;
   title: string;
@@ -10,6 +15,7 @@ interface Lesson {
   status: string;
   kinescopeVideoId: string;
   duration: string;
+  thumbnail: string;
 }
 
 export default function ModuleLessonsPage({
@@ -18,6 +24,7 @@ export default function ModuleLessonsPage({
   params: Promise<{ courseId: string; moduleId: string }>;
 }) {
   const { courseId, moduleId } = use(params);
+  const [moduleInfo, setModuleInfo] = useState<ModuleInfo>({ name: "", thumbnail: "" });
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
@@ -25,8 +32,10 @@ export default function ModuleLessonsPage({
   const [creating, setCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<Partial<Lesson>>({});
+  const [savingModule, setSavingModule] = useState(false);
 
   const basePath = `/api/admin/cms/courses/${courseId}/modules/${moduleId}/lessons`;
+  const modulePath = `/api/admin/cms/courses/${courseId}/modules/${moduleId}`;
 
   async function fetchLessons() {
     const res = await fetch(basePath);
@@ -35,8 +44,27 @@ export default function ModuleLessonsPage({
     setLoading(false);
   }
 
+  async function fetchModuleInfo() {
+    const res = await fetch(`/api/admin/cms/courses/${courseId}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const mod = (data.modules || []).find((m: { id: string }) => m.id === moduleId);
+    if (mod) setModuleInfo({ name: mod.name || "", thumbnail: mod.thumbnail || "" });
+  }
+
+  async function saveModuleField(update: Partial<ModuleInfo>) {
+    setSavingModule(true);
+    await fetch(modulePath, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(update),
+    });
+    setSavingModule(false);
+  }
+
   useEffect(() => {
     fetchLessons();
+    fetchModuleInfo();
   }, [courseId, moduleId]);
 
   async function handleCreate() {
@@ -105,6 +133,7 @@ export default function ModuleLessonsPage({
       title: lesson.title,
       kinescopeVideoId: lesson.kinescopeVideoId,
       duration: lesson.duration,
+      thumbnail: lesson.thumbnail || "",
     });
   }
 
@@ -117,7 +146,10 @@ export default function ModuleLessonsPage({
         >
           &larr; Módulos
         </Link>
-        <h1 className="text-xl font-bold text-black">Aulas do Módulo</h1>
+        <h1 className="text-xl font-bold text-black truncate">{moduleInfo.name || "Aulas do Módulo"}</h1>
+        {savingModule && (
+          <span className="text-xs text-primary animate-pulse">Salvando...</span>
+        )}
         <div className="ml-auto">
           <button
             onClick={() => setShowCreate(!showCreate)}
@@ -127,6 +159,33 @@ export default function ModuleLessonsPage({
           </button>
         </div>
       </div>
+
+      {/* Module details */}
+      <div className="rounded-2xl p-5 mb-6 bg-gray-light border border-gray-border space-y-4">
+        <div>
+          <label className="text-[10px] text-black/50 block mb-1">Nome do Módulo</label>
+          <input
+            type="text"
+            value={moduleInfo.name}
+            onChange={(e) => setModuleInfo({ ...moduleInfo, name: e.target.value })}
+            onBlur={() => saveModuleField({ name: moduleInfo.name })}
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+          />
+        </div>
+        <div>
+          <label className="text-[10px] text-black/50 block mb-1">Thumbnail URL</label>
+          <input
+            type="text"
+            value={moduleInfo.thumbnail}
+            onChange={(e) => setModuleInfo({ ...moduleInfo, thumbnail: e.target.value })}
+            onBlur={() => saveModuleField({ thumbnail: moduleInfo.thumbnail })}
+            placeholder="https://..."
+            className="w-full px-3 py-2.5 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/40 outline-none"
+          />
+        </div>
+      </div>
+
+      <h2 className="text-base font-semibold text-black mb-4">Aulas</h2>
 
       {showCreate && (
         <div className="rounded-2xl p-5 mb-4 bg-gray-light border border-gray-border">
@@ -210,6 +269,18 @@ export default function ModuleLessonsPage({
                         })
                       }
                       placeholder="Kinescope Video ID"
+                      className="w-full px-3 py-2 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={editFields.thumbnail || ""}
+                      onChange={(e) =>
+                        setEditFields({
+                          ...editFields,
+                          thumbnail: e.target.value,
+                        })
+                      }
+                      placeholder="Thumbnail URL"
                       className="w-full px-3 py-2 rounded-xl border border-gray-border bg-white text-black text-sm focus:ring-2 focus:ring-primary/30 outline-none"
                     />
                     <div className="flex gap-2">

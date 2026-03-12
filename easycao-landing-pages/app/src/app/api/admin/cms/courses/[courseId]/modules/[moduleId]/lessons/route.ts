@@ -34,7 +34,7 @@ export async function POST(
   const { courseId, moduleId } = await params;
   const db = getFirestoreDb();
   const body = await req.json();
-  const { title, order, status, kinescopeVideoId, duration, materials } = body;
+  const { title, order, status, kinescopeVideoId, duration, materials, thumbnail } = body;
 
   const docRef = await db
     .collection(`courses/${courseId}/modules/${moduleId}/lessons`)
@@ -45,6 +45,7 @@ export async function POST(
       kinescopeVideoId: kinescopeVideoId || "",
       duration: duration || "",
       materials: materials || [],
+      thumbnail: thumbnail || "",
       createdAt: new Date(),
       updatedAt: new Date(),
     });

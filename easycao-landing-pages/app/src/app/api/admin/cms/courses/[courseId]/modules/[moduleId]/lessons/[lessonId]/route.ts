@@ -19,6 +19,7 @@ export async function PATCH(
     "kinescopeVideoId",
     "duration",
     "materials",
+    "thumbnail",
   ];
   const update: Record<string, unknown> = { updatedAt: new Date() };
   for (const key of allowed) {
