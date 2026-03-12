@@ -2,23 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-
-interface CourseData {
-  id: string;
-  name: string;
-  description: string;
-  thumbnail: string;
-  status: string;
-}
-
-interface ModuleData {
-  id: string;
-  name: string;
-  thumbnail: string;
-  order: number;
-  status: string;
-  lessonCount: number;
-}
+import type { CourseData, Module } from "@/lib/platform/types";
 
 export default function CourseEditorPage({
   params,
@@ -27,7 +11,7 @@ export default function CourseEditorPage({
 }) {
   const { courseId } = use(params);
   const [course, setCourse] = useState<CourseData | null>(null);
-  const [modules, setModules] = useState<ModuleData[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModule, setShowCreateModule] = useState(false);
   const [newModuleName, setNewModuleName] = useState("");
@@ -104,7 +88,7 @@ export default function CourseEditorPage({
     fetchData();
   }
 
-  async function saveModule(mod: ModuleData) {
+  async function saveModule(mod: Module) {
     const update: Record<string, string> = {};
     if (editModuleFields.name.trim() && editModuleFields.name.trim() !== mod.name) {
       update.name = editModuleFields.name.trim();
@@ -125,7 +109,7 @@ export default function CourseEditorPage({
     fetchData();
   }
 
-  async function toggleModuleStatus(mod: ModuleData) {
+  async function toggleModuleStatus(mod: Module) {
     const newStatus = mod.status === "published" ? "draft" : "published";
     await fetch(`/api/admin/cms/courses/${courseId}/modules/${mod.id}`, {
       method: "PATCH",

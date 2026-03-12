@@ -4,28 +4,14 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCachedFetch } from "@/hooks/useCachedFetch";
-
-interface CourseInfo {
-  id: string;
-  name: string;
-  description: string;
-  thumbnail: string;
-  lessonCount: number;
-}
-
-interface DashboardData {
-  courseProgress: Record<string, {
-    completedLessons: string[];
-    progressPercent: number;
-  }>;
-}
+import type { Course, DashboardData } from "@/lib/platform/types";
 
 export default function CoursesPage() {
   const { user } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const { data: coursesData, loading: coursesLoading } = useCachedFetch<{ courses: CourseInfo[] }>({
+  const { data: coursesData, loading: coursesLoading } = useCachedFetch<{ courses: Course[] }>({
     key: `courses-${user?.uid}`,
     url: `/api/platform/courses?uid=${user?.uid}`,
     enabled: !!user,

@@ -2,21 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
-
-interface ModuleInfo {
-  name: string;
-  thumbnail: string;
-}
-
-interface Lesson {
-  id: string;
-  title: string;
-  order: number;
-  status: string;
-  kinescopeVideoId: string;
-  duration: string;
-  thumbnail: string;
-}
+import type { ModuleInfo, Lesson } from "@/lib/platform/types";
 
 export default function ModuleLessonsPage({
   params,

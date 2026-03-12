@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,6 +16,7 @@ function getFirebaseApp(): FirebaseApp {
 // Lazy singletons — only initialize when accessed (client-side only)
 let _auth: Auth | null = null;
 let _db: Firestore | null = null;
+let _storage: FirebaseStorage | null = null;
 
 export function getClientAuth(): Auth {
   if (!_auth) _auth = getAuth(getFirebaseApp());
@@ -24,4 +26,9 @@ export function getClientAuth(): Auth {
 export function getClientDb(): Firestore {
   if (!_db) _db = getFirestore(getFirebaseApp());
   return _db;
+}
+
+export function getClientStorage(): FirebaseStorage {
+  if (!_storage) _storage = getStorage(getFirebaseApp());
+  return _storage;
 }
