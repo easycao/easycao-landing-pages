@@ -43,7 +43,8 @@ Use `@agent-name` ou `/AIOS:agents:agent-name`:
 | `@pm` | Morgan | Product Management |
 | `@po` | Pax | Product Owner, stories/epics |
 | `@sm` | River | Scrum Master |
-| `@analyst` | Alex | Pesquisa e análise |
+| `@analyst` | Atlas | Pesquisa e análise |
+| `@gamifier` | Dopamine | Gamificação e design comportamental |
 | `@data-engineer` | Dara | Database design |
 | `@ux-design-expert` | Uma | UX/UI design |
 | `@devops` | Gage | CI/CD, git push (EXCLUSIVO) |
