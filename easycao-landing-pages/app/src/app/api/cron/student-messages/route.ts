@@ -28,10 +28,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const dryRun = request.nextUrl.searchParams.get("dryRun") === "true";
+
   // Skip weekends (Saturday=6, Sunday=0) — use BRT (UTC-3)
   const nowBRT = new Date(Date.now() - 3 * 60 * 60 * 1000);
   const dayOfWeek = nowBRT.getUTCDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
+  if (!dryRun && (dayOfWeek === 0 || dayOfWeek === 6)) {
     return NextResponse.json({ skipped: true, reason: "weekend" });
   }
 
@@ -153,35 +155,50 @@ export async function GET(request: NextRequest) {
 
     // Step 5: Auto-block (parallel writes)
     if (autoBlockCandidates.length > 0) {
-      await Promise.all(
-        autoBlockCandidates.map(({ studentId }) =>
-          updateStudent(studentId, { hotmartStatus: "BLOCKED" })
-        )
-      );
+      if (!dryRun) {
+        await Promise.all(
+          autoBlockCandidates.map(({ studentId }) =>
+            updateStudent(studentId, { hotmartStatus: "BLOCKED" })
+          )
+        );
+      }
       autoBlocked = autoBlockCandidates.length;
       for (const { student } of autoBlockCandidates) {
         autoBlockedEmails.push(student.email);
-        console.log(`Cron: auto-blocked ${student.email}`);
+        console.log(`Cron${dryRun ? " [DRY RUN]" : ""}: auto-blocked ${student.email}`);
       }
     }
 
     // Step 6: Process eligible students (only a handful per day)
     for (const { studentId, student, enrollmentId, enrollment, stageName, csEnabled } of candidates) {
       try {
-        // Fetch live engagement from Hotmart
-        const hotmartInfo = await getHotmartUserInfo(student.email);
-        const currentEngagement = hotmartInfo.engagement;
+        // In dry-run mode, use cached data instead of calling Hotmart API
+        let currentEngagement: string;
+        let hotmartStatus: string | null;
+        let hotmartProgress: number | null;
 
-        // Update student-level status + progress
-        await updateStudent(studentId, {
-          hotmartStatus: hotmartInfo.status,
-          courseProgress: hotmartInfo.progress,
-        });
+        if (dryRun) {
+          currentEngagement = student.hotmartEngagement || "UNKNOWN";
+          hotmartStatus = student.hotmartStatus || null;
+          hotmartProgress = student.courseProgress ?? null;
+        } else {
+          // Fetch live engagement from Hotmart
+          const hotmartInfo = await getHotmartUserInfo(student.email);
+          currentEngagement = hotmartInfo.engagement;
+          hotmartStatus = hotmartInfo.status;
+          hotmartProgress = hotmartInfo.progress;
+
+          // Update student-level status + progress
+          await updateStudent(studentId, {
+            hotmartStatus: hotmartInfo.status,
+            courseProgress: hotmartInfo.progress,
+          });
+        }
 
         // Skip if Hotmart says blocked
-        if (hotmartInfo.status?.startsWith("BLOCKED")) {
+        if (hotmartStatus?.startsWith("BLOCKED")) {
           skippedBlocked++;
-          console.log(`Cron: skipped ${student.email} — blocked on Hotmart`);
+          console.log(`Cron${dryRun ? " [DRY RUN]" : ""}: skipped ${student.email} — blocked on Hotmart`);
           continue;
         }
 
@@ -201,12 +218,14 @@ export async function GET(request: NextRequest) {
         // CS disabled: track engagement/progress but don't send WhatsApp
         if (!csEnabled) {
           skippedCsDisabled++;
-          await updateEnrollmentStage(studentId, enrollmentId, stageName, {
-            engagement: currentEngagement,
-            sentAt: "cs_disabled",
-            template: templateName,
-            progress: hotmartInfo.progress,
-          });
+          if (!dryRun) {
+            await updateEnrollmentStage(studentId, enrollmentId, stageName, {
+              engagement: currentEngagement,
+              sentAt: "cs_disabled",
+              template: templateName,
+              progress: hotmartProgress,
+            });
+          }
           messageLogs.push({
             name: student.name || "",
             email: student.email,
@@ -214,44 +233,62 @@ export async function GET(request: NextRequest) {
             stage: stageName,
             template: templateName,
             engagement: currentEngagement,
-            progress: hotmartInfo.progress,
+            progress: hotmartProgress,
             success: false,
           });
           console.log(
-            `Cron: CS disabled for ${student.email} | stage=${stageName} | engagement=${currentEngagement} | progress=${hotmartInfo.progress ?? "N/A"}% — message skipped`
+            `Cron${dryRun ? " [DRY RUN]" : ""}: CS disabled for ${student.email} | stage=${stageName} | engagement=${currentEngagement} | progress=${hotmartProgress ?? "N/A"}% — message skipped`
           );
           continue;
         }
 
-        // Send WhatsApp message
-        const success = await sendTemplate(student.phone, templateName);
-
-        // Log the message attempt
-        messageLogs.push({
-          name: student.name || "",
-          email: student.email,
-          phone: student.phone,
-          stage: stageName,
-          template: templateName,
-          engagement: currentEngagement,
-          progress: hotmartInfo.progress,
-          success,
-        });
-
-        if (success) {
-          await updateEnrollmentStage(studentId, enrollmentId, stageName, {
-            engagement: currentEngagement,
-            sentAt: Timestamp.now(),
+        if (dryRun) {
+          // Dry run: log what WOULD be sent
+          messageLogs.push({
+            name: student.name || "",
+            email: student.email,
+            phone: student.phone,
+            stage: stageName,
             template: templateName,
-            progress: hotmartInfo.progress,
+            engagement: currentEngagement,
+            progress: hotmartProgress,
+            success: true,
           });
           sent++;
           console.log(
-            `Cron: sent to ${student.email} | phone=${student.phone} | stage=${stageName} | template=${templateName} | engagement=${currentEngagement} | progress=${hotmartInfo.progress ?? "N/A"}%`
+            `Cron [DRY RUN]: WOULD send to ${student.email} | phone=${student.phone} | stage=${stageName} | template=${templateName} | engagement=${currentEngagement} | progress=${hotmartProgress ?? "N/A"}%`
           );
         } else {
-          errors++;
-          console.log(`Cron: WhatsApp failed for ${student.email} | stage=${stageName} | template=${templateName}`);
+          // Send WhatsApp message
+          const success = await sendTemplate(student.phone, templateName);
+
+          // Log the message attempt
+          messageLogs.push({
+            name: student.name || "",
+            email: student.email,
+            phone: student.phone,
+            stage: stageName,
+            template: templateName,
+            engagement: currentEngagement,
+            progress: hotmartProgress,
+            success,
+          });
+
+          if (success) {
+            await updateEnrollmentStage(studentId, enrollmentId, stageName, {
+              engagement: currentEngagement,
+              sentAt: Timestamp.now(),
+              template: templateName,
+              progress: hotmartProgress,
+            });
+            sent++;
+            console.log(
+              `Cron: sent to ${student.email} | phone=${student.phone} | stage=${stageName} | template=${templateName} | engagement=${currentEngagement} | progress=${hotmartProgress ?? "N/A"}%`
+            );
+          } else {
+            errors++;
+            console.log(`Cron: WhatsApp failed for ${student.email} | stage=${stageName} | template=${templateName}`);
+          }
         }
       } catch (error) {
         console.error(`Cron: error processing ${student.email}:`, error);
@@ -261,25 +298,27 @@ export async function GET(request: NextRequest) {
 
     const durationMs = Date.now() - startTime;
 
-    // Step 7: Persist cron log to Firestore
-    await db.collection("cronLogs").add({
-      executedAt: Timestamp.now(),
-      durationMs,
-      processed,
-      sent,
-      skippedBlocked,
-      skippedApproved,
-      skippedCsDisabled,
-      autoBlocked,
-      errors,
-      messages: messageLogs,
-      autoBlockedList: autoBlockedEmails,
-    });
+    // Step 7: Persist cron log to Firestore (skip in dry-run)
+    if (!dryRun) {
+      await db.collection("cronLogs").add({
+        executedAt: Timestamp.now(),
+        durationMs,
+        processed,
+        sent,
+        skippedBlocked,
+        skippedApproved,
+        skippedCsDisabled,
+        autoBlocked,
+        errors,
+        messages: messageLogs,
+        autoBlockedList: autoBlockedEmails,
+      });
+    }
 
     console.log(
-      `Cron complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, skippedApproved=${skippedApproved}, skippedCsDisabled=${skippedCsDisabled}, autoBlocked=${autoBlocked}, errors=${errors}, duration=${durationMs}ms`
+      `Cron${dryRun ? " [DRY RUN]" : ""} complete: processed=${processed}, sent=${sent}, skippedBlocked=${skippedBlocked}, skippedApproved=${skippedApproved}, skippedCsDisabled=${skippedCsDisabled}, autoBlocked=${autoBlocked}, errors=${errors}, duration=${durationMs}ms`
     );
-    return NextResponse.json({ processed, sent, skippedBlocked, skippedApproved, skippedCsDisabled, autoBlocked, errors, durationMs });
+    return NextResponse.json({ dryRun, processed, sent, skippedBlocked, skippedApproved, skippedCsDisabled, autoBlocked, errors, durationMs, messages: dryRun ? messageLogs : undefined });
   } catch (error) {
     console.error("Cron fatal error:", error);
 
