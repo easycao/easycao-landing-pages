@@ -173,12 +173,12 @@ export async function GET(request: NextRequest) {
     for (const { studentId, student, enrollmentId, enrollment, stageName, csEnabled } of candidates) {
       try {
         // In dry-run mode, use cached data instead of calling Hotmart API
-        let currentEngagement: string;
+        let currentEngagement: EngagementLevel;
         let hotmartStatus: string | null;
         let hotmartProgress: number | null;
 
         if (dryRun) {
-          currentEngagement = student.hotmartEngagement || "UNKNOWN";
+          currentEngagement = (student.hotmartEngagement || "NONE") as EngagementLevel;
           hotmartStatus = student.hotmartStatus || null;
           hotmartProgress = student.courseProgress ?? null;
         } else {
