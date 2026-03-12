@@ -345,12 +345,12 @@ export default function ModuleLessonsPage({
                       >
                         {lesson.status === "published" ? "Draft" : "Pub"}
                       </button>
-                      <button
-                        onClick={() => startEdit(lesson)}
+                      <Link
+                        href={`/admin/cms/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}`}
                         className="text-xs px-3 py-1.5 rounded-lg text-primary hover:bg-primary/5 transition-colors"
                       >
                         Editar
-                      </button>
+                      </Link>
                       <button
                         onClick={() => handleDelete(lesson.id, lesson.title)}
                         className="text-xs px-2 py-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"

@@ -1,6 +1,34 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase-admin";
 
+export async function GET(
+  _req: NextRequest,
+  {
+    params,
+  }: {
+    params: Promise<{ courseId: string; moduleId: string; lessonId: string }>;
+  }
+) {
+  const { courseId, moduleId, lessonId } = await params;
+  const db = getFirestoreDb();
+  const doc = await db
+    .collection(`courses/${courseId}/modules/${moduleId}/lessons`)
+    .doc(lessonId)
+    .get();
+  if (!doc.exists) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  const data = doc.data()!;
+  return NextResponse.json({
+    lesson: {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate?.()?.toISOString() || null,
+      updatedAt: data.updatedAt?.toDate?.()?.toISOString() || null,
+    },
+  });
+}
+
 export async function PATCH(
   req: NextRequest,
   {
@@ -20,6 +48,9 @@ export async function PATCH(
     "duration",
     "materials",
     "thumbnail",
+    "hasConsolidation",
+    "hasExercises",
+    "consolidationConfig",
   ];
   const update: Record<string, unknown> = { updatedAt: new Date() };
   for (const key of allowed) {
