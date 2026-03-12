@@ -25,14 +25,16 @@ export async function getStudentByEmail(
 
   if (snapshot.empty) return null;
   const doc = snapshot.docs[0];
-  return { id: doc.id, ...doc.data() } as Student;
+  const data = doc.data();
+  return { id: doc.id, ...data, name: data.name || data.display_name || "" } as Student;
 }
 
 export async function getStudentById(id: string): Promise<Student | null> {
   const db = getFirestoreDb();
   const doc = await db.collection(STUDENTS_COLLECTION).doc(id).get();
   if (!doc.exists) return null;
-  return { id: doc.id, ...doc.data() } as Student;
+  const data = doc.data()!;
+  return { id: doc.id, ...data, name: data.name || data.display_name || "" } as Student;
 }
 
 export async function searchStudents(query: string): Promise<Student[]> {
@@ -50,7 +52,7 @@ export async function searchStudents(query: string): Promise<Student[]> {
 
   for (const doc of snapshot.docs) {
     const data = doc.data();
-    const name = (data.name || "").toLowerCase();
+    const name = (data.name || data.display_name || "").toLowerCase();
     const email = (data.email || "").toLowerCase();
     const phone = (data.phone || "").replace(/\D/g, "");
     const searchPhone = q.replace(/\D/g, "");
@@ -60,7 +62,7 @@ export async function searchStudents(query: string): Promise<Student[]> {
       email.includes(q) ||
       (searchPhone && phone.includes(searchPhone))
     ) {
-      results.push({ id: doc.id, ...data } as Student);
+      results.push({ id: doc.id, ...data, name: data.name || data.display_name || "" } as Student);
     }
 
     if (results.length >= 20) break;

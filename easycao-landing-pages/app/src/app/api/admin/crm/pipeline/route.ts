@@ -80,7 +80,7 @@ export async function GET() {
     if (currentEnrollmentId) {
       studentDocs.push({
         id: doc.id,
-        name: data.name || "",
+        name: data.name || data.display_name || "",
         email: data.email || "",
         phone: data.phone || "",
         currentEnrollmentId,

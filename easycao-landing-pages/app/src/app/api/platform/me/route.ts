@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
   const data = doc.data()!;
   return NextResponse.json({
-    name: data.name || null,
+    name: data.name || data.display_name || null,
     role: data.role || "student",
   });
 }
