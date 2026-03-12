@@ -114,7 +114,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: "Dashboard", href: "/dashboard", icon: <HomeIcon />, enabled: true },
       { label: "Meus Cursos", href: "/courses", icon: <BookIcon />, enabled: true },
-      { label: "Simulador", href: "/simulator", icon: <MicIcon />, enabled: false },
+      { label: "Simulador", href: "/simulator", icon: <MicIcon />, enabled: true },
       { label: "Exercicios", href: "/exercises", icon: <PencilIcon />, enabled: false },
     ],
   },
