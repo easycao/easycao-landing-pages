@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase-admin";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/auth";
 
 /**
  * POST /api/simulator/exam
@@ -7,13 +9,25 @@ import { getFirestoreDb } from "@/lib/firebase-admin";
  * Questions are selected by Question_Type, and Firestore doc IDs are stored.
  */
 export async function POST(req: NextRequest) {
+  // Auth — use session cookie as source of truth for UID
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const sessionUser = await verifySession(sessionCookie);
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+  }
+
   const db = getFirestoreDb();
   const body = await req.json();
-  const { part, mode, uid } = body;
+  const { part, mode } = body;
+  const uid = sessionUser.uid; // Always use session UID
 
-  if (!part || !uid) {
+  if (!part) {
     return NextResponse.json(
-      { error: "part and uid are required" },
+      { error: "part is required" },
       { status: 400 }
     );
   }
