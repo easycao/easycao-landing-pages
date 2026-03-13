@@ -54,11 +54,16 @@ export default function AudioRecorder({
   const [storagePath, setStoragePath] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const [silentWarning, setSilentWarning] = useState(false);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const peakLevelRef = useRef(0);
 
   const isUploading = state === "processing";
 
@@ -116,9 +121,42 @@ export default function AudioRecorder({
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
+      // Set up audio level monitoring to detect silence
+      try {
+        const audioCtx = new AudioContext();
+        audioContextRef.current = audioCtx;
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        analyserRef.current = analyser;
+        peakLevelRef.current = 0;
+
+        // Monitor audio level periodically
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        const monitorInterval = setInterval(() => {
+          if (!analyserRef.current) { clearInterval(monitorInterval); return; }
+          analyserRef.current.getByteTimeDomainData(dataArray);
+          // Calculate max deviation from silence (128 = silence in unsigned byte)
+          let maxDev = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const dev = Math.abs(dataArray[i] - 128);
+            if (dev > maxDev) maxDev = dev;
+          }
+          if (maxDev > peakLevelRef.current) peakLevelRef.current = maxDev;
+        }, 200);
+
+        // Store interval for cleanup
+        const origCleanup = () => { clearInterval(monitorInterval); };
+        stream.getTracks()[0].addEventListener("ended", origCleanup, { once: true });
+      } catch {
+        // AudioContext not available, skip silence detection
+      }
+
       const recorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = recorder;
       chunksRef.current = [];
+      setSilentWarning(false);
 
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
@@ -161,6 +199,20 @@ export default function AudioRecorder({
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+
+    // Check if audio was silent (peak deviation < 5 from silence baseline)
+    const wasSilent = peakLevelRef.current < 5;
+    if (wasSilent) {
+      setSilentWarning(true);
+    }
+
+    // Cleanup audio context
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+      analyserRef.current = null;
+    }
+
     if (
       mediaRecorderRef.current &&
       mediaRecorderRef.current.state !== "inactive"
@@ -234,6 +286,7 @@ export default function AudioRecorder({
     setUploadProgress(0);
     setState("idle");
     setIsPlaying(false);
+    setSilentWarning(false);
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -283,6 +336,17 @@ export default function AudioRecorder({
           >
             Fechar
           </button>
+        </div>
+      )}
+
+      {/* Silent audio warning */}
+      {silentWarning && (state === "processing" || state === "done") && (
+        <div className={`mb-4 rounded-xl border p-3 text-sm ${
+          isDark
+            ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
+            : "bg-amber-50 border-amber-200 text-amber-700"
+        }`}>
+          Nenhum áudio detectado. Verifique se seu microfone está ativo e não está mutado.
         </div>
       )}
 

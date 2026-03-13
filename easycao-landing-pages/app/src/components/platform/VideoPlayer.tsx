@@ -16,6 +16,8 @@ export interface VideoPlayerProps {
   repeatCount?: number;
   /** Called when all repeats have been consumed. */
   onRepeatUsed?: () => void;
+  /** Alternative audio/video URL to play on repeat (e.g., P2 T4 plays T3's audio). */
+  repeatSrc?: string;
   autoPlay?: boolean;
   className?: string;
 }
@@ -27,6 +29,7 @@ export default function VideoPlayer({
   showRepeat = false,
   repeatCount = 1,
   onRepeatUsed,
+  repeatSrc,
   autoPlay = false,
   className = "",
 }: VideoPlayerProps) {
@@ -34,9 +37,11 @@ export default function VideoPlayer({
   const isDark = theme === "dark";
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const repeatAudioRef = useRef<HTMLAudioElement | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [hasEnded, setHasEnded] = useState(false);
   const [repeatsUsed, setRepeatsUsed] = useState(0);
+  const [playingRepeatAudio, setPlayingRepeatAudio] = useState(false);
 
   const repeatsRemaining = repeatCount - repeatsUsed;
 
@@ -53,18 +58,39 @@ export default function VideoPlayer({
   }, []);
 
   const handleRepeat = useCallback(() => {
-    if (!videoRef.current || repeatsRemaining <= 0) return;
-    videoRef.current.currentTime = 0;
-    videoRef.current.play();
-    setHasEnded(false);
+    if (repeatsRemaining <= 0) return;
 
     const newUsed = repeatsUsed + 1;
     setRepeatsUsed(newUsed);
 
-    if (newUsed >= repeatCount) {
+    if (repeatSrc) {
+      // Play alternative audio source (e.g., P2 T4 repeats T3's audio)
+      if (repeatAudioRef.current) {
+        repeatAudioRef.current.pause();
+        repeatAudioRef.current = null;
+      }
+      const audio = new Audio(repeatSrc);
+      repeatAudioRef.current = audio;
+      setPlayingRepeatAudio(true);
+      audio.onended = () => {
+        setPlayingRepeatAudio(false);
+        if (newUsed >= repeatCount) onRepeatUsed?.();
+      };
+      audio.play().catch(() => {
+        setPlayingRepeatAudio(false);
+      });
+    } else {
+      // Replay the same video
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+      setHasEnded(false);
+    }
+
+    if (!repeatSrc && newUsed >= repeatCount) {
       onRepeatUsed?.();
     }
-  }, [repeatsUsed, repeatsRemaining, repeatCount, onRepeatUsed]);
+  }, [repeatsUsed, repeatsRemaining, repeatCount, onRepeatUsed, repeatSrc]);
 
   // Auto-play on mount
   useEffect(() => {
@@ -76,6 +102,16 @@ export default function VideoPlayer({
       });
     }
   }, [autoPlay]);
+
+  // Cleanup repeat audio on unmount
+  useEffect(() => {
+    return () => {
+      if (repeatAudioRef.current) {
+        repeatAudioRef.current.pause();
+        repeatAudioRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
@@ -110,7 +146,7 @@ export default function VideoPlayer({
       </div>
 
       {/* Repeat button — outside the player */}
-      {showRepeat && hasEnded && repeatsRemaining > 0 && (
+      {showRepeat && hasEnded && repeatsRemaining > 0 && !playingRepeatAudio && (
         <button
           onClick={handleRepeat}
           className={`w-full py-3 rounded-xl text-sm font-medium border transition-all duration-200 flex items-center justify-center gap-2 ${
@@ -125,7 +161,17 @@ export default function VideoPlayer({
           Repetir ({repeatsRemaining})
         </button>
       )}
-      {showRepeat && hasEnded && repeatsRemaining <= 0 && (
+      {playingRepeatAudio && (
+        <div className={`w-full py-3 rounded-xl text-sm font-medium border flex items-center justify-center gap-2 ${
+          isDark
+            ? "border-white/[0.12] text-white/60"
+            : "border-gray-200 text-black/50"
+        }`}>
+          <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          Reproduzindo áudio...
+        </div>
+      )}
+      {showRepeat && hasEnded && repeatsRemaining <= 0 && !playingRepeatAudio && (
         <p className={`text-center text-xs ${isDark ? "text-white/40" : "text-black/30"}`}>
           Sem repetições restantes
         </p>

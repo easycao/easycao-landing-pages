@@ -66,6 +66,9 @@ export async function POST(
         );
       }
 
+      // Send total task count immediately so the client knows upfront
+      sendEvent({ status: "init", totalTasks: tasks.length });
+
       // Process tasks in batches with concurrency limit
       const CONCURRENCY = 3;
       const queue = [...tasks];

@@ -462,6 +462,10 @@ export default function FeedbackPage() {
             if (!match) continue;
             try {
               const data = JSON.parse(match[1]);
+              if (data.status === "init") {
+                setTotalTasks(data.totalTasks);
+                continue;
+              }
               if (data.status === "done") {
                 setTotalTasks(data.total);
                 setIsDone(true);
@@ -478,8 +482,6 @@ export default function FeedbackPage() {
                   feedback: data.feedback,
                   error: data.error,
                 });
-                // Update total as we discover tasks
-                if (next.size > totalTasks) setTotalTasks(next.size);
                 return next;
               });
             } catch {
@@ -492,7 +494,8 @@ export default function FeedbackPage() {
         setIsProcessing(false);
       }
     })();
-  }, [examId, user, totalTasks]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examId, user]);
 
   // Auto-expand tasks as they complete during streaming
   useEffect(() => {
@@ -633,9 +636,16 @@ export default function FeedbackPage() {
     (f) => f.status === "error"
   ).length;
 
-  const sortedFeedbacks = [...taskFeedbacks.values()].sort(
-    (a, b) => a.taskIndex - b.taskIndex
-  );
+  // Build full task list: show all tasks from 0..totalTasks-1
+  const sortedFeedbacks: TaskFeedback[] = useMemo(() => {
+    if (totalTasks === 0) return [...taskFeedbacks.values()].sort((a, b) => a.taskIndex - b.taskIndex);
+    const list: TaskFeedback[] = [];
+    for (let i = 0; i < totalTasks; i++) {
+      const existing = taskFeedbacks.get(i);
+      list.push(existing || { taskIndex: i, status: "processing" as const, phase: null });
+    }
+    return list;
+  }, [taskFeedbacks, totalTasks]);
 
   const allExpanded = completedCount > 0 && expandedTasks.size >= completedCount;
 
@@ -776,13 +786,18 @@ export default function FeedbackPage() {
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                  {tf.status === "processing" && (
+                  {tf.status === "processing" && tf.phase && (
                     <>
                       <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                       <span className={`text-xs ${textSecondary}`}>
-                        {tf.phase ? PHASE_LABELS[tf.phase] || "Processando..." : "Processando..."}
+                        {PHASE_LABELS[tf.phase] || "Processando..."}
                       </span>
                     </>
+                  )}
+                  {tf.status === "processing" && !tf.phase && (
+                    <span className={`text-xs ${textSecondary}`}>
+                      Aguardando...
+                    </span>
                   )}
                   {tf.status === "error" && (
                     <button

@@ -531,6 +531,7 @@ export default function ExamPage() {
                   showRepeat={isRepeatAvailable}
                   repeatCount={1}
                   onRepeatUsed={() => repeatUsed()}
+                  repeatSrc={currentTask.repeatAudioUrl}
                   autoPlay
                   className="rounded-xl"
                 />
@@ -569,6 +570,7 @@ export default function ExamPage() {
                   showRepeat={isRepeatAvailable}
                   repeatCount={1}
                   onRepeatUsed={() => repeatUsed()}
+                  repeatSrc={currentTask.repeatAudioUrl}
                   autoPlay
                   className="rounded-xl"
                 />
