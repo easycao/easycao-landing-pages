@@ -5,12 +5,20 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import KinescopePlayer from "@/components/platform/KinescopePlayer";
+import ConsolidationChat from "@/components/platform/ConsolidationChat";
+import LessonExercises from "@/components/platform/LessonExercises";
 
 interface LessonData {
   id: string;
   title: string;
   duration: string | null;
   kinescopeVideoId: string | null;
+  hasConsolidation?: boolean;
+  hasExercises?: boolean;
+  consolidationConfig?: {
+    concepts: string[];
+    language: "pt" | "en";
+  };
 }
 
 interface NavLesson {
@@ -43,6 +51,8 @@ export default function LessonPage({
   const [loading, setLoading] = useState(true);
   const [studentName, setStudentName] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
+  const [completedParts, setCompletedParts] = useState<string[]>([]);
+  const [videoWatched, setVideoWatched] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -66,9 +76,13 @@ export default function LessonPage({
       const progressData = await progressRes.json();
 
       setData(lessonData);
-      setIsCompleted(
-        (progressData.completedLessons || []).includes(lessonId)
-      );
+      const lessonIsCompleted = (progressData.completedLessons || []).includes(lessonId);
+      setIsCompleted(lessonIsCompleted);
+
+      // Load lesson parts progress
+      const partsData = progressData.lessonParts?.[lessonId] || [];
+      setCompletedParts(partsData);
+      setVideoWatched(lessonIsCompleted || partsData.includes("video"));
 
       // Track last accessed
       fetch("/api/platform/progress/last-accessed", {
@@ -90,17 +104,39 @@ export default function LessonPage({
     if (!user || isCompleted || completing) return;
     setCompleting(true);
 
-    await fetch("/api/platform/progress/complete", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uid: user.uid,
-        courseId,
-        lessonId,
-      }),
-    });
+    const lesson = data?.lesson;
+    const hasExtensions = lesson?.hasConsolidation || lesson?.hasExercises;
 
-    setIsCompleted(true);
+    if (hasExtensions) {
+      // Mark video part complete
+      const totalParts = 1 + (lesson?.hasConsolidation ? 1 : 0) + (lesson?.hasExercises ? 1 : 0);
+      await fetch("/api/platform/progress/complete-part", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          courseId,
+          lessonId,
+          part: "video",
+          totalParts,
+        }),
+      });
+      setVideoWatched(true);
+      setCompletedParts((prev) => prev.includes("video") ? prev : [...prev, "video"]);
+    } else {
+      // No extensions — mark fully complete
+      await fetch("/api/platform/progress/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          courseId,
+          lessonId,
+        }),
+      });
+      setIsCompleted(true);
+    }
+
     setCompleting(false);
   }
 
@@ -191,16 +227,16 @@ export default function LessonPage({
         {/* Complete button */}
         <button
           onClick={handleComplete}
-          disabled={isCompleted || completing}
+          disabled={isCompleted || completing || videoWatched}
           className={`group/cta relative overflow-hidden px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
-            isCompleted
+            isCompleted || videoWatched
               ? isDark
                 ? "bg-green-500/10 text-green-400 border border-green-500/20 cursor-default"
                 : "bg-green-50 text-green-600 border border-green-200 cursor-default"
               : "bg-primary text-white hover:bg-[#1888e0] shadow-[0_2px_8px_rgba(31,150,247,0.25)] hover:shadow-[0_4px_12px_rgba(31,150,247,0.4)] active:scale-[0.97]"
           }`}
         >
-          {!isCompleted && !completing && (
+          {!isCompleted && !completing && !videoWatched && (
             <span className="absolute inset-0 rounded-[inherit] bg-[linear-gradient(45deg,transparent_25%,rgba(52,184,248,0.45)_50%,transparent_75%)] bg-[length:250%_250%] bg-[position:200%_0] group-hover/cta:bg-[position:-100%_0] transition-[background-position] duration-[800ms] ease-out pointer-events-none" />
           )}
           {completing ? (
@@ -208,7 +244,7 @@ export default function LessonPage({
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               Concluindo...
             </span>
-          ) : isCompleted ? (
+          ) : isCompleted || videoWatched ? (
             <span className="flex items-center gap-2">
               <svg
                 className="w-4 h-4"
@@ -223,10 +259,14 @@ export default function LessonPage({
                   d="M5 13l4 4L19 7"
                 />
               </svg>
-              Aula Concluida
+              {videoWatched && !isCompleted ? "Vídeo Concluído" : "Aula Concluida"}
             </span>
           ) : (
-            <span className="relative">Concluir Aula</span>
+            <span className="relative">
+              {data?.lesson.hasConsolidation || data?.lesson.hasExercises
+                ? "Concluir Vídeo"
+                : "Concluir Aula"}
+            </span>
           )}
         </button>
 
@@ -237,6 +277,99 @@ export default function LessonPage({
           </span>
         )}
       </div>
+
+      {/* Consolidation Section */}
+      {lesson.hasConsolidation && lesson.consolidationConfig && (
+        <div className={`${cardClass} p-5`} style={cardBg}>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className={`text-sm font-bold ${textPrimary}`}>Consolidação</h3>
+            {completedParts.includes("consolidation") && (
+              <span className="text-xs text-emerald-500 font-medium">✓ Concluída</span>
+            )}
+            {!videoWatched && (
+              <span className={`text-xs ${textSecondary}`}>(assista o vídeo primeiro)</span>
+            )}
+          </div>
+          {completedParts.includes("consolidation") ? (
+            <p className={`text-sm ${textSecondary}`}>
+              Consolidação concluída com sucesso.
+            </p>
+          ) : (
+            <ConsolidationChat
+              concepts={lesson.consolidationConfig.concepts}
+              language={lesson.consolidationConfig.language}
+              disabled={!videoWatched}
+              onComplete={async () => {
+                if (!user) return;
+                const totalParts = 1 + (lesson.hasConsolidation ? 1 : 0) + (lesson.hasExercises ? 1 : 0);
+                await fetch("/api/platform/progress/complete-part", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    uid: user.uid,
+                    courseId,
+                    lessonId,
+                    part: "consolidation",
+                    totalParts,
+                  }),
+                });
+                setCompletedParts((prev) => [...prev, "consolidation"]);
+              }}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Exercises Section */}
+      {lesson.hasExercises && (
+        <div className={`${cardClass} p-5`} style={cardBg}>
+          <div className="flex items-center gap-2 mb-4">
+            <h3 className={`text-sm font-bold ${textPrimary}`}>Exercícios Práticos</h3>
+            {completedParts.includes("exercises") && (
+              <span className="text-xs text-emerald-500 font-medium">✓ Concluídos</span>
+            )}
+          </div>
+          <LessonExercises
+            courseId={courseId}
+            moduleId={moduleId}
+            lessonId={lessonId}
+            uid={user?.uid || ""}
+            disabled={
+              (lesson.hasConsolidation && !completedParts.includes("consolidation")) ||
+              !videoWatched
+            }
+            onAllComplete={async () => {
+              if (!user) return;
+              const totalParts = 1 + (lesson.hasConsolidation ? 1 : 0) + (lesson.hasExercises ? 1 : 0);
+              await fetch("/api/platform/progress/complete-part", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  uid: user.uid,
+                  courseId,
+                  lessonId,
+                  part: "exercises",
+                  totalParts,
+                }),
+              });
+              setCompletedParts((prev) => [...prev, "exercises"]);
+            }}
+          />
+        </div>
+      )}
+
+      {/* Part progress indicator */}
+      {(lesson.hasConsolidation || lesson.hasExercises) && (
+        <div className="flex items-center gap-1.5 justify-center">
+          <div className={`w-2.5 h-2.5 rounded-full ${videoWatched ? "bg-emerald-500" : isDark ? "bg-white/20" : "bg-gray-300"}`} title="Vídeo" />
+          {lesson.hasConsolidation && (
+            <div className={`w-2.5 h-2.5 rounded-full ${completedParts.includes("consolidation") ? "bg-emerald-500" : isDark ? "bg-white/20" : "bg-gray-300"}`} title="Consolidação" />
+          )}
+          {lesson.hasExercises && (
+            <div className={`w-2.5 h-2.5 rounded-full ${completedParts.includes("exercises") ? "bg-emerald-500" : isDark ? "bg-white/20" : "bg-gray-300"}`} title="Exercícios" />
+          )}
+        </div>
+      )}
 
       {/* Navigation */}
       <div className={`flex items-center justify-between gap-4 pt-4 border-t ${isDark ? "border-white/[0.06]" : "border-gray-border/40"}`}>

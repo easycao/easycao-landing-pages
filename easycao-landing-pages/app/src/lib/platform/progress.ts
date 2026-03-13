@@ -46,6 +46,77 @@ export async function markLessonComplete(
 }
 
 /**
+ * Mark a lesson part as complete (video, consolidation, or exercises).
+ * Updates per-lesson part tracking in lessonParts map.
+ * When all parts are done, automatically marks lesson as complete.
+ */
+export async function markLessonPartComplete(
+  uid: string,
+  courseId: string,
+  lessonId: string,
+  part: "video" | "consolidation" | "exercises",
+  totalParts: number,
+  totalLessons: number
+) {
+  const db = getFirestoreDb();
+  const progressRef = db
+    .collection("Users")
+    .doc(uid)
+    .collection("progress")
+    .doc(courseId);
+
+  const snap = await progressRef.get();
+  const existing = snap.exists ? snap.data() : null;
+  const lessonParts: Record<string, string[]> = existing?.lessonParts || {};
+
+  if (!lessonParts[lessonId]) lessonParts[lessonId] = [];
+  if (!lessonParts[lessonId].includes(part)) {
+    lessonParts[lessonId].push(part);
+  }
+
+  await progressRef.set(
+    {
+      lessonParts,
+      lastLessonId: lessonId,
+      lastAccessedAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  // If all parts done, mark lesson as fully complete
+  if (lessonParts[lessonId].length >= totalParts) {
+    return markLessonComplete(uid, courseId, lessonId, totalLessons);
+  }
+
+  return { lessonParts, completedParts: lessonParts[lessonId].length, totalParts };
+}
+
+/**
+ * Get lesson parts progress for a specific lesson.
+ */
+export async function getLessonPartsProgress(
+  uid: string,
+  courseId: string,
+  lessonId: string
+): Promise<{ completedParts: string[]; totalParts: number }> {
+  const db = getFirestoreDb();
+  const snap = await db
+    .collection("Users")
+    .doc(uid)
+    .collection("progress")
+    .doc(courseId)
+    .get();
+
+  const data = snap.exists ? snap.data() : null;
+  const lessonParts: Record<string, string[]> = data?.lessonParts || {};
+  return {
+    completedParts: lessonParts[lessonId] || [],
+    totalParts: 1, // Default; caller should provide actual total
+  };
+}
+
+/**
  * Get student progress for a specific course.
  * Filters out completed lessons that no longer exist in the course.
  */
@@ -85,6 +156,7 @@ export async function getStudentProgress(uid: string, courseId: string) {
     lastLessonId: data.lastLessonId || null,
     lastAccessedAt: data.lastAccessedAt?.toDate?.()?.toISOString() || null,
     progressPercent,
+    lessonParts: data.lessonParts || {},
   };
 }
 
