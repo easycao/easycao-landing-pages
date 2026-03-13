@@ -389,6 +389,7 @@ export default function FeedbackPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
+  const [debugError, setDebugError] = useState<string | null>(null);
   const sseStarted = useRef(false);
   const prevCompletedRef = useRef<Set<number>>(new Set());
 
@@ -427,12 +428,17 @@ export default function FeedbackPage() {
 
       // Start SSE processing
       setIsProcessing(true);
+      setDebugError(null);
       try {
         const res = await fetch(`/api/simulator/exam/${examId}/feedback`, {
           method: "POST",
         });
 
         if (!res.ok || !res.body) {
+          const errorText = res.body ? await res.text() : "(no body)";
+          const msg = `POST feedback failed: ${res.status} ${res.statusText} — ${errorText}`;
+          console.error(msg);
+          setDebugError(msg);
           setIsProcessing(false);
           return;
         }
@@ -479,7 +485,10 @@ export default function FeedbackPage() {
             }
           }
         }
-      } catch {
+      } catch (err) {
+        const msg = `SSE error: ${err instanceof Error ? err.message : String(err)}`;
+        console.error(msg);
+        setDebugError(msg);
         setIsProcessing(false);
       }
     })();
@@ -720,6 +729,13 @@ export default function FeedbackPage() {
           );
         })()}
       </div>
+
+      {/* Debug error display */}
+      {debugError && (
+        <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono break-all">
+          {debugError}
+        </div>
+      )}
 
       {/* Exam Dashboard (only when done) */}
       {isDone && dashboard && <ExamDashboardSection dashboard={dashboard} isDark={isDark} />}
