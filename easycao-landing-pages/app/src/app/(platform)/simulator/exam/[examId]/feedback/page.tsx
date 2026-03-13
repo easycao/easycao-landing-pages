@@ -730,7 +730,10 @@ export default function FeedbackPage() {
         })()}
       </div>
 
-      {/* Debug error display */}
+      {/* Debug info */}
+      <div className="mb-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono break-all">
+        isDone={String(isDone)} | isProcessing={String(isProcessing)} | totalTasks={totalTasks} | feedbackCount={taskFeedbacks.size} | completedCount={completedCount} | errorCount={errorCount} | sortedLen={sortedFeedbacks.length}
+      </div>
       {debugError && (
         <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono break-all">
           {debugError}
