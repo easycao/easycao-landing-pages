@@ -49,9 +49,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(getClientAuth(), (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(getClientAuth(), async (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
+
+      // Sync server-side session cookie
+      if (firebaseUser) {
+        try {
+          const idToken = await firebaseUser.getIdToken();
+          await fetch("/api/platform/session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken }),
+          });
+        } catch {
+          // Non-critical — session cookie will be created on next sign-in
+        }
+      }
     });
     return unsubscribe;
   }, []);
@@ -79,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    await fetch("/api/platform/session", { method: "DELETE" }).catch(() => {});
     await firebaseSignOut(getClientAuth());
   }
 

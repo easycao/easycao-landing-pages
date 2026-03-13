@@ -115,7 +115,7 @@ const NAV_SECTIONS: NavSection[] = [
       { label: "Dashboard", href: "/dashboard", icon: <HomeIcon />, enabled: true },
       { label: "Meus Cursos", href: "/courses", icon: <BookIcon />, enabled: true },
       { label: "Simulador", href: "/simulator", icon: <MicIcon />, enabled: true },
-      { label: "Exercicios", href: "/exercises", icon: <PencilIcon />, enabled: false },
+      { label: "Exercicios", href: "/exercises", icon: <PencilIcon />, enabled: true },
     ],
   },
   {
@@ -128,8 +128,8 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: "PROGRESSO",
     items: [
-      { label: "Desempenho", href: "/performance", icon: <ChartIcon />, enabled: false },
-      { label: "Planejador", href: "/planner", icon: <CalendarIcon />, enabled: false },
+      { label: "Desempenho", href: "/performance", icon: <ChartIcon />, enabled: true },
+      { label: "Planejador", href: "/planner", icon: <CalendarIcon />, enabled: true },
     ],
   },
 ];

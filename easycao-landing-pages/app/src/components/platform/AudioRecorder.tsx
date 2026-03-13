@@ -23,8 +23,10 @@ export interface AudioRecorderProps {
   onUploadingChange?: (isUploading: boolean) => void;
   /** Block recording (e.g., video not watched yet). */
   disabled?: boolean;
-  /** Max recording seconds (default: 120). */
+  /** Max recording seconds (0 = unlimited, default: 0). */
   maxDuration?: number;
+  /** Show play/re-record preview after recording (default: true). */
+  showPreview?: boolean;
   className?: string;
 }
 
@@ -37,7 +39,8 @@ export default function AudioRecorder({
   onRecordingDelete,
   onUploadingChange,
   disabled = false,
-  maxDuration = 120,
+  maxDuration = 0,
+  showPreview = true,
   className = "",
 }: AudioRecorderProps) {
   const { theme } = useTheme();
@@ -135,11 +138,11 @@ export default function AudioRecorder({
 
       timerRef.current = setInterval(() => {
         setElapsed((prev) => {
-          if (prev + 1 >= maxDuration) {
+          const next = prev + 1;
+          if (maxDuration > 0 && next >= maxDuration) {
             stopRecording();
-            return prev + 1;
           }
-          return prev + 1;
+          return next;
         });
       }, 1000);
     } catch (err) {
@@ -173,7 +176,7 @@ export default function AudioRecorder({
 
       const ext = getFileExtension(mimeType);
       const timestamp = Date.now();
-      const path = `recordings/${uid}/${context}/${timestamp}.${ext}`;
+      const path = `users/${uid}/recordings/${context}/${timestamp}.${ext}`;
 
       try {
         const storage = getClientStorage();
@@ -194,10 +197,14 @@ export default function AudioRecorder({
           },
           async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
-            setAudioUrl(url);
-            setStoragePath(path);
-            setState("done");
             onRecordingComplete(url);
+            if (showPreview) {
+              setAudioUrl(url);
+              setStoragePath(path);
+              setState("done");
+            }
+            // When showPreview=false, stay in "processing" state
+            // so the record button doesn't flash. Parent will unmount us.
           }
         );
       } catch {
@@ -205,7 +212,7 @@ export default function AudioRecorder({
         setState("idle");
       }
     },
-    [uid, context, getFileExtension, onRecordingComplete]
+    [uid, context, getFileExtension, onRecordingComplete, showPreview]
   );
 
   const handleReRecord = useCallback(async () => {
@@ -331,17 +338,8 @@ export default function AudioRecorder({
               </span>
             </div>
             <span className={`text-xs ${textSecondary}`}>
-              {formatTime(elapsed)} / {formatTime(maxDuration)}
+              {formatTime(elapsed)}
             </span>
-          </div>
-          {/* Progress bar */}
-          <div
-            className={`flex-1 h-1.5 rounded-full overflow-hidden ${isDark ? "bg-white/[0.06]" : "bg-black/[0.04]"}`}
-          >
-            <div
-              className="h-full bg-red-500 rounded-full transition-all duration-1000"
-              style={{ width: `${(elapsed / maxDuration) * 100}%` }}
-            />
           </div>
         </div>
       )}

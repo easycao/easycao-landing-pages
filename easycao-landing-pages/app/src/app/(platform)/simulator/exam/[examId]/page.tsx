@@ -18,13 +18,17 @@ import AudioRecorder from "@/components/platform/AudioRecorder";
 const TASK_LABELS: Record<string, string> = {
   P1: "Pergunta",
   P2_T1: "Cotejamento",
-  P2_T2: "ABC",
-  P2_T3: "Afirmação/Negação",
-  P2_T4: "Reported Speech",
+  P2_T2: "Sistema ABC",
+  P2_T3: "Affirm / Negative",
+  P2_T4: "What did the controller say",
   P3_RS: "Reported Speech",
   P3_Q: "Pergunta",
   P3_CMP: "Comparação",
-  P4: "Tarefa",
+  P4_DESC: "Descrição da Foto",
+  P4_PAST: "Passado",
+  P4_FUTURE: "Futuro",
+  P4_Q: "Question",
+  P4_STMT: "Statement",
 };
 
 function getTaskLabel(task: TaskData, part: string): string {
@@ -34,6 +38,7 @@ function getTaskLabel(task: TaskData, part: string): string {
 }
 
 // --- Question → TaskData mappers per part ---
+// Field names match actual Firestore document structure
 
 function mapP1Tasks(questions: any[]): TaskData[] {
   return questions.map((q, i) => ({
@@ -48,50 +53,49 @@ function mapP2Tasks(questions: any[]): TaskData[] {
   const tasks: TaskData[] = [];
   let taskIndex = 0;
   questions.forEach((q, sitIdx) => {
-    const isImage = q.Part2_Tipo === "Imagem";
+    const isImage = q.questionType === "Part2-Tipo2" || q.Question_Type === "Part2-Tipo2";
     const sharedGroup = `sit${sitIdx}_T3T4`;
 
-    // T1 — Cotejamento
+    // T1 — Cotejamento: listen to cenário + track 1
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part2_Video_T1 || q.Part2_Audio_Track1 || "",
-      audioUrl: q.Part2_Audio_Track1 || "",
+      videoUrl: q.Part2_Cenario_e_Track1 || "",
       repeatAudioUrl: q.Part2_RepeatTrack1 || "",
       taskType: "P2_T1",
       situationIndex: sitIdx,
       situationType: isImage ? "image" : "audio",
     });
 
-    // T2 — ABC
+    // T2 — Sistema ABC: show pane video, image side-by-side if Tipo2
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part2_Video_T2 || q.Part2_Audio_Track2 || "",
+      videoUrl: q.Part2_Pane || "",
       imageUrl: isImage ? (q.Part2_Image || "") : undefined,
       taskType: "P2_T2",
       situationIndex: sitIdx,
       situationType: isImage ? "image" : "audio",
-      hideImageOnRepeat: true,
+      imageSideBySide: isImage,
     });
 
-    // T3 — Affirm/Negative
+    // T3 — Affirm / Negative: listen to track 2 (shared repeat with T4)
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part2_Video_T3 || q.Part2_Audio_Track1 || "",
-      audioUrl: q.Part2_Audio_Track1 || "",
+      videoUrl: q.Part2_Track2 || "",
       taskType: "P2_T3",
       situationIndex: sitIdx,
       situationType: isImage ? "image" : "audio",
       sharedRepeatGroup: sharedGroup,
     });
 
-    // T4 — Reported Speech
+    // T4 — What did the controller say: pergunta final, repeat = Track2 (shared with T3)
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part2_Video_T4 || "",
+      videoUrl: q.Part2_Pergunta_Final || "",
+      repeatAudioUrl: q.Part2_Track2 || "",
       taskType: "P2_T4",
       situationIndex: sitIdx,
       situationType: isImage ? "image" : "audio",
@@ -104,12 +108,21 @@ function mapP2Tasks(questions: any[]): TaskData[] {
 function mapP3Tasks(questions: any[]): TaskData[] {
   const tasks: TaskData[] = [];
   let taskIndex = 0;
-  questions.forEach((q, sitIdx) => {
-    // RS task (auto-repeat built into video)
+
+  // Separate regular P3 questions from comparison doc
+  const regularQs = questions.filter(
+    (q) => (q.questionType || q.Question_Type) !== "Part3Comparison"
+  );
+  const comparisonDoc = questions.find(
+    (q) => (q.questionType || q.Question_Type) === "Part3Comparison"
+  );
+
+  regularQs.forEach((q, sitIdx) => {
+    // RS task — listen to the communication track
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part3_RS || "",
+      videoUrl: q.Part3_Track1 || "",
       taskType: "P3_RS",
       situationIndex: sitIdx,
       autoRepeat: true,
@@ -119,57 +132,132 @@ function mapP3Tasks(questions: any[]): TaskData[] {
     tasks.push({
       index: taskIndex++,
       questionId: q.id,
-      videoUrl: q.Part3_Pergunta || "",
+      videoUrl: q.Part3_Question || "",
       taskType: "P3_Q",
       situationIndex: sitIdx,
     });
   });
 
-  // Comparison task (uses last question's data as reference)
-  if (questions.length > 0) {
-    const lastQ = questions[questions.length - 1];
+  // Comparison task (single doc in collection)
+  if (comparisonDoc) {
     tasks.push({
       index: taskIndex,
-      questionId: lastQ.id,
-      videoUrl: lastQ.Part3_Comparacao || lastQ.Part3_Pergunta || "",
+      questionId: comparisonDoc.id,
+      videoUrl: comparisonDoc.Part3Comparison || "",
       taskType: "P3_CMP",
-      situationIndex: questions.length,
+      situationIndex: regularQs.length,
     });
   }
+
   return tasks;
 }
 
-function mapP4Tasks(questions: any[]): TaskData[] {
+function mapP4Tasks(questions: any[], mode?: string): TaskData[] {
   const q = questions[0];
   if (!q) return [];
-  const taskLabels = ["T1", "T2", "T3", "T4", "T5", "T6"];
-  return taskLabels.map((label, i) => ({
-    index: i,
-    questionId: q.id,
-    videoUrl: q[`Part4_Video_${label}`] || q.Part4_Video || "",
-    imageUrl: q.Part4_Image || "",
-    taskType: "P4",
-    situationIndex: 0,
-    clarifyVideoUrl: label === "T6" ? (q.Part4Clarify || "") : undefined,
-  }));
+
+  const sharedGroup = "p4_stmt_clarify";
+
+  // All possible Part4 tasks in order (6 tasks total)
+  const allTasks: TaskData[] = [
+    // 0 — Descrição da Foto
+    {
+      index: 0,
+      questionId: q.id,
+      videoUrl: q.Part4Question1 || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_DESC",
+      situationIndex: 0,
+    },
+    // 1 — Passado
+    {
+      index: 1,
+      questionId: q.id,
+      videoUrl: q.Part4Question2 || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_PAST",
+      situationIndex: 0,
+    },
+    // 2 — Futuro
+    {
+      index: 2,
+      questionId: q.id,
+      videoUrl: q.Part4Question3 || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_FUTURE",
+      situationIndex: 0,
+    },
+    // 3 — Question 4
+    {
+      index: 3,
+      questionId: q.id,
+      videoUrl: q.Part4Question4 || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_Q",
+      situationIndex: 0,
+    },
+    // 4 — Question 5
+    {
+      index: 4,
+      questionId: q.id,
+      videoUrl: q.Part4Question5 || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_Q",
+      situationIndex: 0,
+    },
+    // 5 — Statement (with clarify + shared repeat)
+    {
+      index: 5,
+      questionId: q.id,
+      videoUrl: q.Part4Statement || "",
+      imageUrl: q.Part4Image || "",
+      taskType: "P4_STMT",
+      situationIndex: 0,
+      clarifyVideoUrl: q.Part4Clarify || "",
+      sharedRepeatGroup: sharedGroup,
+    },
+  ];
+
+  // Filter by mode
+  const modeFilter: Record<string, string[]> = {
+    description: ["P4_DESC"],
+    past: ["P4_PAST"],
+    future: ["P4_FUTURE"],
+    question: ["P4_Q"],
+    statement: ["P4_STMT"],
+  };
+
+  let tasks: TaskData[];
+  if (mode && modeFilter[mode]) {
+    const filtered = allTasks.filter((t) => modeFilter[mode].includes(t.taskType!));
+    // For "question" mode, randomly pick one of Q4/Q5
+    if (mode === "question" && filtered.length > 1) {
+      const pick = filtered[Math.floor(Math.random() * filtered.length)];
+      tasks = [pick];
+    } else {
+      tasks = filtered;
+    }
+  } else {
+    tasks = allTasks; // complete
+  }
+
+  // Re-index
+  return tasks.map((t, i) => ({ ...t, index: i }));
 }
 
-function mapCompleteTasks(questions: any[], part: string): TaskData[] {
-  // For complete test, questions come pre-sorted by part segments
-  // Part field in exam tells us this is complete, but questions already
-  // have their fields. We detect by available fields.
-  // Complete exam: first 3 = P1, next 5 = P2, next 3+1 = P3, last 1 = P4
-  // But question indexes have offsets, so we detect by fields present
-  if (part !== "complete") return [];
-
+function mapCompleteTasks(questions: any[]): TaskData[] {
   const tasks: TaskData[] = [];
   let idx = 0;
 
-  // P1 questions (first 3) — have Part1_Pergunta
-  const p1Qs = questions.filter((q) => q.Part1_Pergunta);
-  const p2Qs = questions.filter((q) => q.Part2_Audio_Track1 || q.Part2_Tipo);
-  const p3Qs = questions.filter((q) => q.Part3_RS || q.Part3_Pergunta);
-  const p4Qs = questions.filter((q) => q.Part4_Image || q.Part4_Video);
+  // Split by questionType (set by the questions API)
+  const p1Qs = questions.filter((q) => q.questionType === "Part1");
+  const p2Qs = questions.filter(
+    (q) => q.questionType === "Part2-Tipo1" || q.questionType === "Part2-Tipo2"
+  );
+  const p3Qs = questions.filter(
+    (q) => q.questionType === "Part3" || q.questionType === "Part3Comparison"
+  );
+  const p4Qs = questions.filter((q) => q.questionType === "Part4");
 
   for (const t of mapP1Tasks(p1Qs)) {
     tasks.push({ ...t, index: idx++ });
@@ -180,20 +268,20 @@ function mapCompleteTasks(questions: any[], part: string): TaskData[] {
   for (const t of mapP3Tasks(p3Qs)) {
     tasks.push({ ...t, index: idx++ });
   }
-  for (const t of mapP4Tasks(p4Qs)) {
+  for (const t of mapP4Tasks(p4Qs, "complete")) {
     tasks.push({ ...t, index: idx++ });
   }
 
   return tasks;
 }
 
-function mapQuestions(questions: any[], part: string): TaskData[] {
+function mapQuestions(questions: any[], part: string, mode?: string): TaskData[] {
   switch (part) {
     case "P1": return mapP1Tasks(questions);
     case "P2": return mapP2Tasks(questions);
     case "P3": return mapP3Tasks(questions);
-    case "P4": return mapP4Tasks(questions);
-    case "complete": return mapCompleteTasks(questions, part);
+    case "P4": return mapP4Tasks(questions, mode);
+    case "complete": return mapCompleteTasks(questions);
     default: return mapP1Tasks(questions);
   }
 }
@@ -234,7 +322,7 @@ export default function ExamPage() {
           return;
         }
 
-        const tasks = mapQuestions(data.questions, data.part);
+        const tasks = mapQuestions(data.questions, data.part, data.mode);
         // Resume from last saved task index
         const resumeIndex = Math.min(data.currentTaskIndex || 0, tasks.length - 1);
         init(tasks, resumeIndex > 0 ? resumeIndex : undefined);
@@ -359,7 +447,7 @@ export default function ExamPage() {
   // Determine repeat availability
   const isRepeatAvailable = (() => {
     if (state.repeatUsed) return false;
-    if (currentTask.autoRepeat) return false; // auto-repeat has no button
+    if (currentTask.autoRepeat) return false;
     if (currentTask.sharedRepeatGroup) {
       return !state.sharedRepeatUsed[currentTask.sharedRepeatGroup];
     }
@@ -420,52 +508,91 @@ export default function ExamPage() {
         {taskLabel}
       </div>
 
-      {/* Image display (P2 image type, P4) */}
-      {currentTask.imageUrl && state.showImage && (
-        <div className={`${cardClass} overflow-hidden mb-4`} style={cardBg}>
-          <div className="p-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={currentTask.imageUrl}
-              alt="Situação"
-              className="w-full rounded-xl object-contain max-h-[300px]"
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Video/Audio Card */}
-      <div className={`${cardClass} overflow-hidden mb-6`} style={cardBg}>
-        <div className="p-1">
-          {currentTask.videoUrl ? (
-            <VideoPlayer
-              src={currentTask.videoUrl}
-              onEnded={() => videoEnded()}
-              showRepeat={isRepeatAvailable}
-              repeatCount={1}
-              onRepeatUsed={() => repeatUsed()}
-              autoPlay
-              className="rounded-xl"
-            />
-          ) : currentTask.audioUrl ? (
-            <div className="p-4">
-              <audio
-                src={currentTask.audioUrl}
-                autoPlay
-                onEnded={() => videoEnded()}
-                controls
-                className="w-full"
+      {/* Side-by-side layout for P2 Type 2 T2 (image + video) */}
+      {currentTask.imageSideBySide && currentTask.imageUrl && state.showImage ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className={`${cardClass} overflow-hidden`} style={cardBg}>
+            <div className="p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentTask.imageUrl}
+                alt="Situação"
+                className="w-full rounded-xl object-contain"
               />
             </div>
-          ) : (
-            <div className={`aspect-video flex items-center justify-center ${textSecondary} text-sm`}>
-              Mídia indisponível para esta tarefa
+          </div>
+          <div className={`${cardClass} overflow-hidden`} style={cardBg}>
+            <div className="p-1">
+              {currentTask.videoUrl ? (
+                <VideoPlayer
+                  key={state.currentTaskIndex}
+                  src={currentTask.videoUrl}
+                  onEnded={() => videoEnded()}
+                  showRepeat={isRepeatAvailable}
+                  repeatCount={1}
+                  onRepeatUsed={() => repeatUsed()}
+                  autoPlay
+                  className="rounded-xl"
+                />
+              ) : (
+                <div className={`aspect-video flex items-center justify-center ${textSecondary} text-sm`}>
+                  Mídia indisponível
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Image display (P2 image type, P4) */}
+          {currentTask.imageUrl && state.showImage && (
+            <div className={`${cardClass} overflow-hidden mb-4`} style={cardBg}>
+              <div className="p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentTask.imageUrl}
+                  alt="Situação"
+                  className="w-full rounded-xl object-contain max-h-[300px]"
+                />
+              </div>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Clarify button for P4 T6 */}
+          {/* Video/Audio Card */}
+          <div className={`${cardClass} overflow-hidden mb-6`} style={cardBg}>
+            <div className="p-1">
+              {currentTask.videoUrl ? (
+                <VideoPlayer
+                  key={state.currentTaskIndex}
+                  src={currentTask.videoUrl}
+                  onEnded={() => videoEnded()}
+                  showRepeat={isRepeatAvailable}
+                  repeatCount={1}
+                  onRepeatUsed={() => repeatUsed()}
+                  autoPlay
+                  className="rounded-xl"
+                />
+              ) : currentTask.audioUrl ? (
+                <div className="p-4">
+                  <audio
+                    src={currentTask.audioUrl}
+                    autoPlay
+                    onEnded={() => videoEnded()}
+                    controls
+                    className="w-full"
+                  />
+                </div>
+              ) : (
+                <div className={`aspect-video flex items-center justify-center ${textSecondary} text-sm`}>
+                  Mídia indisponível para esta tarefa
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Clarify button for P4 last question */}
       {currentTask.clarifyVideoUrl && !showClarify && state.taskState !== "watching" && (
         <button
           onClick={() => setShowClarify(true)}
@@ -520,6 +647,7 @@ export default function ExamPage() {
               onRecordingComplete={handleRecordingComplete}
               onUploadingChange={setIsUploading}
               disabled={isUploading}
+              showPreview={false}
             />
           </div>
         )}

@@ -1,6 +1,6 @@
 # Story Platform-5.1 — Database Unification: Migrate `students` to `Users` + Firestore Cleanup
 
-**Status:** InProgress
+**Status:** Done
 **Priority:** P0 (blocks continued platform development)
 **Epic:** Platform E5 — Database Unification & Cleanup
 **PRD Reference:** N/A (technical debt / architecture)

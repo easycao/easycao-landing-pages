@@ -17,7 +17,7 @@ interface PartConfig {
 const PARTS: PartConfig[] = [
   {
     id: "P1",
-    name: "Part 1 — Interaction",
+    name: "Part 1 — Aviation Topics",
     description: "Responda perguntas do examinador sobre temas gerais de aviação.",
     taskCount: 3,
     modes: [
@@ -28,19 +28,20 @@ const PARTS: PartConfig[] = [
   },
   {
     id: "P2",
-    name: "Part 2 — Situation & Comprehension",
-    description: "Ouça comunicações ATC e responda sobre situações de voo.",
+    name: "Part 2 — Interacting as a Pilot",
+    description: "Resolva situações da parte 2 com cotejamento, reporte de intenções, Affirm/Negative e Reported Speech.",
     taskCount: 20,
     modes: [
-      { id: "single", label: "Situação Individual", description: "1 situação com 4 tarefas" },
-      { id: "complete", label: "Parte Completa", description: "5 situações (3 áudio + 2 imagem)" },
+      { id: "single", label: "Situação de Áudio", description: "Situação tipo 1 — áudio" },
+      { id: "single-image", label: "Situação de Imagem", description: "Situação tipo 2 — imagem" },
+      { id: "complete", label: "Parte 2 Completa", description: "5 situações (3 áudio + 2 imagem)" },
     ],
     color: "from-emerald-500 to-emerald-600",
   },
   {
     id: "P3",
-    name: "Part 3 — Reported Speech",
-    description: "Ouça e reproduza comunicações em reported speech + compare.",
+    name: "Part 3 — Unexpected Situations",
+    description: "Simule situações da parte 3 com Reported Speech, Perguntas e comparação.",
     taskCount: 7,
     modes: [
       { id: "single", label: "Situação Individual", description: "1 situação com RS + pergunta" },
@@ -50,18 +51,23 @@ const PARTS: PartConfig[] = [
   },
   {
     id: "P4",
-    name: "Part 4 — Extended Description",
-    description: "Descreva e discuta uma imagem de forma detalhada.",
+    name: "Part 4 — Picture Description and Discussion",
+    description: "Responda perguntas sobre as imagens da prova ICAO.",
     taskCount: 6,
     modes: [
-      { id: "complete", label: "Parte Completa", description: "1 situação com 6 tarefas" },
+      { id: "description", label: "Descrição da Foto", description: "Descreva a imagem" },
+      { id: "past", label: "Passado", description: "O que aconteceu antes" },
+      { id: "future", label: "Futuro", description: "O que vai acontecer" },
+      { id: "question", label: "Question", description: "Responda a pergunta" },
+      { id: "statement", label: "Statement", description: "Comente a afirmação" },
+      { id: "complete", label: "Parte 4 Completa", description: "Todas as 6 tarefas" },
     ],
     color: "from-amber-500 to-amber-600",
   },
   {
     id: "complete",
-    name: "Teste Completo ICAO",
-    description: "Simulado completo: Parts 1 a 4 sequenciais (36 tarefas).",
+    name: "Teste ICAO Completo",
+    description: "Simule todas as 4 partes do exame exatamente como é na prova ICAO.",
     taskCount: 36,
     modes: [],
     color: "from-red-500 to-red-600",
@@ -155,7 +161,7 @@ export default function SimulatorPage() {
           onClick={() => setSelectedPart(null)}
         >
           <div
-            className={`w-full max-w-md ${isDark ? "bg-[#1a1a2e]" : "bg-white"} rounded-2xl shadow-2xl p-6`}
+            className={`w-full max-w-md rounded-2xl shadow-2xl p-6 ${isDark ? "bg-[#141418] border border-white/[0.09]" : "bg-white"}`}
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className={`text-lg font-bold ${textPrimary} mb-1`}>

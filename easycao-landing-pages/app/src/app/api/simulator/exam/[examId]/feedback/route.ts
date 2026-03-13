@@ -2,12 +2,15 @@ import { type NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import { getFirestoreDb } from "@/lib/firebase-admin";
-import { transcribeAudio } from "@/lib/platform/whisper";
-import { assessPronunciation } from "@/lib/platform/azure-speech";
+import { transcribeAudio, type WhisperWord } from "@/lib/platform/whisper";
+import { assessPronunciationChunked } from "@/lib/platform/azure-speech";
+import { convertToWav } from "@/lib/platform/audio-convert";
 import {
   analyzeGrammarVocabulary,
   evaluateComprehension,
 } from "@/lib/platform/llm-feedback";
+import { generateReferenceAudio } from "@/lib/platform/polly";
+import { getGlossaryTerms } from "@/lib/platform/glossary";
 
 /**
  * POST /api/simulator/exam/[examId]/feedback
@@ -39,6 +42,7 @@ export async function POST(
   }
   const exam = examDoc.data()!;
   if (exam.uid !== user.uid) {
+    console.error(`[feedback] UID mismatch: exam.uid=${exam.uid}, session.uid=${user.uid}`);
     return new Response("Unauthorized", { status: 403 });
   }
 
@@ -72,7 +76,7 @@ export async function POST(
         const recordingUrl = task.recordingUrl as string;
         const MAX_RETRIES = 3;
 
-        sendEvent({ taskIndex, status: "processing" });
+        sendEvent({ taskIndex, status: "processing", phase: "downloading" });
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
           try {
@@ -82,38 +86,94 @@ export async function POST(
             const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
             const filename = "audio.webm";
 
-            // Whisper + Azure in parallel
-            const [whisperResult, azureResult] = await Promise.allSettled([
-              transcribeAudio(audioBuffer, filename),
-              assessPronunciation(audioBuffer, "").catch(() => null),
-            ]);
+            // Step 1: Transcribe with Whisper (word-level timestamps)
+            sendEvent({ taskIndex, status: "processing", phase: "transcribing" });
+            let transcription = "";
+            let whisperWords: WhisperWord[] = [];
+            try {
+              const whisperResult = await transcribeAudio(audioBuffer, filename);
+              transcription = whisperResult.text;
+              whisperWords = whisperResult.words;
+            } catch (err) {
+              console.error(`[feedback] Whisper failed for task ${taskIndex}:`, err);
+            }
 
-            const transcription =
-              whisperResult.status === "fulfilled"
-                ? whisperResult.value.text
-                : "";
+            // Step 2: Pronunciation assessment (convert webm → WAV for Azure)
+            sendEvent({ taskIndex, status: "processing", phase: "pronunciation" });
+            let azure: Awaited<ReturnType<typeof assessPronunciationChunked>> | null = null;
+            if (transcription) {
+              try {
+                const wavBuffer = await convertToWav(audioBuffer, "webm");
+                azure = await assessPronunciationChunked(wavBuffer, transcription, whisperWords);
+              } catch (err) {
+                console.error(`[feedback] Azure Speech failed for task ${taskIndex}:`, err);
+              }
+            }
+            sendEvent({ taskIndex, status: "processing", phase: "pronunciation" });
 
-            const azure =
-              azureResult.status === "fulfilled" ? azureResult.value : null;
+            // Step 3: Grammar + vocabulary analysis
+            sendEvent({ taskIndex, status: "processing", phase: "grammar" });
+            let grammar: Awaited<ReturnType<typeof analyzeGrammarVocabulary>> = {
+              errors: [],
+              correctedText: transcription,
+              aiFeedback: "",
+              level4Version: "",
+              level5Version: "",
+            };
+            if (transcription) {
+              try {
+                grammar = await analyzeGrammarVocabulary(transcription);
+              } catch (err) {
+                console.error(`[feedback] Grammar analysis failed for task ${taskIndex}:`, err);
+              }
+            }
 
-            // Grammar + comprehension
-            const [grammarResult] = await Promise.allSettled([
-              transcription
-                ? analyzeGrammarVocabulary(transcription)
-                : Promise.resolve({ errors: [], correctedText: "" }),
-            ]);
+            // Step 4: Fetch glossary entries for assessed words
+            let glossary: Record<string, unknown> = {};
+            if (azure && azure.words.length > 0) {
+              try {
+                const wordsList = azure.words.map((w) => w.word);
+                const glossaryMap = await getGlossaryTerms(wordsList);
+                glossary = Object.fromEntries(glossaryMap);
+              } catch (err) {
+                console.error(`[feedback] Glossary fetch failed for task ${taskIndex}:`, err);
+              }
+            }
 
-            const grammar =
-              grammarResult.status === "fulfilled"
-                ? grammarResult.value
-                : { errors: [], correctedText: transcription };
+            // Step 5: Generate Polly reference audio if pronunciation < 70%
+            let pollyReferenceUrl: string | null = null;
+            if (azure && azure.pronunciation < 70 && grammar.correctedText) {
+              try {
+                pollyReferenceUrl = await generateReferenceAudio(grammar.correctedText);
+              } catch (err) {
+                console.error(`[feedback] Polly TTS failed for task ${taskIndex}:`, err);
+              }
+            }
 
             const feedback = {
               transcription,
               pronunciation: azure?.pronunciation ?? null,
               fluency: azure?.fluency ?? null,
-              errors: grammar.errors,
+              wordScores: azure?.words ?? [],
+              whisperWords,
+              // Map `original` → `word` for frontend compatibility
+              errors: grammar.errors.map((e) => {
+                const extra = e as unknown as Record<string, unknown>;
+                return {
+                  word: e.original || "",
+                  category: e.category || "",
+                  subCategory: (extra.subCategory as string) || "",
+                  confidence: (extra.confidence as string) || "high",
+                  correction: e.correction || "",
+                  explanation: e.explanation || "",
+                };
+              }),
               correctedText: grammar.correctedText,
+              aiFeedback: grammar.aiFeedback || "",
+              level4Version: grammar.level4Version || "",
+              level5Version: grammar.level5Version || "",
+              ...(pollyReferenceUrl && { pollyReferenceUrl }),
+              ...(Object.keys(glossary).length > 0 && { glossary }),
             };
 
             // Save feedback to Firestore
@@ -130,7 +190,7 @@ export async function POST(
                 processedAt: new Date(),
               });
 
-            sendEvent({ taskIndex, status: "complete", feedback });
+            sendEvent({ taskIndex, status: "complete", feedback: { ...feedback, recordingUrl } });
             return;
           } catch (err) {
             if (attempt === MAX_RETRIES) {

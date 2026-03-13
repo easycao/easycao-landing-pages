@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, getFirebaseErrorMessage } from "@/contexts/AuthContext";
@@ -14,8 +14,13 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/dashboard");
+    }
+  }, [loading, user, router]);
+
   if (!loading && user) {
-    router.replace("/dashboard");
     return null;
   }
 

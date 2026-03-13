@@ -3,7 +3,7 @@ import { getFirestoreDb } from "@/lib/firebase-admin";
 
 /**
  * GET /api/simulator/questions?examId=xxx
- * Fetch questions for an exam based on its stored question indexes.
+ * Fetch questions for an exam based on its stored question doc IDs.
  */
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -25,31 +25,24 @@ export async function GET(req: NextRequest) {
   }
 
   const exam = examDoc.data()!;
-  const indexes: number[] = exam.questionIndexes || [];
+  const questionDocIds: { docId: string; type: string }[] =
+    exam.questionDocIds || [];
 
-  // Fetch all ICAO_Test_Questions docs (they have numeric IDs matching indexes)
-  // Since Firestore doesn't support IN queries with > 30 items efficiently,
-  // we fetch the full collection and filter
-  const questionsSnap = await db
-    .collection("ICAO_Test_Questions")
-    .get();
-
-  const questionsMap = new Map<number, Record<string, unknown>>();
-  for (const doc of questionsSnap.docs) {
-    const idx = parseInt(doc.id, 10);
-    if (!isNaN(idx)) {
-      questionsMap.set(idx, { id: doc.id, ...doc.data() });
-    }
-  }
-
-  // Map indexes to questions, maintaining order
-  const questions = indexes.map((idx) => {
-    const q = questionsMap.get(idx);
-    if (q) return q;
-    // For offset indexes (P2 image, P3, P4), try without offset
-    const baseIdx = idx % 1000 || idx;
-    return questionsMap.get(baseIdx) || { id: String(idx), missing: true };
-  });
+  // Fetch each question doc by its Firestore ID
+  const questions = await Promise.all(
+    questionDocIds.map(async (entry) => {
+      const docRef = db.collection("ICAO_Test_Questions").doc(entry.docId);
+      const docSnap = await docRef.get();
+      if (!docSnap.exists) {
+        return { id: entry.docId, questionType: entry.type, missing: true };
+      }
+      return {
+        id: docSnap.id,
+        questionType: entry.type,
+        ...docSnap.data(),
+      };
+    })
+  );
 
   return NextResponse.json({
     examId,

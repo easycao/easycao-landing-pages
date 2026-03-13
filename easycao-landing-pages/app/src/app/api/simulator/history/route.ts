@@ -87,7 +87,7 @@ export async function GET(req: NextRequest) {
         mode: exam.mode,
         completedAt: exam.completedAt?.toDate?.()?.toISOString() || null,
         createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
-        taskCount: exam.questionIndexes?.length || 0,
+        taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
         summary: {
           avgPronunciation,
           avgFluency,

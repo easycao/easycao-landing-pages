@@ -26,6 +26,7 @@ export interface TaskData {
   hideImageOnRepeat?: boolean;
   sharedRepeatGroup?: string;
   autoRepeat?: boolean;
+  imageSideBySide?: boolean;
 }
 
 export interface CompletedTask {

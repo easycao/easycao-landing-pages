@@ -3,7 +3,8 @@ import { getFirestoreDb } from "@/lib/firebase-admin";
 
 /**
  * POST /api/simulator/exam
- * Create a new exam session with randomized question indexes.
+ * Create a new exam session by picking random questions from Firestore.
+ * Questions are selected by Question_Type, and Firestore doc IDs are stored.
  */
 export async function POST(req: NextRequest) {
   const db = getFirestoreDb();
@@ -17,63 +18,134 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Generate randomized question indexes based on part
-  const questionIndexes = generateIndexes(part, mode);
+  try {
+    // Fetch all questions grouped by type
+    const snap = await db.collection("ICAO_Test_Questions").get();
+    const byType: Record<string, string[]> = {};
+    for (const doc of snap.docs) {
+      const qt = (doc.data().Question_Type as string) || "unknown";
+      if (!byType[qt]) byType[qt] = [];
+      byType[qt].push(doc.id);
+    }
 
-  const examRef = await db.collection("exams").add({
-    uid,
-    part,
-    mode: mode || "complete",
-    status: "in_progress",
-    questionIndexes,
-    currentTaskIndex: 0,
-    createdAt: new Date(),
-    completedAt: null,
-  });
+    // Pick random doc IDs based on part
+    const questionDocIds = pickQuestionIds(part, mode, byType);
 
-  return NextResponse.json({ examId: examRef.id }, { status: 201 });
+    if (questionDocIds.length === 0) {
+      return NextResponse.json(
+        { error: "No questions available for this part" },
+        { status: 400 }
+      );
+    }
+
+    const examRef = await db.collection("exams").add({
+      uid,
+      part,
+      mode: mode || "complete",
+      status: "in_progress",
+      questionDocIds,
+      currentTaskIndex: 0,
+      createdAt: new Date(),
+      completedAt: null,
+    });
+
+    return NextResponse.json({ examId: examRef.id }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating exam:", error);
+    return NextResponse.json(
+      { error: "Failed to create exam" },
+      { status: 500 }
+    );
+  }
 }
 
 /**
- * Generate random unique indexes for each part.
+ * Pick random question doc IDs based on part and mode.
+ * Returns an array of objects with { docId, type } to preserve type info.
  */
-function generateIndexes(part: string, mode?: string): number[] {
+function pickQuestionIds(
+  part: string,
+  mode: string | undefined,
+  byType: Record<string, string[]>
+): { docId: string; type: string }[] {
+  const single = mode === "single";
+
   switch (part) {
     case "P1":
-      return mode === "single"
-        ? pickRandom(152, 1)
-        : pickRandom(152, 3);
+      return pickRandom(byType["Part1"] || [], single ? 1 : 3).map((id) => ({
+        docId: id,
+        type: "Part1",
+      }));
+
     case "P2": {
-      // 3 audio situations + 2 image situations = 5 total
-      const audio = pickRandom(75, mode === "single" ? 1 : 3);
-      const image = pickRandom(51, mode === "single" ? 0 : 2, 1000); // offset to avoid collision
+      if (mode === "single-image") {
+        return pickRandom(byType["Part2-Tipo2"] || [], 1).map(
+          (id) => ({ docId: id, type: "Part2-Tipo2" })
+        );
+      }
+      const audio = pickRandom(byType["Part2-Tipo1"] || [], single ? 1 : 3).map(
+        (id) => ({ docId: id, type: "Part2-Tipo1" })
+      );
+      const image = pickRandom(byType["Part2-Tipo2"] || [], single ? 0 : 2).map(
+        (id) => ({ docId: id, type: "Part2-Tipo2" })
+      );
       return [...audio, ...image];
     }
-    case "P3":
-      return mode === "single"
-        ? pickRandom(30, 1)
-        : pickRandom(30, 3);
+
+    case "P3": {
+      const questions = pickRandom(byType["Part3"] || [], single ? 1 : 3).map(
+        (id) => ({ docId: id, type: "Part3" })
+      );
+      // Add comparison doc only in complete mode
+      if (!single) {
+        const COMPARISON_DOC_ID = "SmYjvRNBdaLI4tT8Afpn";
+        questions.push({ docId: COMPARISON_DOC_ID, type: "Part3Comparison" });
+      }
+      return questions;
+    }
+
     case "P4":
-      return pickRandom(20, 1);
+      return pickRandom(byType["Part4"] || [], 1).map((id) => ({
+        docId: id,
+        type: "Part4",
+      }));
+
     case "complete":
       return [
-        ...pickRandom(152, 3),        // P1: 3
-        ...pickRandom(75, 3, 200),     // P2 audio: 3
-        ...pickRandom(51, 2, 1000),    // P2 image: 2
-        ...pickRandom(30, 3, 2000),    // P3: 3
-        ...pickRandom(20, 1, 3000),    // P4: 1
+        ...pickRandom(byType["Part1"] || [], 3).map((id) => ({
+          docId: id,
+          type: "Part1",
+        })),
+        ...pickRandom(byType["Part2-Tipo1"] || [], 3).map((id) => ({
+          docId: id,
+          type: "Part2-Tipo1",
+        })),
+        ...pickRandom(byType["Part2-Tipo2"] || [], 2).map((id) => ({
+          docId: id,
+          type: "Part2-Tipo2",
+        })),
+        ...pickRandom(byType["Part3"] || [], 3).map((id) => ({
+          docId: id,
+          type: "Part3",
+        })),
+        { docId: "SmYjvRNBdaLI4tT8Afpn", type: "Part3Comparison" },
+        ...pickRandom(byType["Part4"] || [], 1).map((id) => ({
+          docId: id,
+          type: "Part4",
+        })),
       ];
+
     default:
       return [];
   }
 }
 
 /**
- * Pick `count` unique random numbers from 1..max, with optional offset.
+ * Pick `count` unique random items from an array.
  */
-function pickRandom(max: number, count: number, offset: number = 0): number[] {
-  const available = Array.from({ length: max }, (_, i) => i + 1 + offset);
-  const result: number[] = [];
+function pickRandom(arr: string[], count: number): string[] {
+  const available = [...arr];
+  const result: string[] = [];
   for (let i = 0; i < count && available.length > 0; i++) {
     const idx = Math.floor(Math.random() * available.length);
     result.push(available[idx]);
