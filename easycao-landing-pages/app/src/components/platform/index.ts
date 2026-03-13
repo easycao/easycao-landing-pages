@@ -9,3 +9,6 @@ export { default as Sidebar } from "./Sidebar";
 export { default as Header } from "./Header";
 export { default as ComingSoon } from "./ComingSoon";
 export { default as NoAccess } from "./NoAccess";
+
+export { default as FeedbackTabs } from "./FeedbackTabs";
+export type { FeedbackData, GrammarError, WordScore, ComprehensionPoint } from "./FeedbackTabs";

@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import FeedbackTabs, { type FeedbackData } from "@/components/platform/FeedbackTabs";
 
 interface TaskFeedback {
   taskIndex: number;
@@ -293,70 +294,7 @@ export default function FeedbackPage() {
             </div>
 
             {tf.status === "complete" && tf.feedback && (
-              <div className="space-y-3">
-                {/* Transcription */}
-                {tf.feedback.transcription && (
-                  <div>
-                    <p
-                      className={`text-[11px] font-medium uppercase tracking-wider ${textSecondary} mb-1`}
-                    >
-                      Transcrição
-                    </p>
-                    <p className={`text-sm ${textPrimary} leading-relaxed`}>
-                      {tf.feedback.transcription}
-                    </p>
-                  </div>
-                )}
-
-                {/* Scores */}
-                <div className="flex gap-4">
-                  {tf.feedback.pronunciation !== null && (
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[11px] ${textSecondary}`}>
-                        Pronúncia
-                      </span>
-                      <span
-                        className={`text-sm font-bold ${
-                          tf.feedback.pronunciation >= 80
-                            ? "text-emerald-500"
-                            : tf.feedback.pronunciation >= 60
-                              ? "text-amber-500"
-                              : "text-red-500"
-                        }`}
-                      >
-                        {Math.round(tf.feedback.pronunciation)}%
-                      </span>
-                    </div>
-                  )}
-                  {tf.feedback.fluency !== null && (
-                    <div className="flex items-center gap-2">
-                      <span className={`text-[11px] ${textSecondary}`}>
-                        Fluência
-                      </span>
-                      <span
-                        className={`text-sm font-bold ${
-                          tf.feedback.fluency >= 80
-                            ? "text-emerald-500"
-                            : tf.feedback.fluency >= 60
-                              ? "text-amber-500"
-                              : "text-red-500"
-                        }`}
-                      >
-                        {Math.round(tf.feedback.fluency)}%
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Error count */}
-                {tf.feedback.errors.length > 0 && (
-                  <p className={`text-xs ${textSecondary}`}>
-                    {tf.feedback.errors.length} erro
-                    {tf.feedback.errors.length !== 1 ? "s" : ""} encontrado
-                    {tf.feedback.errors.length !== 1 ? "s" : ""}
-                  </p>
-                )}
-              </div>
+              <FeedbackTabs data={tf.feedback as FeedbackData} />
             )}
 
             {tf.status === "error" && (
