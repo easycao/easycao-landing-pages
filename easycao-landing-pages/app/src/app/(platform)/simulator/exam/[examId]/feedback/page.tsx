@@ -735,10 +735,18 @@ export default function FeedbackPage() {
         <div>isDone={String(isDone)} | isProcessing={String(isProcessing)} | totalTasks={totalTasks} | feedbackCount={taskFeedbacks.size} | completedCount={completedCount} | errorCount={errorCount} | sortedLen={sortedFeedbacks.length}</div>
         {[...taskFeedbacks.values()].map((tf) => {
           const fb = tf.feedback as FeedbackData & { _debug?: string[] } | undefined;
-          if (!fb?._debug?.length) return null;
           return (
-            <div key={tf.taskIndex} className="text-yellow-400">
-              Task {tf.taskIndex}: {fb._debug.join(" | ")}
+            <div key={tf.taskIndex}>
+              {fb?._debug?.length ? (
+                <div className="text-yellow-400">
+                  Task {tf.taskIndex} errors: {fb._debug.join(" | ")}
+                </div>
+              ) : null}
+              {fb && (
+                <div className="text-green-400">
+                  Task {tf.taskIndex}: pron={String(fb.pronunciation)} flu={String(fb.fluency)} words={fb.wordScores?.length ?? 0} errors={fb.errors?.length ?? 0} whisper={fb.whisperWords?.length ?? 0} corrected=&quot;{fb.correctedText?.substring(0, 50)}&quot;
+                </div>
+              )}
             </div>
           );
         })}
