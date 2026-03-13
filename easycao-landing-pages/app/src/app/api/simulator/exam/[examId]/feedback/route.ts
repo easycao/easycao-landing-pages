@@ -43,7 +43,7 @@ export async function POST(
   const exam = examDoc.data()!;
   if (exam.uid !== user.uid) {
     console.error(`[feedback] UID mismatch: exam.uid=${exam.uid}, session.uid=${user.uid}`);
-    return new Response(`UID mismatch: exam=${exam.uid}, session=${user.uid}`, { status: 403 });
+    return new Response("Unauthorized", { status: 403 });
   }
 
   // Get all task recordings
@@ -76,7 +76,6 @@ export async function POST(
         const MAX_RETRIES = 3;
 
         sendEvent({ taskIndex, status: "processing", phase: "downloading" });
-        const stepErrors: string[] = [];
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
           try {
@@ -95,9 +94,7 @@ export async function POST(
               transcription = whisperResult.text;
               whisperWords = whisperResult.words;
             } catch (err) {
-              const msg = `Whisper: ${err instanceof Error ? err.message : String(err)}`;
-              console.error(`[feedback] ${msg}`);
-              stepErrors.push(msg);
+              console.error(`[feedback] Whisper failed for task ${taskIndex}:`, err);
             }
 
             // Step 2: Pronunciation assessment (try WAV conversion, fall back to webm)
@@ -109,13 +106,11 @@ export async function POST(
                 if (wavBuffer) {
                   azure = await assessPronunciationChunked(wavBuffer, transcription, whisperWords, true);
                 } else {
-                  stepErrors.push("ffmpeg not available, sending webm to Azure");
+                  console.warn(`[feedback] ffmpeg not available, sending webm to Azure`);
                   azure = await assessPronunciationChunked(audioBuffer, transcription, whisperWords, false);
                 }
               } catch (err) {
-                const msg = `Azure: ${err instanceof Error ? err.message : String(err)}`;
-                console.error(`[feedback] ${msg}`);
-                stepErrors.push(msg);
+                console.error(`[feedback] Azure Speech failed for task ${taskIndex}:`, err);
               }
             }
 
@@ -132,9 +127,7 @@ export async function POST(
               try {
                 grammar = await analyzeGrammarVocabulary(transcription);
               } catch (err) {
-                const msg = `Grammar: ${err instanceof Error ? err.message : String(err)}`;
-                console.error(`[feedback] ${msg}`);
-                stepErrors.push(msg);
+                console.error(`[feedback] Grammar failed for task ${taskIndex}:`, err);
               }
             }
 
@@ -146,9 +139,7 @@ export async function POST(
                 const glossaryMap = await getGlossaryTerms(wordsList);
                 glossary = Object.fromEntries(glossaryMap);
               } catch (err) {
-                const msg = `Glossary: ${err instanceof Error ? err.message : String(err)}`;
-                console.error(`[feedback] ${msg}`);
-                stepErrors.push(msg);
+                console.error(`[feedback] Glossary failed for task ${taskIndex}:`, err);
               }
             }
 
@@ -158,9 +149,7 @@ export async function POST(
               try {
                 pollyReferenceUrl = await generateReferenceAudio(grammar.correctedText);
               } catch (err) {
-                const msg = `Polly: ${err instanceof Error ? err.message : String(err)}`;
-                console.error(`[feedback] ${msg}`);
-                stepErrors.push(msg);
+                console.error(`[feedback] Polly failed for task ${taskIndex}:`, err);
               }
             }
 
@@ -207,11 +196,7 @@ export async function POST(
             sendEvent({
               taskIndex,
               status: "complete",
-              feedback: {
-                ...feedback,
-                recordingUrl,
-                ...(stepErrors.length > 0 && { _debug: stepErrors }),
-              },
+              feedback: { ...feedback, recordingUrl },
             });
             return;
           } catch (err) {
