@@ -43,7 +43,7 @@ export async function POST(
   const exam = examDoc.data()!;
   if (exam.uid !== user.uid) {
     console.error(`[feedback] UID mismatch: exam.uid=${exam.uid}, session.uid=${user.uid}`);
-    return new Response("Unauthorized", { status: 403 });
+    return new Response(`UID mismatch: exam=${exam.uid}, session=${user.uid}`, { status: 403 });
   }
 
   // Get all task recordings
