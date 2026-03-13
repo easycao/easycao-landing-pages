@@ -11,7 +11,7 @@ export async function POST(
 ) {
   const { examId } = await params;
   const body = await req.json();
-  const { uid, taskIndex, questionId, recordingUrl, repeatUsed } = body;
+  const { uid, taskIndex, questionId, recordingUrl, repeatUsed, taskType, situationIndex } = body;
 
   if (!uid || taskIndex === undefined || !questionId || !recordingUrl) {
     return NextResponse.json(
@@ -43,6 +43,8 @@ export async function POST(
       questionId,
       recordingUrl,
       repeatUsed: repeatUsed || false,
+      taskType: taskType || null,
+      situationIndex: situationIndex ?? null,
       savedAt: new Date(),
     });
 

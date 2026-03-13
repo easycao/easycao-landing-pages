@@ -15,6 +15,17 @@ export interface TaskData {
   index: number;
   questionId: string;
   videoUrl: string;
+  // Part 2/3/4 extensions
+  audioUrl?: string;
+  imageUrl?: string;
+  repeatAudioUrl?: string;
+  taskType?: string;
+  situationIndex?: number;
+  situationType?: "audio" | "image";
+  clarifyVideoUrl?: string;
+  hideImageOnRepeat?: boolean;
+  sharedRepeatGroup?: string;
+  autoRepeat?: boolean;
 }
 
 export interface CompletedTask {
@@ -22,6 +33,8 @@ export interface CompletedTask {
   questionId: string;
   recordingUrl: string;
   repeatUsed: boolean;
+  taskType?: string;
+  situationIndex?: number;
 }
 
 export interface ExamState {
@@ -31,6 +44,8 @@ export interface ExamState {
   tasks: TaskData[];
   completedTasks: CompletedTask[];
   finished: boolean;
+  sharedRepeatUsed: Record<string, boolean>;
+  showImage: boolean;
 }
 
 type ExamAction =
@@ -40,7 +55,8 @@ type ExamAction =
   | { type: "START_RECORDING" }
   | { type: "START_UPLOADING" }
   | { type: "UPLOAD_COMPLETE"; recordingUrl: string }
-  | { type: "ADVANCE" };
+  | { type: "ADVANCE" }
+  | { type: "HIDE_IMAGE" };
 
 // --- Reducer ---
 
@@ -51,6 +67,8 @@ const initialState: ExamState = {
   tasks: [],
   completedTasks: [],
   finished: false,
+  sharedRepeatUsed: {},
+  showImage: true,
 };
 
 function examReducer(state: ExamState, action: ExamAction): ExamState {
@@ -67,12 +85,23 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
         taskState: "ready_to_record",
       };
 
-    case "REPEAT_USED":
+    case "REPEAT_USED": {
+      const task = state.tasks[state.currentTaskIndex];
+      const newSharedRepeat = { ...state.sharedRepeatUsed };
+      if (task?.sharedRepeatGroup) {
+        newSharedRepeat[task.sharedRepeatGroup] = true;
+      }
       return {
         ...state,
         repeatUsed: true,
         taskState: "watching",
+        sharedRepeatUsed: newSharedRepeat,
+        showImage: task?.hideImageOnRepeat ? false : state.showImage,
       };
+    }
+
+    case "HIDE_IMAGE":
+      return { ...state, showImage: false };
 
     case "START_RECORDING":
       return {
@@ -93,6 +122,8 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
         questionId: currentTask.questionId,
         recordingUrl: action.recordingUrl,
         repeatUsed: state.repeatUsed,
+        taskType: currentTask.taskType,
+        situationIndex: currentTask.situationIndex,
       };
       return {
         ...state,
@@ -106,11 +137,16 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
       if (nextIndex >= state.tasks.length) {
         return { ...state, finished: true };
       }
+      const nextTask = state.tasks[nextIndex];
+      const currentTask = state.tasks[state.currentTaskIndex];
+      const newSituation = nextTask.situationIndex !== currentTask?.situationIndex;
       return {
         ...state,
         currentTaskIndex: nextIndex,
         taskState: "watching",
         repeatUsed: false,
+        showImage: true,
+        sharedRepeatUsed: newSituation ? {} : state.sharedRepeatUsed,
       };
     }
 
@@ -152,6 +188,10 @@ export function useExamReducer() {
     dispatch({ type: "ADVANCE" });
   }, []);
 
+  const hideImage = useCallback(() => {
+    dispatch({ type: "HIDE_IMAGE" });
+  }, []);
+
   return {
     state,
     init,
@@ -161,5 +201,6 @@ export function useExamReducer() {
     startUploading,
     uploadComplete,
     advance,
+    hideImage,
   };
 }

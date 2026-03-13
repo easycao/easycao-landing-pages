@@ -11,11 +11,194 @@ import {
 import VideoPlayer from "@/components/platform/VideoPlayer";
 import AudioRecorder from "@/components/platform/AudioRecorder";
 
-interface QuestionData {
-  id: string;
-  Part1_Pergunta?: string;
-  [key: string]: unknown;
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+// --- Task label helpers ---
+
+const TASK_LABELS: Record<string, string> = {
+  P1: "Pergunta",
+  P2_T1: "Cotejamento",
+  P2_T2: "ABC",
+  P2_T3: "Afirmação/Negação",
+  P2_T4: "Reported Speech",
+  P3_RS: "Reported Speech",
+  P3_Q: "Pergunta",
+  P3_CMP: "Comparação",
+  P4: "Tarefa",
+};
+
+function getTaskLabel(task: TaskData, part: string): string {
+  if (task.taskType && TASK_LABELS[task.taskType]) return TASK_LABELS[task.taskType];
+  if (part === "P1") return "Pergunta";
+  return "Tarefa";
 }
+
+// --- Question → TaskData mappers per part ---
+
+function mapP1Tasks(questions: any[]): TaskData[] {
+  return questions.map((q, i) => ({
+    index: i,
+    questionId: q.id,
+    videoUrl: q.Part1_Pergunta || "",
+    taskType: "P1",
+  }));
+}
+
+function mapP2Tasks(questions: any[]): TaskData[] {
+  const tasks: TaskData[] = [];
+  let taskIndex = 0;
+  questions.forEach((q, sitIdx) => {
+    const isImage = q.Part2_Tipo === "Imagem";
+    const sharedGroup = `sit${sitIdx}_T3T4`;
+
+    // T1 — Cotejamento
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part2_Video_T1 || q.Part2_Audio_Track1 || "",
+      audioUrl: q.Part2_Audio_Track1 || "",
+      repeatAudioUrl: q.Part2_RepeatTrack1 || "",
+      taskType: "P2_T1",
+      situationIndex: sitIdx,
+      situationType: isImage ? "image" : "audio",
+    });
+
+    // T2 — ABC
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part2_Video_T2 || q.Part2_Audio_Track2 || "",
+      imageUrl: isImage ? (q.Part2_Image || "") : undefined,
+      taskType: "P2_T2",
+      situationIndex: sitIdx,
+      situationType: isImage ? "image" : "audio",
+      hideImageOnRepeat: true,
+    });
+
+    // T3 — Affirm/Negative
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part2_Video_T3 || q.Part2_Audio_Track1 || "",
+      audioUrl: q.Part2_Audio_Track1 || "",
+      taskType: "P2_T3",
+      situationIndex: sitIdx,
+      situationType: isImage ? "image" : "audio",
+      sharedRepeatGroup: sharedGroup,
+    });
+
+    // T4 — Reported Speech
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part2_Video_T4 || "",
+      taskType: "P2_T4",
+      situationIndex: sitIdx,
+      situationType: isImage ? "image" : "audio",
+      sharedRepeatGroup: sharedGroup,
+    });
+  });
+  return tasks;
+}
+
+function mapP3Tasks(questions: any[]): TaskData[] {
+  const tasks: TaskData[] = [];
+  let taskIndex = 0;
+  questions.forEach((q, sitIdx) => {
+    // RS task (auto-repeat built into video)
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part3_RS || "",
+      taskType: "P3_RS",
+      situationIndex: sitIdx,
+      autoRepeat: true,
+    });
+
+    // Question task
+    tasks.push({
+      index: taskIndex++,
+      questionId: q.id,
+      videoUrl: q.Part3_Pergunta || "",
+      taskType: "P3_Q",
+      situationIndex: sitIdx,
+    });
+  });
+
+  // Comparison task (uses last question's data as reference)
+  if (questions.length > 0) {
+    const lastQ = questions[questions.length - 1];
+    tasks.push({
+      index: taskIndex,
+      questionId: lastQ.id,
+      videoUrl: lastQ.Part3_Comparacao || lastQ.Part3_Pergunta || "",
+      taskType: "P3_CMP",
+      situationIndex: questions.length,
+    });
+  }
+  return tasks;
+}
+
+function mapP4Tasks(questions: any[]): TaskData[] {
+  const q = questions[0];
+  if (!q) return [];
+  const taskLabels = ["T1", "T2", "T3", "T4", "T5", "T6"];
+  return taskLabels.map((label, i) => ({
+    index: i,
+    questionId: q.id,
+    videoUrl: q[`Part4_Video_${label}`] || q.Part4_Video || "",
+    imageUrl: q.Part4_Image || "",
+    taskType: "P4",
+    situationIndex: 0,
+    clarifyVideoUrl: label === "T6" ? (q.Part4Clarify || "") : undefined,
+  }));
+}
+
+function mapCompleteTasks(questions: any[], part: string): TaskData[] {
+  // For complete test, questions come pre-sorted by part segments
+  // Part field in exam tells us this is complete, but questions already
+  // have their fields. We detect by available fields.
+  // Complete exam: first 3 = P1, next 5 = P2, next 3+1 = P3, last 1 = P4
+  // But question indexes have offsets, so we detect by fields present
+  if (part !== "complete") return [];
+
+  const tasks: TaskData[] = [];
+  let idx = 0;
+
+  // P1 questions (first 3) — have Part1_Pergunta
+  const p1Qs = questions.filter((q) => q.Part1_Pergunta);
+  const p2Qs = questions.filter((q) => q.Part2_Audio_Track1 || q.Part2_Tipo);
+  const p3Qs = questions.filter((q) => q.Part3_RS || q.Part3_Pergunta);
+  const p4Qs = questions.filter((q) => q.Part4_Image || q.Part4_Video);
+
+  for (const t of mapP1Tasks(p1Qs)) {
+    tasks.push({ ...t, index: idx++ });
+  }
+  for (const t of mapP2Tasks(p2Qs)) {
+    tasks.push({ ...t, index: idx++ });
+  }
+  for (const t of mapP3Tasks(p3Qs)) {
+    tasks.push({ ...t, index: idx++ });
+  }
+  for (const t of mapP4Tasks(p4Qs)) {
+    tasks.push({ ...t, index: idx++ });
+  }
+
+  return tasks;
+}
+
+function mapQuestions(questions: any[], part: string): TaskData[] {
+  switch (part) {
+    case "P1": return mapP1Tasks(questions);
+    case "P2": return mapP2Tasks(questions);
+    case "P3": return mapP3Tasks(questions);
+    case "P4": return mapP4Tasks(questions);
+    case "complete": return mapCompleteTasks(questions, part);
+    default: return mapP1Tasks(questions);
+  }
+}
+
+// --- Main Component ---
 
 export default function ExamPage() {
   const { examId } = useParams<{ examId: string }>();
@@ -32,6 +215,7 @@ export default function ExamPage() {
   const [examPart, setExamPart] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showClarify, setShowClarify] = useState(false);
   const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch exam questions on mount
@@ -43,14 +227,7 @@ export default function ExamPage() {
         if (!res.ok) throw new Error("Falha ao carregar exame");
         const data = await res.json();
         setExamPart(data.part);
-
-        const tasks: TaskData[] = (data.questions as QuestionData[]).map(
-          (q: QuestionData, i: number) => ({
-            index: i,
-            questionId: q.id,
-            videoUrl: q.Part1_Pergunta || "",
-          })
-        );
+        const tasks = mapQuestions(data.questions, data.part);
         init(tasks);
       } catch {
         setError("Erro ao carregar o exame. Tente novamente.");
@@ -60,19 +237,17 @@ export default function ExamPage() {
     })();
   }, [examId, init]);
 
-  // Auto-advance after upload complete
+  // Auto-advance after upload
   useEffect(() => {
     if (state.taskState === "uploaded" && !state.finished) {
-      advanceTimerRef.current = setTimeout(() => {
-        advance();
-      }, 1500);
+      advanceTimerRef.current = setTimeout(() => advance(), 1500);
       return () => {
         if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
       };
     }
   }, [state.taskState, state.finished, advance]);
 
-  // Save Part1History when finished
+  // Save history when finished
   useEffect(() => {
     if (!state.finished || !user || !examId) return;
     (async () => {
@@ -99,8 +274,6 @@ export default function ExamPage() {
     async (recordingUrl: string) => {
       if (!user || !examId) return;
       const currentTask = state.tasks[state.currentTaskIndex];
-
-      // Save individual task recording
       try {
         await fetch(`/api/simulator/exam/${examId}/task`, {
           method: "POST",
@@ -111,30 +284,19 @@ export default function ExamPage() {
             questionId: currentTask.questionId,
             recordingUrl,
             repeatUsed: state.repeatUsed,
+            taskType: currentTask.taskType,
+            situationIndex: currentTask.situationIndex,
           }),
         });
       } catch {
-        // Continue even if save fails — url is already in state
+        // Continue even if save fails
       }
-
       uploadComplete(recordingUrl);
     },
     [user, examId, state.tasks, state.currentTaskIndex, state.repeatUsed, uploadComplete]
   );
 
-  const handleVideoEnded = useCallback(() => {
-    videoEnded();
-  }, [videoEnded]);
-
-  const handleRepeatUsed = useCallback(() => {
-    repeatUsed();
-  }, [repeatUsed]);
-
-  const handleRecordStart = useCallback(() => {
-    startRecording();
-  }, [startRecording]);
-
-  // --- UI ---
+  // --- UI helpers ---
 
   const textPrimary = isDark ? "text-[#F0F0F5]" : "text-black";
   const textSecondary = isDark ? "text-[#9090A0]" : "text-black/50";
@@ -156,11 +318,8 @@ export default function ExamPage() {
   if (error) {
     return (
       <div className="max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <p className={`text-sm text-red-500`}>{error}</p>
-        <button
-          onClick={() => router.push("/simulator")}
-          className="text-sm text-primary hover:underline"
-        >
+        <p className="text-sm text-red-500">{error}</p>
+        <button onClick={() => router.push("/simulator")} className="text-sm text-primary hover:underline">
           Voltar ao Simulador
         </button>
       </div>
@@ -185,8 +344,24 @@ export default function ExamPage() {
   const currentTask = state.tasks[state.currentTaskIndex];
   if (!currentTask) return null;
 
-  const progress = ((state.currentTaskIndex) / state.tasks.length) * 100;
-  const showRecorder = state.taskState === "ready_to_record" || state.taskState === "recording" || state.taskState === "uploading" || state.taskState === "uploaded";
+  const progress = (state.currentTaskIndex / state.tasks.length) * 100;
+  const taskLabel = getTaskLabel(currentTask, examPart);
+
+  // Determine repeat availability
+  const isRepeatAvailable = (() => {
+    if (state.repeatUsed) return false;
+    if (currentTask.autoRepeat) return false; // auto-repeat has no button
+    if (currentTask.sharedRepeatGroup) {
+      return !state.sharedRepeatUsed[currentTask.sharedRepeatGroup];
+    }
+    return true;
+  })();
+
+  // Situation header
+  const showSituationHeader =
+    currentTask.situationIndex !== undefined &&
+    (state.currentTaskIndex === 0 ||
+      state.tasks[state.currentTaskIndex - 1]?.situationIndex !== currentTask.situationIndex);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -194,13 +369,13 @@ export default function ExamPage() {
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => router.push("/simulator")}
-          className={`text-xs font-medium ${textSecondary} hover:${isDark ? "text-white" : "text-black"} transition-colors`}
+          className={`text-xs font-medium ${textSecondary} hover:opacity-70 transition-colors`}
         >
           &larr; Voltar
         </button>
         <div className="flex items-center gap-3">
           <span className={`text-xs font-medium ${textSecondary}`}>
-            Pergunta {state.currentTaskIndex + 1} de {state.tasks.length}
+            Tarefa {state.currentTaskIndex + 1} de {state.tasks.length}
           </span>
         </div>
       </div>
@@ -213,26 +388,99 @@ export default function ExamPage() {
         />
       </div>
 
-      {/* Video Card */}
+      {/* Situation header */}
+      {showSituationHeader && currentTask.situationIndex !== undefined && (
+        <div className={`mb-4 flex items-center gap-2`}>
+          <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-white/40" : "text-black/30"}`}>
+            Situação {currentTask.situationIndex + 1}
+          </span>
+          {currentTask.situationType && (
+            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+              currentTask.situationType === "image"
+                ? "bg-amber-500/20 text-amber-500"
+                : "bg-blue-500/20 text-blue-500"
+            } font-medium`}>
+              {currentTask.situationType === "image" ? "Imagem" : "Áudio"}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Task type badge */}
+      <div className={`mb-4 text-xs font-semibold ${isDark ? "text-primary/80" : "text-primary"}`}>
+        {taskLabel}
+      </div>
+
+      {/* Image display (P2 image type, P4) */}
+      {currentTask.imageUrl && state.showImage && (
+        <div className={`${cardClass} overflow-hidden mb-4`} style={cardBg}>
+          <div className="p-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentTask.imageUrl}
+              alt="Situação"
+              className="w-full rounded-xl object-contain max-h-[300px]"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Video/Audio Card */}
       <div className={`${cardClass} overflow-hidden mb-6`} style={cardBg}>
         <div className="p-1">
           {currentTask.videoUrl ? (
             <VideoPlayer
               src={currentTask.videoUrl}
-              onEnded={handleVideoEnded}
-              showRepeat={!state.repeatUsed}
+              onEnded={() => videoEnded()}
+              showRepeat={isRepeatAvailable}
               repeatCount={1}
-              onRepeatUsed={handleRepeatUsed}
+              onRepeatUsed={() => repeatUsed()}
               autoPlay
               className="rounded-xl"
             />
+          ) : currentTask.audioUrl ? (
+            <div className="p-4">
+              <audio
+                src={currentTask.audioUrl}
+                autoPlay
+                onEnded={() => videoEnded()}
+                controls
+                className="w-full"
+              />
+            </div>
           ) : (
             <div className={`aspect-video flex items-center justify-center ${textSecondary} text-sm`}>
-              Video indisponível para esta pergunta
+              Mídia indisponível para esta tarefa
             </div>
           )}
         </div>
       </div>
+
+      {/* Clarify button for P4 T6 */}
+      {currentTask.clarifyVideoUrl && !showClarify && state.taskState !== "watching" && (
+        <button
+          onClick={() => setShowClarify(true)}
+          className={`mb-4 w-full py-3 rounded-xl text-sm font-medium border transition-all ${
+            isDark
+              ? "border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+              : "border-amber-500/30 text-amber-600 hover:bg-amber-50"
+          }`}
+        >
+          Clarify Statement
+        </button>
+      )}
+      {showClarify && currentTask.clarifyVideoUrl && (
+        <div className={`${cardClass} overflow-hidden mb-4`} style={cardBg}>
+          <div className="p-1">
+            <VideoPlayer
+              src={currentTask.clarifyVideoUrl}
+              onEnded={() => setShowClarify(false)}
+              autoPlay
+              className="rounded-xl"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Status + Recorder */}
       <div className={`${cardClass} p-6`} style={cardBg}>
@@ -240,17 +488,21 @@ export default function ExamPage() {
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             <p className={`text-sm ${textSecondary}`}>
-              Assista ao vídeo do examinador...
+              {currentTask.audioUrl && !currentTask.videoUrl
+                ? "Ouça o áudio..."
+                : "Assista ao vídeo..."}
             </p>
           </div>
         )}
 
-        {state.taskState === "ready_to_record" && (
+        {(state.taskState === "ready_to_record" || state.taskState === "recording") && (
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500" />
+              <div className={`w-2 h-2 rounded-full ${
+                state.taskState === "recording" ? "bg-red-500 animate-pulse" : "bg-emerald-500"
+              }`} />
               <p className={`text-sm font-medium ${textPrimary}`}>
-                Pronto para gravar sua resposta
+                {state.taskState === "recording" ? "Gravando..." : "Pronto para gravar sua resposta"}
               </p>
             </div>
             <AudioRecorder
@@ -263,30 +515,10 @@ export default function ExamPage() {
           </div>
         )}
 
-        {state.taskState === "recording" && (
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <p className={`text-sm font-medium ${textPrimary}`}>
-                Gravando...
-              </p>
-            </div>
-            <AudioRecorder
-              uid={user?.uid || ""}
-              context={`exam/${examId}/task/${state.currentTaskIndex}`}
-              onRecordingComplete={handleRecordingComplete}
-              onUploadingChange={setIsUploading}
-              disabled={false}
-            />
-          </div>
-        )}
-
         {state.taskState === "uploading" && (
           <div className="flex items-center gap-3">
             <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className={`text-sm ${textSecondary}`}>
-              Enviando gravação...
-            </p>
+            <p className={`text-sm ${textSecondary}`}>Enviando gravação...</p>
           </div>
         )}
 
@@ -295,7 +527,7 @@ export default function ExamPage() {
             <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
             </svg>
-            <p className={`text-sm font-medium text-emerald-500`}>
+            <p className="text-sm font-medium text-emerald-500">
               Resposta enviada! Avançando...
             </p>
           </div>
