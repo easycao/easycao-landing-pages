@@ -1,6 +1,6 @@
 /**
  * Convert audio buffer (webm/mp3/etc.) to WAV 16kHz mono PCM
- * using system ffmpeg, required by Azure Speech API.
+ * using ffmpeg-static (bundled binary, works on Vercel).
  * Also provides WAV splitting for long audio chunking.
  */
 
@@ -8,12 +8,14 @@ import { execFile } from "child_process";
 import { writeFile, readFile, unlink, mkdtemp } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
+import ffmpegPath from "ffmpeg-static";
+
+function getFfmpegPath(): string {
+  return ffmpegPath || "ffmpeg";
+}
 
 /**
  * Convert an audio buffer to WAV 16kHz mono using ffmpeg.
- * @param inputBuffer - Raw audio bytes (webm, mp3, ogg, etc.)
- * @param inputExt - File extension hint (e.g. "webm", "mp3")
- * @returns WAV buffer suitable for Azure Speech API
  */
 export async function convertToWav(
   inputBuffer: Buffer,
@@ -28,7 +30,7 @@ export async function convertToWav(
 
     await new Promise<void>((resolve, reject) => {
       execFile(
-        "ffmpeg",
+        getFfmpegPath(),
         [
           "-y",
           "-i", inputPath,
@@ -51,7 +53,6 @@ export async function convertToWav(
 
     return await readFile(outputPath);
   } finally {
-    // Cleanup temp files
     await unlink(inputPath).catch(() => {});
     await unlink(outputPath).catch(() => {});
   }
@@ -59,9 +60,6 @@ export async function convertToWav(
 
 /**
  * Split a WAV buffer into chunks at specified timestamps using ffmpeg.
- * @param wavBuffer - WAV 16kHz mono buffer
- * @param breakpoints - Array of times (seconds) to split at
- * @returns Array of WAV buffers for each chunk
  */
 export async function splitWav(
   wavBuffer: Buffer,
@@ -93,7 +91,7 @@ export async function splitWav(
       ];
 
       await new Promise<void>((resolve, reject) => {
-        execFile("ffmpeg", args, { timeout: 15000 }, (error, _stdout, stderr) => {
+        execFile(getFfmpegPath(), args, { timeout: 15000 }, (error, _stdout, stderr) => {
           if (error) reject(new Error(`ffmpeg split failed: ${stderr || error.message}`));
           else resolve();
         });
