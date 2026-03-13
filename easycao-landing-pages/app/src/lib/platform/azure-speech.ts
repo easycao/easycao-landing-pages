@@ -30,13 +30,15 @@ export interface WordScore {
 
 /**
  * Assess pronunciation and fluency of audio against a reference text.
- * @param audioBuffer - WAV audio buffer (16kHz mono recommended)
+ * @param audioBuffer - Audio buffer (WAV preferred, webm also supported)
  * @param referenceText - The expected text for pronunciation comparison
+ * @param contentType - MIME type of the audio (default: audio/wav)
  * @returns Pronunciation and fluency scores with phoneme breakdown
  */
 export async function assessPronunciation(
   audioBuffer: Buffer,
-  referenceText: string
+  referenceText: string,
+  contentType: string = "audio/wav"
 ): Promise<AzureSpeechResult> {
   const apiKey = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION || "brazilsouth";
@@ -60,7 +62,7 @@ export async function assessPronunciation(
     method: "POST",
     headers: {
       "Ocp-Apim-Subscription-Key": apiKey,
-      "Content-Type": "audio/wav",
+      "Content-Type": contentType,
       "Pronunciation-Assessment": configBase64,
       Accept: "application/json",
     },
@@ -200,25 +202,32 @@ function splitReferenceText(
 /**
  * Assess pronunciation with automatic chunking for long audio.
  * Uses Whisper timestamps to find natural break points.
+ * Falls back to single-pass when ffmpeg is not available (Vercel).
  */
 export async function assessPronunciationChunked(
-  wavBuffer: Buffer,
+  audioBuffer: Buffer,
   referenceText: string,
-  whisperWords: WhisperTimestamp[]
+  whisperWords: WhisperTimestamp[],
+  isWav: boolean = true
 ): Promise<AzureSpeechResult> {
+  const contentType = isWav ? "audio/wav" : "audio/webm";
   const totalDuration = whisperWords.length > 0
     ? whisperWords[whisperWords.length - 1].end
     : 0;
 
   const breakpoints = findBreakpoints(whisperWords, totalDuration);
 
-  // Short audio — no chunking needed
-  if (breakpoints.length === 0) {
-    return assessPronunciation(wavBuffer, referenceText);
+  // Short audio or no WAV (can't chunk webm) — no chunking needed
+  if (breakpoints.length === 0 || !isWav) {
+    return assessPronunciation(audioBuffer, referenceText, contentType);
   }
 
   // Split audio and text
-  const audioChunks = await splitWav(wavBuffer, breakpoints);
+  const audioChunks = await splitWav(audioBuffer, breakpoints);
+  if (!audioChunks) {
+    // ffmpeg not available, fall back to single pass
+    return assessPronunciation(audioBuffer, referenceText, contentType);
+  }
   const textChunks = splitReferenceText(referenceText, whisperWords, breakpoints);
 
   // Process each chunk

@@ -1,26 +1,49 @@
 /**
- * Convert audio buffer (webm/mp3/etc.) to WAV 16kHz mono PCM
- * using ffmpeg-static (bundled binary, works on Vercel).
- * Also provides WAV splitting for long audio chunking.
+ * Audio conversion utilities.
+ * Uses ffmpeg-static when available (local dev), falls back to
+ * passing raw audio through when ffmpeg is not available (Vercel).
  */
 
 import { execFile } from "child_process";
 import { writeFile, readFile, unlink, mkdtemp } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
-import ffmpegPath from "ffmpeg-static";
 
-function getFfmpegPath(): string {
-  return ffmpegPath || "ffmpeg";
+/**
+ * Try to get ffmpeg path. Returns null if not available.
+ */
+async function getFfmpegPath(): Promise<string | null> {
+  try {
+    // Try ffmpeg-static first
+    const mod = await import("ffmpeg-static");
+    const p = mod.default || mod;
+    if (typeof p === "string") return p;
+  } catch {
+    // Not installed
+  }
+
+  // Try system ffmpeg
+  return new Promise((resolve) => {
+    execFile("ffmpeg", ["-version"], { timeout: 3000 }, (error) => {
+      resolve(error ? null : "ffmpeg");
+    });
+  });
 }
 
 /**
  * Convert an audio buffer to WAV 16kHz mono using ffmpeg.
+ * Returns null if ffmpeg is not available.
  */
 export async function convertToWav(
   inputBuffer: Buffer,
   inputExt: string = "webm"
-): Promise<Buffer> {
+): Promise<Buffer | null> {
+  const ffmpeg = await getFfmpegPath();
+  if (!ffmpeg) {
+    console.warn("[audio-convert] ffmpeg not available, skipping WAV conversion");
+    return null;
+  }
+
   const dir = await mkdtemp(join(tmpdir(), "audio-"));
   const inputPath = join(dir, `input.${inputExt}`);
   const outputPath = join(dir, "output.wav");
@@ -30,7 +53,7 @@ export async function convertToWav(
 
     await new Promise<void>((resolve, reject) => {
       execFile(
-        getFfmpegPath(),
+        ffmpeg,
         [
           "-y",
           "-i", inputPath,
@@ -60,12 +83,19 @@ export async function convertToWav(
 
 /**
  * Split a WAV buffer into chunks at specified timestamps using ffmpeg.
+ * Returns null if ffmpeg is not available.
  */
 export async function splitWav(
   wavBuffer: Buffer,
   breakpoints: number[]
-): Promise<Buffer[]> {
+): Promise<Buffer[] | null> {
   if (breakpoints.length === 0) return [wavBuffer];
+
+  const ffmpeg = await getFfmpegPath();
+  if (!ffmpeg) {
+    console.warn("[audio-convert] ffmpeg not available, skipping WAV split");
+    return null;
+  }
 
   const dir = await mkdtemp(join(tmpdir(), "split-"));
   const inputPath = join(dir, "input.wav");
@@ -91,7 +121,7 @@ export async function splitWav(
       ];
 
       await new Promise<void>((resolve, reject) => {
-        execFile(getFfmpegPath(), args, { timeout: 15000 }, (error, _stdout, stderr) => {
+        execFile(ffmpeg, args, { timeout: 15000 }, (error, _stdout, stderr) => {
           if (error) reject(new Error(`ffmpeg split failed: ${stderr || error.message}`));
           else resolve();
         });

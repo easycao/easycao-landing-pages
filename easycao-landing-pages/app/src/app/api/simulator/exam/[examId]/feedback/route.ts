@@ -66,10 +66,9 @@ export async function POST(
         );
       }
 
-      // Process all tasks in parallel with concurrency limit
-      const CONCURRENCY = 5;
+      // Process tasks in batches with concurrency limit
+      const CONCURRENCY = 3;
       const queue = [...tasks];
-      const promises: Promise<void>[] = [];
 
       async function processTask(task: Record<string, unknown>) {
         const taskIndex = task.taskIndex as number;
@@ -98,18 +97,22 @@ export async function POST(
               console.error(`[feedback] Whisper failed for task ${taskIndex}:`, err);
             }
 
-            // Step 2: Pronunciation assessment (convert webm → WAV for Azure)
+            // Step 2: Pronunciation assessment (try WAV conversion, fall back to webm)
             sendEvent({ taskIndex, status: "processing", phase: "pronunciation" });
             let azure: Awaited<ReturnType<typeof assessPronunciationChunked>> | null = null;
             if (transcription) {
               try {
                 const wavBuffer = await convertToWav(audioBuffer, "webm");
-                azure = await assessPronunciationChunked(wavBuffer, transcription, whisperWords);
+                if (wavBuffer) {
+                  azure = await assessPronunciationChunked(wavBuffer, transcription, whisperWords, true);
+                } else {
+                  // ffmpeg not available (Vercel) — send webm directly
+                  azure = await assessPronunciationChunked(audioBuffer, transcription, whisperWords, false);
+                }
               } catch (err) {
                 console.error(`[feedback] Azure Speech failed for task ${taskIndex}:`, err);
               }
             }
-            sendEvent({ taskIndex, status: "processing", phase: "pronunciation" });
 
             // Step 3: Grammar + vocabulary analysis
             sendEvent({ taskIndex, status: "processing", phase: "grammar" });
@@ -202,14 +205,9 @@ export async function POST(
       }
 
       // Process in batches for concurrency control
-      let i = 0;
-      while (i < queue.length) {
+      for (let i = 0; i < queue.length; i += CONCURRENCY) {
         const batch = queue.slice(i, i + CONCURRENCY);
-        promises.push(
-          ...batch.map((task) => processTask(task))
-        );
         await Promise.allSettled(batch.map((task) => processTask(task)));
-        i += CONCURRENCY;
       }
 
       sendEvent({ status: "done", total: tasks.length });
