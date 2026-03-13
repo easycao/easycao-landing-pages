@@ -156,6 +156,40 @@ function ExamDashboardSection({
         Visão Geral do Exame
       </p>
 
+      {/* Insight (top position) */}
+      <div
+        className={`p-4 rounded-xl border mb-5 ${
+          isDark
+            ? "bg-primary/[0.06] border-primary/10"
+            : "bg-gradient-to-br from-blue-100/80 to-blue-50/70 border-blue-200/60"
+        }`}
+      >
+        <div className="flex gap-3">
+          <div
+            className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+              isDark ? "bg-primary/15" : "bg-primary/10"
+            }`}
+          >
+            <svg
+              className="w-3.5 h-3.5 text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
+              />
+            </svg>
+          </div>
+          <p className={`text-[13px] leading-relaxed pt-0.5 ${isDark ? "text-white/75" : "text-black/70"}`}>
+            {dashboard.insight}
+          </p>
+        </div>
+      </div>
+
       {/* Error descriptors + top subcategories (primary metrics) */}
       {(dashboard.errorsByDescriptor.length > 0 || dashboard.topSubcategories.length > 0) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -265,39 +299,12 @@ function ExamDashboardSection({
         </div>
       )}
 
-      {/* Insight */}
-      <div
-        className={`p-4 rounded-xl border ${
-          isDark
-            ? "bg-primary/[0.06] border-primary/10"
-            : "bg-gradient-to-br from-blue-100/80 to-blue-50/70 border-blue-200/60"
-        }`}
-      >
-        <div className="flex gap-3">
-          <div
-            className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
-              isDark ? "bg-primary/15" : "bg-primary/10"
-            }`}
-          >
-            <svg
-              className="w-3.5 h-3.5 text-primary"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
-              />
-            </svg>
-          </div>
-          <p className={`text-[13px] leading-relaxed pt-0.5 ${isDark ? "text-white/75" : "text-black/70"}`}>
-            {dashboard.insight}
-          </p>
-        </div>
-      </div>
+      {/* No-data fallback */}
+      {dashboard.avgPronunciation === null && dashboard.avgFluency === null && dashboard.errorsByDescriptor.length === 0 && (
+        <p className={`text-sm ${isDark ? "text-white/40" : "text-black/40"}`}>
+          Revise as tarefas individuais para identificar seus pontos de melhoria.
+        </p>
+      )}
     </div>
   );
 }
@@ -389,7 +396,6 @@ export default function FeedbackPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isDone, setIsDone] = useState(false);
   const [expandedTasks, setExpandedTasks] = useState<Set<number>>(new Set());
-  const [debugError, setDebugError] = useState<string | null>(null);
   const sseStarted = useRef(false);
   const prevCompletedRef = useRef<Set<number>>(new Set());
 
@@ -428,17 +434,13 @@ export default function FeedbackPage() {
 
       // Start SSE processing
       setIsProcessing(true);
-      setDebugError(null);
       try {
         const res = await fetch(`/api/simulator/exam/${examId}/feedback`, {
           method: "POST",
         });
 
         if (!res.ok || !res.body) {
-          const errorText = res.body ? await res.text() : "(no body)";
-          const msg = `POST feedback failed: ${res.status} ${res.statusText} — ${errorText}`;
-          console.error(msg);
-          setDebugError(msg);
+          console.error(`POST feedback failed: ${res.status} ${res.statusText}`);
           setIsProcessing(false);
           return;
         }
@@ -486,9 +488,7 @@ export default function FeedbackPage() {
           }
         }
       } catch (err) {
-        const msg = `SSE error: ${err instanceof Error ? err.message : String(err)}`;
-        console.error(msg);
-        setDebugError(msg);
+        console.error("SSE error:", err);
         setIsProcessing(false);
       }
     })();
@@ -729,33 +729,6 @@ export default function FeedbackPage() {
           );
         })()}
       </div>
-
-      {/* Debug info */}
-      <div className="mb-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono break-all space-y-1">
-        <div>isDone={String(isDone)} | isProcessing={String(isProcessing)} | totalTasks={totalTasks} | feedbackCount={taskFeedbacks.size} | completedCount={completedCount} | errorCount={errorCount} | sortedLen={sortedFeedbacks.length}</div>
-        {[...taskFeedbacks.values()].map((tf) => {
-          const fb = tf.feedback as FeedbackData & { _debug?: string[] } | undefined;
-          return (
-            <div key={tf.taskIndex}>
-              {fb?._debug?.length ? (
-                <div className="text-yellow-400">
-                  Task {tf.taskIndex} errors: {fb._debug.join(" | ")}
-                </div>
-              ) : null}
-              {fb && (
-                <div className="text-green-400">
-                  Task {tf.taskIndex}: pron={String(fb.pronunciation)} flu={String(fb.fluency)} words={fb.wordScores?.length ?? 0} errors={fb.errors?.length ?? 0} whisper={fb.whisperWords?.length ?? 0} corrected=&quot;{fb.correctedText?.substring(0, 50)}&quot;
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-      {debugError && (
-        <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono break-all">
-          {debugError}
-        </div>
-      )}
 
       {/* Exam Dashboard (only when done) */}
       {isDone && dashboard && <ExamDashboardSection dashboard={dashboard} isDark={isDark} />}
