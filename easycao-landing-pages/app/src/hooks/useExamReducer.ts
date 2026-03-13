@@ -49,7 +49,7 @@ export interface ExamState {
 }
 
 type ExamAction =
-  | { type: "INIT"; tasks: TaskData[] }
+  | { type: "INIT"; tasks: TaskData[]; startIndex?: number }
   | { type: "VIDEO_ENDED" }
   | { type: "REPEAT_USED" }
   | { type: "START_RECORDING" }
@@ -77,6 +77,7 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
       return {
         ...initialState,
         tasks: action.tasks,
+        currentTaskIndex: action.startIndex || 0,
       };
 
     case "VIDEO_ENDED":
@@ -160,8 +161,8 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
 export function useExamReducer() {
   const [state, dispatch] = useReducer(examReducer, initialState);
 
-  const init = useCallback((tasks: TaskData[]) => {
-    dispatch({ type: "INIT", tasks });
+  const init = useCallback((tasks: TaskData[], startIndex?: number) => {
+    dispatch({ type: "INIT", tasks, startIndex });
   }, []);
 
   const videoEnded = useCallback(() => {

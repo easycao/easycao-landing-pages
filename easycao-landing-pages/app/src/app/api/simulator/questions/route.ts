@@ -55,6 +55,8 @@ export async function GET(req: NextRequest) {
     examId,
     part: exam.part,
     mode: exam.mode,
+    status: exam.status,
+    currentTaskIndex: exam.currentTaskIndex || 0,
     questions,
   });
 }

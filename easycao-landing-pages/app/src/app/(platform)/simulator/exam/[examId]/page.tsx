@@ -227,8 +227,17 @@ export default function ExamPage() {
         if (!res.ok) throw new Error("Falha ao carregar exame");
         const data = await res.json();
         setExamPart(data.part);
+
+        // If exam is already completed, redirect
+        if (data.status === "completed") {
+          router.push("/simulator");
+          return;
+        }
+
         const tasks = mapQuestions(data.questions, data.part);
-        init(tasks);
+        // Resume from last saved task index
+        const resumeIndex = Math.min(data.currentTaskIndex || 0, tasks.length - 1);
+        init(tasks, resumeIndex > 0 ? resumeIndex : undefined);
       } catch {
         setError("Erro ao carregar o exame. Tente novamente.");
       } finally {
@@ -262,7 +271,7 @@ export default function ExamPage() {
             completedTasks: state.completedTasks,
           }),
         });
-        router.push(`/simulator`);
+        router.push(`/simulator/exam/${examId}/feedback`);
       } catch {
         setError("Erro ao salvar resultado. Tente novamente.");
         setSaving(false);
