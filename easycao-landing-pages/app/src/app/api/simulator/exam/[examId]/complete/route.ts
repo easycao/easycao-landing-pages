@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase-admin";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/auth";
 
 interface CompletedTaskInput {
   index: number;
@@ -19,20 +21,32 @@ export async function POST(
   { params }: { params: Promise<{ examId: string }> }
 ) {
   const { examId } = await params;
+
+  // Auth via session cookie
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const sessionUser = await verifySession(sessionCookie);
+  if (!sessionUser) {
+    return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+  }
+
   const body = await req.json();
-  const { uid, part, completedTasks } = body as {
-    uid: string;
+  const { part, completedTasks } = body as {
     part: string;
     completedTasks: CompletedTaskInput[];
   };
 
-  if (!uid || !part || !completedTasks) {
+  if (!part || !completedTasks) {
     return NextResponse.json(
-      { error: "uid, part, and completedTasks are required" },
+      { error: "part and completedTasks are required" },
       { status: 400 }
     );
   }
 
+  const uid = sessionUser.uid;
   const db = getFirestoreDb();
 
   // Verify exam exists and belongs to user

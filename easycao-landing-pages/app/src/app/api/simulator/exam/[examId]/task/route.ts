@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getFirestoreDb } from "@/lib/firebase-admin";
+import { cookies } from "next/headers";
+import { verifySession } from "@/lib/auth";
 
 /**
  * POST /api/simulator/exam/[examId]/task
@@ -10,12 +12,24 @@ export async function POST(
   { params }: { params: Promise<{ examId: string }> }
 ) {
   const { examId } = await params;
-  const body = await req.json();
-  const { uid, taskIndex, questionId, recordingUrl, repeatUsed, taskType, situationIndex } = body;
 
-  if (!uid || taskIndex === undefined || !questionId || !recordingUrl) {
+  // Auth via session cookie
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const user = await verifySession(sessionCookie);
+  if (!user) {
+    return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+  }
+
+  const body = await req.json();
+  const { taskIndex, questionId, recordingUrl, repeatUsed, taskType, situationIndex } = body;
+
+  if (taskIndex === undefined || !questionId || !recordingUrl) {
     return NextResponse.json(
-      { error: "uid, taskIndex, questionId, and recordingUrl are required" },
+      { error: "taskIndex, questionId, and recordingUrl are required" },
       { status: 400 }
     );
   }
@@ -28,7 +42,7 @@ export async function POST(
     return NextResponse.json({ error: "Exam not found" }, { status: 404 });
   }
   const exam = examDoc.data()!;
-  if (exam.uid !== uid) {
+  if (exam.uid !== user.uid) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
