@@ -76,12 +76,13 @@ export async function POST(
         const MAX_RETRIES = 3;
 
         sendEvent({ taskIndex, status: "processing", phase: "downloading" });
+        const stepErrors: string[] = [];
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
           try {
             // Download audio
             const audioResponse = await fetch(recordingUrl);
-            if (!audioResponse.ok) throw new Error("Download failed");
+            if (!audioResponse.ok) throw new Error(`Download failed: ${audioResponse.status}`);
             const audioBuffer = Buffer.from(await audioResponse.arrayBuffer());
             const filename = "audio.webm";
 
@@ -94,7 +95,9 @@ export async function POST(
               transcription = whisperResult.text;
               whisperWords = whisperResult.words;
             } catch (err) {
-              console.error(`[feedback] Whisper failed for task ${taskIndex}:`, err);
+              const msg = `Whisper: ${err instanceof Error ? err.message : String(err)}`;
+              console.error(`[feedback] ${msg}`);
+              stepErrors.push(msg);
             }
 
             // Step 2: Pronunciation assessment (try WAV conversion, fall back to webm)
@@ -106,11 +109,13 @@ export async function POST(
                 if (wavBuffer) {
                   azure = await assessPronunciationChunked(wavBuffer, transcription, whisperWords, true);
                 } else {
-                  // ffmpeg not available (Vercel) — send webm directly
+                  stepErrors.push("ffmpeg not available, sending webm to Azure");
                   azure = await assessPronunciationChunked(audioBuffer, transcription, whisperWords, false);
                 }
               } catch (err) {
-                console.error(`[feedback] Azure Speech failed for task ${taskIndex}:`, err);
+                const msg = `Azure: ${err instanceof Error ? err.message : String(err)}`;
+                console.error(`[feedback] ${msg}`);
+                stepErrors.push(msg);
               }
             }
 
@@ -127,7 +132,9 @@ export async function POST(
               try {
                 grammar = await analyzeGrammarVocabulary(transcription);
               } catch (err) {
-                console.error(`[feedback] Grammar analysis failed for task ${taskIndex}:`, err);
+                const msg = `Grammar: ${err instanceof Error ? err.message : String(err)}`;
+                console.error(`[feedback] ${msg}`);
+                stepErrors.push(msg);
               }
             }
 
@@ -139,7 +146,9 @@ export async function POST(
                 const glossaryMap = await getGlossaryTerms(wordsList);
                 glossary = Object.fromEntries(glossaryMap);
               } catch (err) {
-                console.error(`[feedback] Glossary fetch failed for task ${taskIndex}:`, err);
+                const msg = `Glossary: ${err instanceof Error ? err.message : String(err)}`;
+                console.error(`[feedback] ${msg}`);
+                stepErrors.push(msg);
               }
             }
 
@@ -149,7 +158,9 @@ export async function POST(
               try {
                 pollyReferenceUrl = await generateReferenceAudio(grammar.correctedText);
               } catch (err) {
-                console.error(`[feedback] Polly TTS failed for task ${taskIndex}:`, err);
+                const msg = `Polly: ${err instanceof Error ? err.message : String(err)}`;
+                console.error(`[feedback] ${msg}`);
+                stepErrors.push(msg);
               }
             }
 
@@ -193,7 +204,15 @@ export async function POST(
                 processedAt: new Date(),
               });
 
-            sendEvent({ taskIndex, status: "complete", feedback: { ...feedback, recordingUrl } });
+            sendEvent({
+              taskIndex,
+              status: "complete",
+              feedback: {
+                ...feedback,
+                recordingUrl,
+                ...(stepErrors.length > 0 && { _debug: stepErrors }),
+              },
+            });
             return;
           } catch (err) {
             if (attempt === MAX_RETRIES) {

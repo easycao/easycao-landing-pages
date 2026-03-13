@@ -731,8 +731,17 @@ export default function FeedbackPage() {
       </div>
 
       {/* Debug info */}
-      <div className="mb-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono break-all">
-        isDone={String(isDone)} | isProcessing={String(isProcessing)} | totalTasks={totalTasks} | feedbackCount={taskFeedbacks.size} | completedCount={completedCount} | errorCount={errorCount} | sortedLen={sortedFeedbacks.length}
+      <div className="mb-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-mono break-all space-y-1">
+        <div>isDone={String(isDone)} | isProcessing={String(isProcessing)} | totalTasks={totalTasks} | feedbackCount={taskFeedbacks.size} | completedCount={completedCount} | errorCount={errorCount} | sortedLen={sortedFeedbacks.length}</div>
+        {[...taskFeedbacks.values()].map((tf) => {
+          const fb = tf.feedback as FeedbackData & { _debug?: string[] } | undefined;
+          if (!fb?._debug?.length) return null;
+          return (
+            <div key={tf.taskIndex} className="text-yellow-400">
+              Task {tf.taskIndex}: {fb._debug.join(" | ")}
+            </div>
+          );
+        })}
       </div>
       {debugError && (
         <div className="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono break-all">
