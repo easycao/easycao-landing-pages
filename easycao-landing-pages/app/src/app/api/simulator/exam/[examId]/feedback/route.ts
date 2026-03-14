@@ -156,6 +156,44 @@ export async function POST(
               }
             }
 
+            // Step 6: Comprehension evaluation (P2_T1, P2_T4, P3_RS only)
+            let comprehension: { score: number; total: number; points: { keyPoint: string; matched: boolean }[] } | null = null;
+            const taskType = task.taskType as string | null;
+            const comprehensionTypes = ["P2_T1", "P2_T4", "P3_RS"];
+            if (transcription && taskType && comprehensionTypes.includes(taskType)) {
+              try {
+                sendEvent({ taskIndex, status: "processing", phase: "comprehension" });
+                // Fetch question doc to get key points
+                const questionId = task.questionId as string;
+                const questionDoc = await db.collection("ICAO_Test_Questions").doc(questionId).get();
+                if (questionDoc.exists) {
+                  const qData = questionDoc.data()!;
+                  // Extract key points based on task type
+                  const prefix = taskType === "P2_T4" ? "T2" : "T1";
+                  const totalField = `${prefix}_Total_Pontos_Chaves`;
+                  const total = Number(qData[totalField]) || 0;
+                  const keyPoints: string[] = [];
+                  for (let i = 1; i <= total; i++) {
+                    const val = qData[`${prefix}_Ponto_Chave_${i}`];
+                    if (val && typeof val === "string") keyPoints.push(val);
+                  }
+                  if (keyPoints.length > 0) {
+                    const result = await evaluateComprehension(transcription, keyPoints);
+                    comprehension = {
+                      score: result.score,
+                      total: result.total,
+                      points: result.keyPoints.map((kp) => ({
+                        keyPoint: kp.text,
+                        matched: kp.matched,
+                      })),
+                    };
+                  }
+                }
+              } catch (err) {
+                console.error(`[feedback] Comprehension failed for task ${taskIndex}:`, err);
+              }
+            }
+
             const feedback = {
               transcription,
               recordingUrl,
@@ -179,6 +217,7 @@ export async function POST(
               aiFeedback: grammar.aiFeedback || "",
               level4Version: grammar.level4Version || "",
               level5Version: grammar.level5Version || "",
+              ...(comprehension && { comprehension }),
               ...(pollyReferenceUrl && { pollyReferenceUrl }),
               ...(Object.keys(glossary).length > 0 && { glossary }),
             };
