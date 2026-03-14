@@ -533,7 +533,7 @@ export default function SimulatorPage() {
           <div className="p-5 space-y-4">
             {TASK_TYPE_GROUPS.map((group) => (
               <div key={group.part}>
-                <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 text-primary/60`}>
+                <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${isDark ? "text-white/70" : "text-primary/60"}`}>
                   {group.part}
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
@@ -547,7 +547,7 @@ export default function SimulatorPage() {
                       >
                         {/* Task name — centered, uppercase, blue */}
                         <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
+                          <span className={`text-[11px] font-bold uppercase tracking-wider text-center block ${isDark ? "text-white" : "text-primary"}`}>
                             {TASK_TYPE_SHORT[type] || data.label}
                           </span>
                         </div>
