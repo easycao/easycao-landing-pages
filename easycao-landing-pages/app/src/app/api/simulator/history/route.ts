@@ -13,13 +13,14 @@ const TASK_COUNTS: Record<string, Record<string, number>> = {
 };
 
 function calcTotalTasks(exam: FirebaseFirestore.DocumentData): number {
-  if (exam.totalTasks && exam.totalTasks > 0) return exam.totalTasks;
+  // Fixed mapping is the source of truth
   const partMap = TASK_COUNTS[exam.part];
   if (partMap) {
     const count = partMap[exam.mode];
     if (count) return count;
   }
-  // Fallback for completed exams
+  // Fallback: stored totalTasks or currentTaskIndex
+  if (exam.totalTasks && exam.totalTasks > 0) return exam.totalTasks;
   if (exam.status === "completed" && exam.currentTaskIndex > 0) return exam.currentTaskIndex;
   return 0;
 }
