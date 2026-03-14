@@ -67,10 +67,21 @@ export async function GET(req: NextRequest) {
       .limit(20);
   }
 
-  const [completedSnap, inProgressSnap] = await Promise.all([
-    completedQuery.get(),
-    inProgressQuery.get().catch(() => ({ docs: [] as FirebaseFirestore.QueryDocumentSnapshot[] })),
-  ]);
+  let completedSnap;
+  let inProgressSnap: { docs: FirebaseFirestore.QueryDocumentSnapshot[] };
+  try {
+    completedSnap = await completedQuery.get();
+  } catch (err) {
+    console.error("[history] completedQuery error:", err);
+    return NextResponse.json({ error: "Failed to query completed exams", details: String(err) }, { status: 500 });
+  }
+  try {
+    inProgressSnap = await inProgressQuery.get();
+  } catch {
+    inProgressSnap = { docs: [] as FirebaseFirestore.QueryDocumentSnapshot[] };
+  }
+
+  console.log(`[history] uid=${user.uid}, completed=${completedSnap.docs.length}, inProgress=${inProgressSnap.docs.length}, filter=${partFilter}`);
 
   // Process completed exams with feedback summaries
   const completedSimulations = await Promise.all(

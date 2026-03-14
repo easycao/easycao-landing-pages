@@ -246,16 +246,25 @@ export default function SimulatorPage() {
     fetch("/api/simulator/stats")
       .then((r) => r.json())
       .then((data) => {
-        if (data.error) setStats(emptyStats);
-        else setStats(data);
+        if (data.error) {
+          console.error("[simulator] stats error:", data);
+          setStats(emptyStats);
+        } else {
+          setStats(data);
+        }
       })
-      .catch(() => setStats(emptyStats))
+      .catch((err) => { console.error("[simulator] stats fetch error:", err); setStats(emptyStats); })
       .finally(() => setLoadingStats(false));
 
     fetch("/api/simulator/history")
       .then((r) => r.json())
-      .then((data) => setHistory(data.simulations || []))
-      .catch(() => {})
+      .then((data) => {
+        if (data.error) {
+          console.error("[simulator] history error:", data);
+        }
+        setHistory(data.simulations || []);
+      })
+      .catch((err) => { console.error("[simulator] history fetch error:", err); })
       .finally(() => setLoadingHistory(false));
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 

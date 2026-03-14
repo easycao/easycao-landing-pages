@@ -40,13 +40,20 @@ export async function GET() {
   const db = getFirestoreDb();
 
   // Fetch last 50 completed exams (enough to cover 10 instances of each task type)
-  const completedSnap = await db
-    .collection("exams")
-    .where("uid", "==", user.uid)
-    .where("status", "==", "completed")
-    .orderBy("completedAt", "desc")
-    .limit(50)
-    .get();
+  let completedSnap;
+  try {
+    completedSnap = await db
+      .collection("exams")
+      .where("uid", "==", user.uid)
+      .where("status", "==", "completed")
+      .orderBy("completedAt", "desc")
+      .limit(50)
+      .get();
+  } catch (err) {
+    console.error("[stats] completedQuery error:", err);
+    return NextResponse.json({ error: "Failed to query", details: String(err) }, { status: 500 });
+  }
+  console.log(`[stats] uid=${user.uid}, completedExams=${completedSnap.docs.length}`);
 
   const now = Date.now();
   const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
