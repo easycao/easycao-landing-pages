@@ -371,7 +371,7 @@ export default function SimulatorPage() {
 
             {/* 5 Descriptors Row */}
             <div>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDark ? "text-primary/50" : "text-black/40"}`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDark ? "text-white/40" : "text-black/40"}`}>
                 Descritores — últimos 10 simulados
               </p>
               <div className="grid grid-cols-5 gap-2">
@@ -416,7 +416,7 @@ export default function SimulatorPage() {
       <button
         onClick={handleCompleteClick}
         disabled={creating}
-        className="w-full rounded-2xl overflow-hidden text-left transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(31,150,247,0.25)] disabled:opacity-50 group"
+        className="w-full rounded-2xl overflow-hidden text-left transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(31,150,247,0.25)] disabled:opacity-50 group"
       >
         <div
           className="p-6 sm:p-8 relative"
@@ -467,7 +467,7 @@ export default function SimulatorPage() {
               key={part.id}
               onClick={() => handleCardClick(part)}
               disabled={creating}
-              className={`${cardClass} overflow-hidden text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(31,150,247,0.12)] disabled:opacity-50 group`}
+              className={`${cardClass} overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(31,150,247,0.12)] disabled:opacity-50 group`}
               style={cardBg}
             >
               <div className="p-5">
@@ -526,7 +526,7 @@ export default function SimulatorPage() {
                 últimas 10 de cada
               </span>
             </div>
-            <p className={`text-xs mt-1 ${isDark ? "text-primary/50" : "text-black/50"}`}>
+            <p className={`text-xs mt-1 ${isDark ? "text-white/40" : "text-black/50"}`}>
               Quanto mais próximo de 0, melhor o desempenho
             </p>
           </div>
@@ -561,7 +561,7 @@ export default function SimulatorPage() {
                             }`}>
                               {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
                             </span>
-                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-primary/40" : "text-black/40"}`}>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/40" : "text-black/40"}`}>
                               Estru.
                             </span>
                           </div>
@@ -571,7 +571,7 @@ export default function SimulatorPage() {
                             }`}>
                               {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
                             </span>
-                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-primary/40" : "text-black/40"}`}>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/40" : "text-black/40"}`}>
                               Vocab.
                             </span>
                           </div>
@@ -609,7 +609,7 @@ export default function SimulatorPage() {
                 historyFilter === tab.id
                   ? "text-white shadow-sm"
                   : isDark
-                    ? "text-primary/40 hover:text-primary/70"
+                    ? "text-white/40 hover:text-white/60"
                     : "text-black/40 hover:text-black/60"
               }`}
               style={
@@ -643,7 +643,7 @@ export default function SimulatorPage() {
             {visibleHistory.map((sim) => (
               <div
                 key={sim.id}
-                className={`${cardClass} p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-all duration-200 hover:shadow-md`}
+                className={`${cardClass} p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-[box-shadow] duration-200 hover:shadow-md`}
                 style={cardBg}
               >
                 {/* Left: Date + Part info */}
