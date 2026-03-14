@@ -84,58 +84,73 @@ export async function GET(req: NextRequest) {
   console.log(`[history] uid=${user.uid}, completed=${completedSnap.docs.length}, inProgress=${inProgressSnap.docs.length}, filter=${partFilter}`);
 
   // Process completed exams with feedback summaries
-  const completedSimulations = await Promise.all(
-    completedSnap.docs.map(async (doc) => {
-      const exam = doc.data();
+  let completedSimulations: {
+    id: string; part: string; mode: string; status: "completed";
+    completedAt: string | null; createdAt: string | null;
+    taskCount: number; answeredTasks: number;
+    summary: { avgPronunciation: number; avgFluency: number; totalErrors: number; feedbackCount: number };
+  }[] = [];
 
-      const feedbackSnap = await db
-        .collection("exams")
-        .doc(doc.id)
-        .collection("feedback")
-        .get();
+  try {
+    completedSimulations = await Promise.all(
+      completedSnap.docs.map(async (doc) => {
+        const exam = doc.data();
 
-      let avgPronunciation = 0;
-      let avgFluency = 0;
-      let totalErrors = 0;
-      let feedbackCount = 0;
+        let avgPronunciation = 0;
+        let avgFluency = 0;
+        let totalErrors = 0;
+        let feedbackCount = 0;
 
-      feedbackSnap.docs.forEach((fbDoc) => {
-        const fb = fbDoc.data();
-        if (fb.pronunciation != null) {
-          avgPronunciation += fb.pronunciation;
-          feedbackCount++;
+        try {
+          const feedbackSnap = await db
+            .collection("exams")
+            .doc(doc.id)
+            .collection("feedback")
+            .get();
+
+          feedbackSnap.docs.forEach((fbDoc) => {
+            const fb = fbDoc.data();
+            if (fb.pronunciation != null) {
+              avgPronunciation += fb.pronunciation;
+              feedbackCount++;
+            }
+            if (fb.fluency != null) {
+              avgFluency += fb.fluency;
+            }
+            if (Array.isArray(fb.errors)) {
+              totalErrors += fb.errors.length;
+            }
+          });
+
+          if (feedbackCount > 0) {
+            avgPronunciation = Math.round(avgPronunciation / feedbackCount);
+            avgFluency = Math.round(avgFluency / feedbackCount);
+          }
+        } catch (fbErr) {
+          console.error(`[history] feedback fetch error for exam ${doc.id}:`, fbErr);
         }
-        if (fb.fluency != null) {
-          avgFluency += fb.fluency;
-        }
-        if (Array.isArray(fb.errors)) {
-          totalErrors += fb.errors.length;
-        }
-      });
 
-      if (feedbackCount > 0) {
-        avgPronunciation = Math.round(avgPronunciation / feedbackCount);
-        avgFluency = Math.round(avgFluency / feedbackCount);
-      }
-
-      return {
-        id: doc.id,
-        part: exam.part,
-        mode: exam.mode,
-        status: "completed" as const,
-        completedAt: exam.completedAt?.toDate?.()?.toISOString() || null,
-        createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
-        taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
-        answeredTasks: exam.currentTaskIndex || 0,
-        summary: {
-          avgPronunciation,
-          avgFluency,
-          totalErrors,
-          feedbackCount,
-        },
-      };
-    })
-  );
+        return {
+          id: doc.id,
+          part: exam.part,
+          mode: exam.mode,
+          status: "completed" as const,
+          completedAt: exam.completedAt?.toDate?.()?.toISOString() || null,
+          createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
+          taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
+          answeredTasks: exam.currentTaskIndex || 0,
+          summary: {
+            avgPronunciation,
+            avgFluency,
+            totalErrors,
+            feedbackCount,
+          },
+        };
+      })
+    );
+  } catch (err) {
+    console.error("[history] completedSimulations processing error:", err);
+  }
 
   // Process in-progress exams (only include those with ≥1 task answered)
   const inProgressSimulations = inProgressSnap.docs
@@ -169,5 +184,6 @@ export async function GET(req: NextRequest) {
     ...completedSimulations,
   ];
 
+  console.log(`[history] returning ${simulations.length} simulations (${completedSimulations.length} completed, ${inProgressSimulations.length} in-progress)`);
   return NextResponse.json({ simulations });
 }

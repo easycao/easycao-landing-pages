@@ -257,8 +257,12 @@ export default function SimulatorPage() {
       .finally(() => setLoadingStats(false));
 
     fetch("/api/simulator/history")
-      .then((r) => r.json())
+      .then((r) => {
+        console.log("[simulator] history response status:", r.status);
+        return r.json();
+      })
       .then((data) => {
+        console.log("[simulator] history data:", JSON.stringify(data).slice(0, 500));
         if (data.error) {
           console.error("[simulator] history error:", data);
         }
