@@ -64,6 +64,7 @@ export default function AudioRecorder({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const peakLevelRef = useRef(0);
+  const silentBlockedRef = useRef(false);
 
   const isUploading = state === "processing";
 
@@ -166,6 +167,13 @@ export default function AudioRecorder({
         stream.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
 
+        // If silence was detected, don't upload — go back to idle
+        if (silentBlockedRef.current) {
+          silentBlockedRef.current = false;
+          setState("idle");
+          return;
+        }
+
         const blob = new Blob(chunksRef.current, { type: mimeType });
         uploadRecording(blob, mimeType);
       };
@@ -204,6 +212,9 @@ export default function AudioRecorder({
     const wasSilent = peakLevelRef.current < 5;
     if (wasSilent) {
       setSilentWarning(true);
+      silentBlockedRef.current = true;
+    } else {
+      silentBlockedRef.current = false;
     }
 
     // Cleanup audio context
@@ -340,13 +351,13 @@ export default function AudioRecorder({
       )}
 
       {/* Silent audio warning */}
-      {silentWarning && (state === "processing" || state === "done") && (
+      {silentWarning && (
         <div className={`mb-4 rounded-xl border p-3 text-sm ${
           isDark
             ? "bg-amber-500/10 border-amber-500/20 text-amber-400"
             : "bg-amber-50 border-amber-200 text-amber-700"
         }`}>
-          Nenhum áudio detectado. Verifique se seu microfone está ativo e não está mutado.
+          Nenhum áudio detectado. Verifique se seu microfone está ativo e não está mutado, e grave novamente.
         </div>
       )}
 
