@@ -136,21 +136,23 @@ const MODE_LABELS: Record<string, string> = {
   sdea: "SDEA",
 };
 
-const TASK_TYPE_ORDER = [
-  "P1",
-  "P2_T1",
-  "P2_T2",
-  "P2_T3",
-  "P2_T4",
-  "P3_RS",
-  "P3_Q",
-  "P3_CMP",
-  "P4_DESC",
-  "P4_PAST",
-  "P4_FUTURE",
-  "P4_Q",
-  "P4_STMT",
-];
+const TASK_TYPE_LABELS: Record<string, string> = {
+  P1: "Parte 1: Pergunta",
+  P2_T1: "Parte 2: Cotejamento",
+  P2_T2: "Parte 2: Sistema ABC",
+  P2_T3: "Parte 2: Pane",
+  P2_T4: "Parte 2: Reported Speech",
+  P3_RS: "Parte 3: Reported Speech",
+  P3_Q: "Parte 3: Pergunta",
+  P3_CMP: "Parte 3: Comparação",
+  P4_DESC: "Parte 4: Presente",
+  P4_PAST: "Parte 4: Passado",
+  P4_FUTURE: "Parte 4: Futuro",
+  P4_Q: "Parte 4: Pergunta",
+  P4_STMT: "Parte 4: Statement",
+};
+
+const TASK_TYPE_ORDER = Object.keys(TASK_TYPE_LABELS);
 
 // ─── Helpers ────────────────────────────────────────────
 
@@ -197,13 +199,28 @@ export default function SimulatorPage() {
   const [historyFilter, setHistoryFilter] = useState<string>("all");
   const [visibleCount, setVisibleCount] = useState(10);
 
+  const emptyStats: Stats = {
+    totalCompleted: 0,
+    thisWeekCount: 0,
+    weeklyChange: null,
+    perPart: { P1: 0, P2: 0, P3: 0, P4: 0, complete: 0 },
+    avgPronunciation: null,
+    avgFluency: null,
+    taskTypeErrors: Object.fromEntries(
+      TASK_TYPE_ORDER.map((t) => [t, { label: TASK_TYPE_LABELS[t], avgStructure: null, avgVocabulary: null, count: 0 }])
+    ),
+  };
+
   // Fetch stats and history on mount
   useEffect(() => {
     if (!user) return;
     fetch("/api/simulator/stats")
       .then((r) => r.json())
-      .then((data) => setStats(data))
-      .catch(() => {})
+      .then((data) => {
+        if (data.error) setStats(emptyStats);
+        else setStats(data);
+      })
+      .catch(() => setStats(emptyStats))
       .finally(() => setLoadingStats(false));
 
     fetch("/api/simulator/history")
@@ -211,7 +228,7 @@ export default function SimulatorPage() {
       .then((data) => setHistory(data.simulations || []))
       .catch(() => {})
       .finally(() => setLoadingHistory(false));
-  }, [user]);
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filtered history
   const filteredHistory = useMemo(() => {
@@ -274,7 +291,7 @@ export default function SimulatorPage() {
       {/* ─── Stats Dashboard ─── */}
       <div className={`${cardClass} overflow-hidden`} style={cardBg}>
         <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
-          <h2 className={`text-xs font-bold uppercase tracking-[0.08em] ${isDark ? "text-white/50" : "text-primary"}`}>
+          <h2 className={`text-base font-bold tracking-tight ${isDark ? "text-white/50" : "text-primary"}`}>
             Seu Desempenho
           </h2>
         </div>
@@ -455,7 +472,7 @@ export default function SimulatorPage() {
 
       {/* ─── Part Cards Grid ─── */}
       <div>
-        <h2 className={`text-xs font-bold uppercase tracking-[0.08em] mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
+        <h2 className={`text-base font-bold tracking-tight mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
           Praticar por Parte
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -513,7 +530,7 @@ export default function SimulatorPage() {
 
       {/* ─── History Section ─── */}
       <div>
-        <h2 className={`text-xs font-bold uppercase tracking-[0.08em] mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
+        <h2 className={`text-base font-bold tracking-tight mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
           Histórico de Simulações
         </h2>
 

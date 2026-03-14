@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
   const [completedSnap, inProgressSnap] = await Promise.all([
     completedQuery.get(),
-    inProgressQuery.get(),
+    inProgressQuery.get().catch(() => ({ docs: [] as FirebaseFirestore.QueryDocumentSnapshot[] })),
   ]);
 
   // Process completed exams with feedback summaries
