@@ -5,7 +5,8 @@ import { getFirestoreDb } from "@/lib/firebase-admin";
 
 /**
  * GET /api/simulator/history?part=P1|P2|P3|P4|complete
- * Returns student's simulation history from exams collection.
+ * Returns student's simulation history including in-progress exams (with ≥1 task).
+ * In-progress exams have status "in_progress"; completed have "completed".
  */
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
@@ -22,35 +23,60 @@ export async function GET(req: NextRequest) {
   const partFilter = searchParams.get("part");
 
   const db = getFirestoreDb();
+  const validParts = ["P1", "P2", "P3", "P4", "complete"];
 
-  // Query completed exams for this user
-  let query = db
+  // Build base query constraints
+  const baseConstraints = {
+    uid: user.uid,
+    ...(partFilter && validParts.includes(partFilter) ? { part: partFilter } : {}),
+  };
+
+  // Fetch completed exams
+  let completedQuery = db
     .collection("exams")
-    .where("uid", "==", user.uid)
+    .where("uid", "==", baseConstraints.uid)
     .where("status", "==", "completed")
     .orderBy("completedAt", "desc")
     .limit(50);
 
-  if (
-    partFilter &&
-    ["P1", "P2", "P3", "P4", "complete"].includes(partFilter)
-  ) {
-    query = db
+  if (baseConstraints.part) {
+    completedQuery = db
       .collection("exams")
-      .where("uid", "==", user.uid)
+      .where("uid", "==", baseConstraints.uid)
       .where("status", "==", "completed")
-      .where("part", "==", partFilter)
+      .where("part", "==", baseConstraints.part)
       .orderBy("completedAt", "desc")
       .limit(50);
   }
 
-  const examsSnap = await query.get();
+  // Fetch in-progress exams (with at least 1 task answered: currentTaskIndex > 0)
+  let inProgressQuery = db
+    .collection("exams")
+    .where("uid", "==", baseConstraints.uid)
+    .where("status", "==", "in_progress")
+    .orderBy("createdAt", "desc")
+    .limit(20);
 
-  const simulations = await Promise.all(
-    examsSnap.docs.map(async (doc) => {
+  if (baseConstraints.part) {
+    inProgressQuery = db
+      .collection("exams")
+      .where("uid", "==", baseConstraints.uid)
+      .where("status", "==", "in_progress")
+      .where("part", "==", baseConstraints.part)
+      .orderBy("createdAt", "desc")
+      .limit(20);
+  }
+
+  const [completedSnap, inProgressSnap] = await Promise.all([
+    completedQuery.get(),
+    inProgressQuery.get(),
+  ]);
+
+  // Process completed exams with feedback summaries
+  const completedSimulations = await Promise.all(
+    completedSnap.docs.map(async (doc) => {
       const exam = doc.data();
 
-      // Fetch feedback summary for this exam
       const feedbackSnap = await db
         .collection("exams")
         .doc(doc.id)
@@ -85,9 +111,11 @@ export async function GET(req: NextRequest) {
         id: doc.id,
         part: exam.part,
         mode: exam.mode,
+        status: "completed" as const,
         completedAt: exam.completedAt?.toDate?.()?.toISOString() || null,
         createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
         taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
+        answeredTasks: exam.currentTaskIndex || 0,
         summary: {
           avgPronunciation,
           avgFluency,
@@ -97,6 +125,38 @@ export async function GET(req: NextRequest) {
       };
     })
   );
+
+  // Process in-progress exams (only include those with ≥1 task answered)
+  const inProgressSimulations = inProgressSnap.docs
+    .filter((doc) => {
+      const exam = doc.data();
+      return (exam.currentTaskIndex || 0) > 0;
+    })
+    .map((doc) => {
+      const exam = doc.data();
+      return {
+        id: doc.id,
+        part: exam.part,
+        mode: exam.mode,
+        status: "in_progress" as const,
+        completedAt: null,
+        createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
+        taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
+        answeredTasks: exam.currentTaskIndex || 0,
+        summary: {
+          avgPronunciation: 0,
+          avgFluency: 0,
+          totalErrors: 0,
+          feedbackCount: 0,
+        },
+      };
+    });
+
+  // Merge: in-progress first, then completed (sorted by date)
+  const simulations = [
+    ...inProgressSimulations,
+    ...completedSimulations,
+  ];
 
   return NextResponse.json({ simulations });
 }
