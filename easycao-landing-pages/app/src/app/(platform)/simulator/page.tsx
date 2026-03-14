@@ -305,7 +305,7 @@ export default function SimulatorPage() {
 
   // Shared styles
   const cardClass = isDark
-    ? "rounded-2xl border border-primary/20 backdrop-blur-[20px]"
+    ? "rounded-2xl border border-white/[0.06] backdrop-blur-[20px]"
     : "rounded-2xl bg-white border border-primary/20 shadow-[0_2px_8px_rgba(31,150,247,0.08)]";
   const cardBg = isDark
     ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" }
@@ -327,7 +327,7 @@ export default function SimulatorPage() {
       </div>
 
       {/* ─── Stats Dashboard ─── */}
-      <div className={`${isDark ? "rounded-2xl border border-white/[0.06] backdrop-blur-[20px]" : cardClass} overflow-hidden`} style={cardBg}>
+      <div className={`${cardClass} overflow-hidden`} style={cardBg}>
         <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
           <h2 className={`text-base font-bold tracking-tight text-primary`}>
             Seu Desempenho
@@ -526,7 +526,7 @@ export default function SimulatorPage() {
       {/* ─── Error Cards by Task Type ─── */}
       {stats && (
         <div className={`${cardClass} overflow-hidden`} style={cardBg}>
-          <div className={`px-5 py-3 border-b ${isDark ? "border-primary/15" : "border-primary/10"}`}>
+          <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
             <div className="flex items-center gap-2">
               <h2 className={`text-base font-bold tracking-tight text-primary`}>
                 Média de Erros por Tipo de Tarefa
@@ -752,7 +752,7 @@ export default function SimulatorPage() {
           onClick={() => setSelectedPart(null)}
         >
           <div
-            className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-[#141418] border border-primary/20" : "bg-white border border-primary/15"}`}
+            className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-[#141418] border border-white/[0.06]" : "bg-white border border-primary/15"}`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
@@ -784,7 +784,7 @@ export default function SimulatorPage() {
                   disabled={creating}
                   className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
                     isDark
-                      ? "border-primary/15 hover:border-primary/40 hover:bg-primary/[0.06]"
+                      ? "border-white/[0.06] hover:border-white/15 hover:bg-white/[0.04]"
                       : "border-primary/15 hover:border-primary/30 hover:bg-primary/[0.04]"
                   } disabled:opacity-50`}
                 >
