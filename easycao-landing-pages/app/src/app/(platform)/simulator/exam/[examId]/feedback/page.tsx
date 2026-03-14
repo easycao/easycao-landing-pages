@@ -473,6 +473,9 @@ export default function FeedbackPage() {
                 continue;
               }
 
+              // Guard: skip events without a valid taskIndex
+              if (typeof data.taskIndex !== "number") continue;
+
               setTaskFeedbacks((prev) => {
                 const next = new Map(prev);
                 next.set(data.taskIndex, {

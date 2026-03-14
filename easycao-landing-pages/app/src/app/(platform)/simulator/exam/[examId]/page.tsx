@@ -559,10 +559,21 @@ export default function ExamPage() {
             </div>
           )}
 
-          {/* Video/Audio Card */}
+          {/* Video/Audio Card — shows clarify video when active, otherwise main video */}
           <div className={`${cardClass} overflow-hidden mb-6`} style={cardBg}>
             <div className="p-1">
-              {currentTask.videoUrl ? (
+              {showClarify && currentTask.clarifyVideoUrl ? (
+                <VideoPlayer
+                  key={`${state.currentTaskIndex}-clarify`}
+                  src={currentTask.clarifyVideoUrl}
+                  onEnded={() => videoEnded()}
+                  showRepeat={isRepeatAvailable}
+                  repeatCount={1}
+                  onRepeatUsed={() => repeatUsed()}
+                  autoPlay
+                  className="rounded-xl"
+                />
+              ) : currentTask.videoUrl ? (
                 <VideoPlayer
                   key={state.currentTaskIndex}
                   src={currentTask.videoUrl}
@@ -594,7 +605,7 @@ export default function ExamPage() {
         </>
       )}
 
-      {/* Clarify button for P4 last question */}
+      {/* Clarify button for P4 Statement — replaces the main video */}
       {currentTask.clarifyVideoUrl && !showClarify && state.taskState !== "watching" && (
         <button
           onClick={() => setShowClarify(true)}
@@ -606,18 +617,6 @@ export default function ExamPage() {
         >
           Clarify Statement
         </button>
-      )}
-      {showClarify && currentTask.clarifyVideoUrl && (
-        <div className={`${cardClass} overflow-hidden mb-4`} style={cardBg}>
-          <div className="p-1">
-            <VideoPlayer
-              src={currentTask.clarifyVideoUrl}
-              onEnded={() => setShowClarify(false)}
-              autoPlay
-              className="rounded-xl"
-            />
-          </div>
-        </div>
       )}
 
       {/* Status + Recorder */}
