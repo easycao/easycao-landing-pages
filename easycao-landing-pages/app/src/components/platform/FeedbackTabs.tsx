@@ -458,7 +458,7 @@ function ErrorPopover({
 
 export function SectionHeader({ children, isDark }: { children: React.ReactNode; isDark: boolean }) {
   return (
-    <p className={`text-[13px] font-bold uppercase tracking-[0.08em] mb-3 ${isDark ? "text-white/40" : "text-black/40"}`}>
+    <p className={`text-[13px] font-bold uppercase tracking-[0.08em] mb-3 ${isDark ? "text-white/40" : "text-primary"}`}>
       {children}
     </p>
   );
@@ -1040,7 +1040,7 @@ function PronunciationFluencyTab({ data }: { data: FeedbackData }) {
       {/* Gauges */}
       <div
         className={`grid grid-cols-2 gap-4 p-5 rounded-2xl border ${
-          isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-gray-border/30 bg-gray-light"
+          isDark ? "border-white/[0.06] bg-white/[0.02]" : "border-primary/15 bg-primary/[0.03]"
         }`}
       >
         {data.pronunciation !== null && (
@@ -1258,20 +1258,25 @@ export default function FeedbackTabs({ data }: { data: FeedbackData }) {
     <div>
       {/* Tab headers */}
       {visibleTabs.length > 1 && (
-        <div className={`flex gap-1 mb-5 p-1 rounded-2xl ${isDark ? "bg-white/[0.04]" : "bg-gray-100/80"}`}>
+        <div className={`flex gap-1 mb-5 p-1 rounded-2xl ${isDark ? "bg-white/[0.04]" : "bg-primary/[0.06] border border-primary/10"}`}>
           {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 px-3 text-xs font-semibold rounded-xl ${
+              className={`flex-1 py-2.5 px-3 text-xs font-semibold rounded-xl transition-all ${
                 activeTab === tab.id
                   ? isDark
                     ? "bg-white/[0.08] text-white"
-                    : "bg-white text-black shadow-sm"
+                    : "text-white shadow-sm"
                   : isDark
                     ? "text-white/35 hover:text-white/50"
-                    : "text-black/35 hover:text-black/50"
+                    : "text-primary/50 hover:text-primary/70"
               }`}
+              style={
+                activeTab === tab.id && !isDark
+                  ? { background: "linear-gradient(135deg, #0057B4, #1F96F7)" }
+                  : undefined
+              }
             >
               {tab.label}
             </button>

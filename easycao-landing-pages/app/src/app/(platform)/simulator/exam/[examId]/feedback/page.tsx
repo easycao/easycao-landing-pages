@@ -145,12 +145,12 @@ function ExamDashboardSection({
       className={`rounded-2xl border p-5 mb-6 ${
         isDark
           ? "border-white/[0.09] bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-[20px]"
-          : "bg-white border-gray-border/40 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+          : "bg-white border-primary/20 shadow-[0_2px_8px_rgba(31,150,247,0.08)]"
       }`}
     >
       <p
         className={`text-[13px] font-bold uppercase tracking-[0.08em] mb-5 ${
-          isDark ? "text-white/40" : "text-black/40"
+          isDark ? "text-white/40" : "text-primary"
         }`}
       >
         Visão Geral do Exame
@@ -624,7 +624,7 @@ export default function FeedbackPage() {
   const textSecondary = isDark ? "text-[#9090A0]" : "text-black/50";
   const cardClass = isDark
     ? "rounded-2xl border border-white/[0.09] backdrop-blur-[20px]"
-    : "rounded-2xl bg-white border border-gray-border/40 shadow-[0_2px_8px_rgba(0,0,0,0.06)]";
+    : "rounded-2xl bg-white border border-primary/20 shadow-[0_2px_8px_rgba(31,150,247,0.08)]";
   const cardBg = isDark
     ? {
         background:
@@ -666,7 +666,7 @@ export default function FeedbackPage() {
 
       <h2
         className={`text-sm font-bold uppercase tracking-[0.08em] mb-2 ${
-          isDark ? "text-white/50" : "text-black/70"
+          isDark ? "text-white/50" : "text-primary"
         }`}
       >
         Feedback do Exame
@@ -778,7 +778,7 @@ export default function FeedbackPage() {
                 }`}
               >
                 <div className="flex items-center gap-3 flex-wrap min-w-0">
-                  <span className={`text-lg font-bold flex-shrink-0 ${isDark ? "text-[#F0F0F5]" : "text-black"}`}>
+                  <span className={`text-lg font-bold flex-shrink-0 ${isDark ? "text-[#F0F0F5]" : "text-primary"}`}>
                     Tarefa {tf.taskIndex + 1}
                   </span>
 
