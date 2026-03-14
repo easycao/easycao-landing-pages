@@ -329,7 +329,7 @@ export default function SimulatorPage() {
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? "bg-primary/[0.06]" : "bg-gray-100"}`} />
+                <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-gray-100"}`} />
               ))}
             </div>
           </div>
@@ -384,7 +384,7 @@ export default function SimulatorPage() {
                 ] as const).map((desc) => (
                   <div
                     key={desc.label}
-                    className={`rounded-xl border p-3 text-center ${isDark ? "border-primary/15 bg-primary/[0.06]" : "border-primary/15 bg-primary/[0.03]"}`}
+                    className={`rounded-xl border p-3 text-center ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-primary/15 bg-primary/[0.03]"}`}
                   >
                     <span className={`text-xl sm:text-2xl font-bold font-mono block ${
                       desc.value === null
@@ -493,7 +493,7 @@ export default function SimulatorPage() {
                         </span>
                         {stats && stats.perPart[part.id] > 0 && (
                           <span className={`text-[11px] px-2 py-0.5 rounded-full ${
-                            isDark ? "bg-primary/[0.08] text-primary/60" : "bg-primary/[0.06] text-primary/60"
+                            isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/60"
                           }`}>
                             {stats.perPart[part.id]} feito{stats.perPart[part.id] !== 1 ? "s" : ""}
                           </span>
@@ -522,7 +522,7 @@ export default function SimulatorPage() {
               <h2 className={`text-base font-bold tracking-tight text-primary`}>
                 Média de Erros por Tipo de Tarefa
               </h2>
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/[0.08] text-primary/70`}>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
                 últimas 10 de cada
               </span>
             </div>
@@ -543,10 +543,10 @@ export default function SimulatorPage() {
                     return (
                       <div
                         key={type}
-                        className={`rounded-xl border overflow-hidden border-primary/15`}
+                        className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
                       >
                         {/* Task name — centered, uppercase, blue */}
-                        <div className={`px-3 py-2 ${isDark ? "bg-primary/[0.06]" : "bg-primary/[0.04]"}`}>
+                        <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
                           <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
                             {TASK_TYPE_SHORT[type] || data.label}
                           </span>
@@ -555,7 +555,7 @@ export default function SimulatorPage() {
                         <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
                         {/* Error values: Structure | Vocabulary */}
                         <div className="grid grid-cols-2">
-                          <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-primary/15" : "border-primary/10"}`}>
+                          <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
                             <span className={`text-lg font-bold font-mono block ${
                               data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
                             }`}>
@@ -593,7 +593,7 @@ export default function SimulatorPage() {
         </h2>
 
         {/* Filter tabs */}
-        <div className={`inline-flex rounded-xl p-1 mb-4 ${isDark ? "bg-primary/[0.06] border border-primary/15" : "bg-primary/[0.06] border border-primary/10"}`}>
+        <div className={`inline-flex rounded-xl p-1 mb-4 ${isDark ? "bg-white/[0.04]" : "bg-primary/[0.06] border border-primary/10"}`}>
           {[
             { id: "all", label: "Todos" },
             { id: "P1", label: "P1" },
@@ -627,7 +627,7 @@ export default function SimulatorPage() {
         {loadingHistory ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? "bg-primary/[0.06]" : "bg-gray-100"}`} />
+              <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-gray-100"}`} />
             ))}
           </div>
         ) : filteredHistory.length === 0 ? (
@@ -652,7 +652,7 @@ export default function SimulatorPage() {
                     <span className={`text-sm font-semibold ${textPrimary}`}>
                       {PART_LABELS[sim.part] || sim.part}
                     </span>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${isDark ? "bg-primary/[0.08] text-primary/60" : "bg-primary/[0.06] text-primary/50"}`}>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/50"}`}>
                       {MODE_LABELS[sim.mode] || sim.mode}
                     </span>
                     {/* Status badge */}
