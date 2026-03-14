@@ -301,7 +301,7 @@ export default function ExamPage() {
   const { theme } = useTheme();
   const isDark = theme === "dark";
 
-  const { state, init, videoEnded, repeatUsed, startRecording, uploadComplete, advance } =
+  const { state, init, videoEnded, repeatUsed, repeatAudioStart, repeatAudioEnd, startRecording, uploadComplete, advance } =
     useExamReducer();
 
   const [loading, setLoading] = useState(true);
@@ -536,8 +536,10 @@ export default function ExamPage() {
                   onEnded={() => videoEnded()}
                   showRepeat={isRepeatAvailable}
                   repeatCount={1}
-                  onRepeatUsed={() => repeatUsed()}
+                  onRepeatUsed={() => !currentTask.repeatAudioUrl && repeatUsed()}
                   repeatSrc={currentTask.repeatAudioUrl}
+                  onRepeatStart={currentTask.repeatAudioUrl ? repeatAudioStart : undefined}
+                  onRepeatEnd={currentTask.repeatAudioUrl ? repeatAudioEnd : undefined}
                   autoPlay
                   className="rounded-xl"
                 />
@@ -586,8 +588,10 @@ export default function ExamPage() {
                   onEnded={() => videoEnded()}
                   showRepeat={isRepeatAvailable}
                   repeatCount={1}
-                  onRepeatUsed={() => repeatUsed()}
+                  onRepeatUsed={() => !currentTask.repeatAudioUrl && repeatUsed()}
                   repeatSrc={currentTask.repeatAudioUrl}
+                  onRepeatStart={currentTask.repeatAudioUrl ? repeatAudioStart : undefined}
+                  onRepeatEnd={currentTask.repeatAudioUrl ? repeatAudioEnd : undefined}
                   autoPlay
                   className="rounded-xl"
                 />

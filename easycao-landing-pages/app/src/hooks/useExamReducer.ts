@@ -53,6 +53,8 @@ type ExamAction =
   | { type: "INIT"; tasks: TaskData[]; startIndex?: number }
   | { type: "VIDEO_ENDED" }
   | { type: "REPEAT_USED" }
+  | { type: "REPEAT_AUDIO_START" }
+  | { type: "REPEAT_AUDIO_END" }
   | { type: "START_RECORDING" }
   | { type: "START_UPLOADING" }
   | { type: "UPLOAD_COMPLETE"; recordingUrl: string }
@@ -101,6 +103,28 @@ function examReducer(state: ExamState, action: ExamAction): ExamState {
         showImage: task?.hideImageOnRepeat ? false : state.showImage,
       };
     }
+
+    case "REPEAT_AUDIO_START": {
+      // Block recording while repeat audio plays, mark repeat as used
+      const task = state.tasks[state.currentTaskIndex];
+      const newSharedRepeat = { ...state.sharedRepeatUsed };
+      if (task?.sharedRepeatGroup) {
+        newSharedRepeat[task.sharedRepeatGroup] = true;
+      }
+      return {
+        ...state,
+        repeatUsed: true,
+        taskState: "watching",
+        sharedRepeatUsed: newSharedRepeat,
+      };
+    }
+
+    case "REPEAT_AUDIO_END":
+      // Re-enable recording after repeat audio finishes
+      return {
+        ...state,
+        taskState: "ready_to_record",
+      };
 
     case "HIDE_IMAGE":
       return { ...state, showImage: false };
@@ -194,11 +218,21 @@ export function useExamReducer() {
     dispatch({ type: "HIDE_IMAGE" });
   }, []);
 
+  const repeatAudioStart = useCallback(() => {
+    dispatch({ type: "REPEAT_AUDIO_START" });
+  }, []);
+
+  const repeatAudioEnd = useCallback(() => {
+    dispatch({ type: "REPEAT_AUDIO_END" });
+  }, []);
+
   return {
     state,
     init,
     videoEnded,
     repeatUsed,
+    repeatAudioStart,
+    repeatAudioEnd,
     startRecording,
     startUploading,
     uploadComplete,

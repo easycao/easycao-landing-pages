@@ -18,6 +18,10 @@ export interface VideoPlayerProps {
   onRepeatUsed?: () => void;
   /** Alternative audio/video URL to play on repeat (e.g., P2 T4 plays T3's audio). */
   repeatSrc?: string;
+  /** Called when repeat audio starts playing (repeatSrc only). */
+  onRepeatStart?: () => void;
+  /** Called when repeat audio finishes playing (repeatSrc only). */
+  onRepeatEnd?: () => void;
   autoPlay?: boolean;
   className?: string;
 }
@@ -30,6 +34,8 @@ export default function VideoPlayer({
   repeatCount = 1,
   onRepeatUsed,
   repeatSrc,
+  onRepeatStart,
+  onRepeatEnd,
   autoPlay = false,
   className = "",
 }: VideoPlayerProps) {
@@ -72,12 +78,15 @@ export default function VideoPlayer({
       const audio = new Audio(repeatSrc);
       repeatAudioRef.current = audio;
       setPlayingRepeatAudio(true);
+      onRepeatStart?.();
       audio.onended = () => {
         setPlayingRepeatAudio(false);
+        onRepeatEnd?.();
         if (newUsed >= repeatCount) onRepeatUsed?.();
       };
       audio.play().catch(() => {
         setPlayingRepeatAudio(false);
+        onRepeatEnd?.();
       });
     } else {
       // Replay the same video
@@ -90,7 +99,7 @@ export default function VideoPlayer({
     if (!repeatSrc && newUsed >= repeatCount) {
       onRepeatUsed?.();
     }
-  }, [repeatsUsed, repeatsRemaining, repeatCount, onRepeatUsed, repeatSrc]);
+  }, [repeatsUsed, repeatsRemaining, repeatCount, onRepeatUsed, repeatSrc, onRepeatStart, onRepeatEnd]);
 
   // Auto-play on mount
   useEffect(() => {
