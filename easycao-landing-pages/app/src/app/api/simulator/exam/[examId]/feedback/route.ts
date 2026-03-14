@@ -158,6 +158,7 @@ export async function POST(
 
             const feedback = {
               transcription,
+              recordingUrl,
               pronunciation: azure?.pronunciation ?? null,
               fluency: azure?.fluency ?? null,
               wordScores: azure?.words ?? [],
@@ -199,7 +200,7 @@ export async function POST(
             sendEvent({
               taskIndex,
               status: "complete",
-              feedback: { ...feedback, recordingUrl },
+              feedback,
             });
             return;
           } catch (err) {
