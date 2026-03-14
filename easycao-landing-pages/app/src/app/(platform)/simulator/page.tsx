@@ -296,7 +296,7 @@ export default function SimulatorPage() {
 
   // Shared styles
   const cardClass = isDark
-    ? "rounded-2xl border border-white/[0.09] backdrop-blur-[20px]"
+    ? "rounded-2xl border border-primary/20 backdrop-blur-[20px]"
     : "rounded-2xl bg-white border border-primary/20 shadow-[0_2px_8px_rgba(31,150,247,0.08)]";
   const cardBg = isDark
     ? { background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)" }
@@ -319,8 +319,8 @@ export default function SimulatorPage() {
 
       {/* ─── Stats Dashboard ─── */}
       <div className={`${cardClass} overflow-hidden`} style={cardBg}>
-        <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
-          <h2 className={`text-base font-bold tracking-tight ${isDark ? "text-white/50" : "text-primary"}`}>
+        <div className={`px-5 py-3 border-b ${isDark ? "border-primary/15" : "border-primary/10"}`}>
+          <h2 className={`text-base font-bold tracking-tight text-primary`}>
             Seu Desempenho
           </h2>
         </div>
@@ -329,7 +329,7 @@ export default function SimulatorPage() {
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-gray-100"}`} />
+                <div key={i} className={`h-16 rounded-xl animate-pulse ${isDark ? "bg-primary/[0.06]" : "bg-gray-100"}`} />
               ))}
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function SimulatorPage() {
 
             {/* 5 Descriptors Row */}
             <div>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDark ? "text-white/40" : "text-black/40"}`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDark ? "text-primary/50" : "text-black/40"}`}>
                 Descritores — últimos 10 simulados
               </p>
               <div className="grid grid-cols-5 gap-2">
@@ -384,7 +384,7 @@ export default function SimulatorPage() {
                 ] as const).map((desc) => (
                   <div
                     key={desc.label}
-                    className={`rounded-xl border p-3 text-center ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-primary/15 bg-primary/[0.03]"}`}
+                    className={`rounded-xl border p-3 text-center ${isDark ? "border-primary/15 bg-primary/[0.06]" : "border-primary/15 bg-primary/[0.03]"}`}
                   >
                     <span className={`text-xl sm:text-2xl font-bold font-mono block ${
                       desc.value === null
@@ -458,7 +458,7 @@ export default function SimulatorPage() {
 
       {/* ─── Part Cards Grid ─── */}
       <div>
-        <h2 className={`text-base font-bold tracking-tight mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
+        <h2 className={`text-base font-bold tracking-tight mb-4 text-primary`}>
           Praticar por Parte
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -493,7 +493,7 @@ export default function SimulatorPage() {
                         </span>
                         {stats && stats.perPart[part.id] > 0 && (
                           <span className={`text-[11px] px-2 py-0.5 rounded-full ${
-                            isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/60"
+                            isDark ? "bg-primary/[0.08] text-primary/60" : "bg-primary/[0.06] text-primary/60"
                           }`}>
                             {stats.perPart[part.id]} feito{stats.perPart[part.id] !== 1 ? "s" : ""}
                           </span>
@@ -517,23 +517,23 @@ export default function SimulatorPage() {
       {/* ─── Error Cards by Task Type ─── */}
       {stats && (
         <div className={`${cardClass} overflow-hidden`} style={cardBg}>
-          <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
+          <div className={`px-5 py-3 border-b ${isDark ? "border-primary/15" : "border-primary/10"}`}>
             <div className="flex items-center gap-2">
-              <h2 className={`text-base font-bold tracking-tight ${isDark ? "text-white/50" : "text-primary"}`}>
+              <h2 className={`text-base font-bold tracking-tight text-primary`}>
                 Média de Erros por Tipo de Tarefa
               </h2>
-              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/[0.08] text-primary/70`}>
                 últimas 10 de cada
               </span>
             </div>
-            <p className={`text-xs mt-1 ${isDark ? "text-white/40" : "text-black/50"}`}>
+            <p className={`text-xs mt-1 ${isDark ? "text-primary/50" : "text-black/50"}`}>
               Quanto mais próximo de 0, melhor o desempenho
             </p>
           </div>
           <div className="p-5 space-y-4">
             {TASK_TYPE_GROUPS.map((group) => (
               <div key={group.part}>
-                <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${isDark ? "text-white/30" : "text-primary/60"}`}>
+                <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 text-primary/60`}>
                   {group.part}
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
@@ -543,10 +543,10 @@ export default function SimulatorPage() {
                     return (
                       <div
                         key={type}
-                        className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
+                        className={`rounded-xl border overflow-hidden border-primary/15`}
                       >
                         {/* Task name — centered, uppercase, blue */}
-                        <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
+                        <div className={`px-3 py-2 ${isDark ? "bg-primary/[0.06]" : "bg-primary/[0.04]"}`}>
                           <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
                             {TASK_TYPE_SHORT[type] || data.label}
                           </span>
@@ -555,13 +555,13 @@ export default function SimulatorPage() {
                         <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
                         {/* Error values: Structure | Vocabulary */}
                         <div className="grid grid-cols-2">
-                          <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
+                          <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-primary/15" : "border-primary/10"}`}>
                             <span className={`text-lg font-bold font-mono block ${
                               data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
                             }`}>
                               {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
                             </span>
-                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-primary/40" : "text-black/40"}`}>
                               Estru.
                             </span>
                           </div>
@@ -571,7 +571,7 @@ export default function SimulatorPage() {
                             }`}>
                               {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
                             </span>
-                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-primary/40" : "text-black/40"}`}>
                               Vocab.
                             </span>
                           </div>
@@ -588,12 +588,12 @@ export default function SimulatorPage() {
 
       {/* ─── History Section ─── */}
       <div>
-        <h2 className={`text-base font-bold tracking-tight mb-4 ${isDark ? "text-white/50" : "text-primary"}`}>
+        <h2 className={`text-base font-bold tracking-tight mb-4 text-primary`}>
           Histórico de Simulações
         </h2>
 
         {/* Filter tabs */}
-        <div className={`inline-flex rounded-xl p-1 mb-4 ${isDark ? "bg-white/[0.04]" : "bg-primary/[0.06] border border-primary/10"}`}>
+        <div className={`inline-flex rounded-xl p-1 mb-4 ${isDark ? "bg-primary/[0.06] border border-primary/15" : "bg-primary/[0.06] border border-primary/10"}`}>
           {[
             { id: "all", label: "Todos" },
             { id: "P1", label: "P1" },
@@ -609,7 +609,7 @@ export default function SimulatorPage() {
                 historyFilter === tab.id
                   ? "text-white shadow-sm"
                   : isDark
-                    ? "text-white/40 hover:text-white/60"
+                    ? "text-primary/40 hover:text-primary/70"
                     : "text-black/40 hover:text-black/60"
               }`}
               style={
@@ -627,7 +627,7 @@ export default function SimulatorPage() {
         {loadingHistory ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? "bg-white/[0.04]" : "bg-gray-100"}`} />
+              <div key={i} className={`h-20 rounded-xl animate-pulse ${isDark ? "bg-primary/[0.06]" : "bg-gray-100"}`} />
             ))}
           </div>
         ) : filteredHistory.length === 0 ? (
@@ -652,7 +652,7 @@ export default function SimulatorPage() {
                     <span className={`text-sm font-semibold ${textPrimary}`}>
                       {PART_LABELS[sim.part] || sim.part}
                     </span>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/50"}`}>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${isDark ? "bg-primary/[0.08] text-primary/60" : "bg-primary/[0.06] text-primary/50"}`}>
                       {MODE_LABELS[sim.mode] || sim.mode}
                     </span>
                     {/* Status badge */}
@@ -725,7 +725,7 @@ export default function SimulatorPage() {
                 onClick={() => setVisibleCount((c) => c + 10)}
                 className={`w-full py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isDark
-                    ? "text-white/40 hover:text-white/60 border border-white/[0.06] hover:bg-white/[0.03]"
+                    ? "text-primary/60 hover:text-primary border border-primary/15 hover:bg-primary/[0.06]"
                     : "text-primary/60 hover:text-primary border border-primary/10 hover:bg-primary/[0.03]"
                 }`}
               >
@@ -743,14 +743,14 @@ export default function SimulatorPage() {
           onClick={() => setSelectedPart(null)}
         >
           <div
-            className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-[#141418] border border-white/[0.09]" : "bg-white border border-primary/15"}`}
+            className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-[#141418] border border-primary/20" : "bg-white border border-primary/15"}`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
             <div className="p-6 pb-4">
               <div className="flex items-center gap-3 mb-1">
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                  isDark ? "bg-primary/20 text-primary" : "text-white"
+                  isDark ? "bg-primary/25 text-primary" : "text-white"
                 }`} style={!isDark ? { background: "linear-gradient(135deg, #0057B4, #1F96F7)" } : undefined}>
                   {selectedPart.icon}
                 </div>
@@ -775,7 +775,7 @@ export default function SimulatorPage() {
                   disabled={creating}
                   className={`w-full text-left p-4 rounded-xl border transition-all duration-200 ${
                     isDark
-                      ? "border-white/[0.09] hover:border-primary/40 hover:bg-white/[0.04]"
+                      ? "border-primary/15 hover:border-primary/40 hover:bg-primary/[0.06]"
                       : "border-primary/15 hover:border-primary/30 hover:bg-primary/[0.04]"
                   } disabled:opacity-50`}
                 >
