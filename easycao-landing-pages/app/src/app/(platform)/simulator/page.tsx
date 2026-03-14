@@ -721,7 +721,7 @@ export default function SimulatorPage() {
                       F {sim.summary.avgFluency}
                     </span>
                     {sim.summary.totalErrors > 0 && (
-                      <span className={`text-[11px] px-2 py-1 rounded-lg border font-mono font-semibold ${scoreBg(Math.max(0, 100 - (sim.summary.totalErrors / Math.max(sim.taskCount, 1)) * 50))}`}>
+                      <span className={`text-[11px] px-2 py-1 rounded-lg border font-mono font-semibold ${(() => { const ratio = sim.summary.totalErrors / Math.max(sim.taskCount, 1); if (ratio <= 0.6) return "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"; if (ratio <= 1.5) return "bg-amber-500/10 text-amber-600 border-amber-500/20"; return "bg-red-500/10 text-red-600 border-red-500/20"; })()}`}>
                         {sim.summary.totalErrors} erro{sim.summary.totalErrors !== 1 ? "s" : ""}
                       </span>
                     )}
