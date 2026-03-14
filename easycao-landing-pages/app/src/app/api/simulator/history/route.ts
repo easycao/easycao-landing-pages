@@ -3,25 +3,25 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import { getFirestoreDb } from "@/lib/firebase-admin";
 
-/** Calculate total tasks from questionDocIds types. */
+/** Total tasks by part + mode (fixed mapping). */
+const TASK_COUNTS: Record<string, Record<string, number>> = {
+  P1: { single: 1, complete: 3 },
+  P2: { single: 4, "single-image": 4, complete: 20 },
+  P3: { single: 2, complete: 7 },
+  P4: { complete: 6, description: 1, past: 1, future: 1, question: 1, statement: 1 },
+  complete: { complete: 36 },
+};
+
 function calcTotalTasks(exam: FirebaseFirestore.DocumentData): number {
-  // Prefer explicitly stored totalTasks
   if (exam.totalTasks && exam.totalTasks > 0) return exam.totalTasks;
-  // For completed exams, currentTaskIndex equals total
-  if (exam.status === "completed" && exam.currentTaskIndex > 0) return exam.currentTaskIndex;
-  // Calculate from questionDocIds
-  const docs = exam.questionDocIds;
-  if (!Array.isArray(docs) || docs.length === 0) return 0;
-  let total = 0;
-  for (const q of docs) {
-    const t = (q.type as string) || "";
-    if (t === "Part1") total += 1;
-    else if (t.startsWith("Part2")) total += 4;
-    else if (t === "Part3Comparison") total += 1;
-    else if (t === "Part3") total += 2;
-    else total += 1;
+  const partMap = TASK_COUNTS[exam.part];
+  if (partMap) {
+    const count = partMap[exam.mode];
+    if (count) return count;
   }
-  return total;
+  // Fallback for completed exams
+  if (exam.status === "completed" && exam.currentTaskIndex > 0) return exam.currentTaskIndex;
+  return 0;
 }
 
 /**
