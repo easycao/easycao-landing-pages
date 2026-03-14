@@ -327,8 +327,8 @@ export default function SimulatorPage() {
       </div>
 
       {/* ─── Stats Dashboard ─── */}
-      <div className={`${cardClass} overflow-hidden`} style={cardBg}>
-        <div className={`px-5 py-3 border-b ${isDark ? "border-primary/15" : "border-primary/10"}`}>
+      <div className={`${isDark ? "rounded-2xl border border-white/[0.06] backdrop-blur-[20px]" : cardClass} overflow-hidden`} style={cardBg}>
+        <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
           <h2 className={`text-base font-bold tracking-tight text-primary`}>
             Seu Desempenho
           </h2>
