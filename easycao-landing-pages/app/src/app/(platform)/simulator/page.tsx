@@ -467,7 +467,7 @@ export default function SimulatorPage() {
               key={part.id}
               onClick={() => handleCardClick(part)}
               disabled={creating}
-              className={`${cardClass} overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(31,150,247,0.12)] disabled:opacity-50 group`}
+              className={`${cardClass} overflow-hidden text-left transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 ${isDark ? "hover:shadow-[0_4px_20px_rgba(0,0,0,0.3)]" : "hover:shadow-[0_4px_20px_rgba(31,150,247,0.12)]"} disabled:opacity-50 group`}
               style={cardBg}
             >
               <div className="p-5">
@@ -643,7 +643,7 @@ export default function SimulatorPage() {
             {visibleHistory.map((sim) => (
               <div
                 key={sim.id}
-                className={`${cardClass} p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-[box-shadow] duration-200 hover:shadow-md`}
+                className={`${cardClass} p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-[box-shadow] duration-200 ${isDark ? "hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)]" : "hover:shadow-md"}`}
                 style={cardBg}
               >
                 {/* Left: Date + Part info */}
