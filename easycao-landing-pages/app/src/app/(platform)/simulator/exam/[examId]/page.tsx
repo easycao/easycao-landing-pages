@@ -635,7 +635,7 @@ export default function ExamPage() {
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             <p className={`text-sm ${textSecondary}`}>
-              {currentTask.audioUrl && !currentTask.videoUrl
+              {(currentTask.audioUrl && !currentTask.videoUrl) || (state.repeatUsed && currentTask.repeatAudioUrl)
                 ? "Ouça o áudio..."
                 : "Assista ao vídeo..."}
             </p>
