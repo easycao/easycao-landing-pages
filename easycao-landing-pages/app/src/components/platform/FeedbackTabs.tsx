@@ -63,6 +63,7 @@ export interface FeedbackData {
     score: number;
     total: number;
     points: ComprehensionPoint[];
+    questionAudioUrl?: string;
   };
   pollyReferenceUrl?: string;
   glossary?: Record<string, GlossaryEntry>;
@@ -1182,13 +1183,37 @@ function ComprehensionTab({ data }: { data: FeedbackData }) {
 
   if (!data.comprehension) return null;
 
-  const { score, total, points } = data.comprehension;
+  const { score, total, points, questionAudioUrl } = data.comprehension;
   const percentage = total > 0 ? Math.round((score / total) * 100) : 0;
 
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
         <CircularGauge label={`Compreensão (${score}/${total})`} value={percentage} size={120} />
+      </div>
+
+      {/* Audio Players */}
+      <div className="space-y-3">
+        {questionAudioUrl && (
+          <div>
+            <SectionHeader isDark={isDark}>Áudio Original</SectionHeader>
+            <AudioPlayer
+              recordingUrl={questionAudioUrl}
+              transcription=""
+              showWords={false}
+            />
+          </div>
+        )}
+        {data.recordingUrl && (
+          <div>
+            <SectionHeader isDark={isDark}>Sua Resposta</SectionHeader>
+            <AudioPlayer
+              recordingUrl={data.recordingUrl}
+              transcription={data.transcription || ""}
+              showWords={false}
+            />
+          </div>
+        )}
       </div>
 
       <div>

@@ -157,13 +157,16 @@ export async function POST(
             }
 
             // Step 6: Comprehension evaluation (P2_T1, P2_T4, P3_RS only)
-            let comprehension: { score: number; total: number; points: { keyPoint: string; matched: boolean }[] } | null = null;
+            let comprehension: {
+              score: number; total: number;
+              points: { keyPoint: string; matched: boolean }[];
+              questionAudioUrl?: string;
+            } | null = null;
             const taskType = task.taskType as string | null;
             const comprehensionTypes = ["P2_T1", "P2_T4", "P3_RS"];
             if (transcription && taskType && comprehensionTypes.includes(taskType)) {
               try {
                 sendEvent({ taskIndex, status: "processing", phase: "comprehension" });
-                // Fetch question doc to get key points
                 const questionId = task.questionId as string;
                 const questionDoc = await db.collection("ICAO_Test_Questions").doc(questionId).get();
                 if (questionDoc.exists) {
@@ -177,6 +180,14 @@ export async function POST(
                     const val = qData[`${prefix}_Ponto_Chave_${i}`];
                     if (val && typeof val === "string") keyPoints.push(val);
                   }
+                  // Get the original question audio URL
+                  const audioFieldMap: Record<string, string> = {
+                    P2_T1: "Part2_Cenario_e_Track1",
+                    P2_T4: "Part2_Track2",
+                    P3_RS: "Part3_Track1",
+                  };
+                  const questionAudioUrl = (qData[audioFieldMap[taskType]] as string) || undefined;
+
                   if (keyPoints.length > 0) {
                     const result = await evaluateComprehension(transcription, keyPoints);
                     comprehension = {
@@ -186,6 +197,7 @@ export async function POST(
                         keyPoint: kp.text,
                         matched: kp.matched,
                       })),
+                      ...(questionAudioUrl && { questionAudioUrl }),
                     };
                   }
                 }
