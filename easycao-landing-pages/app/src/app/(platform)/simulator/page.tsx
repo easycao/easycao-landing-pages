@@ -154,6 +154,29 @@ const TASK_TYPE_LABELS: Record<string, string> = {
 
 const TASK_TYPE_ORDER = Object.keys(TASK_TYPE_LABELS);
 
+const TASK_TYPE_SHORT: Record<string, string> = {
+  P1: "Pergunta",
+  P2_T1: "Cotejamento",
+  P2_T2: "Sistema ABC",
+  P2_T3: "Pane",
+  P2_T4: "Reported Speech",
+  P3_RS: "Reported Speech",
+  P3_Q: "Pergunta",
+  P3_CMP: "Comparação",
+  P4_DESC: "Presente",
+  P4_PAST: "Passado",
+  P4_FUTURE: "Futuro",
+  P4_Q: "Pergunta",
+  P4_STMT: "Statement",
+};
+
+const TASK_TYPE_GROUPS = [
+  { part: "Parte 1", types: ["P1"] },
+  { part: "Parte 2", types: ["P2_T1", "P2_T2", "P2_T3", "P2_T4"] },
+  { part: "Parte 3", types: ["P3_RS", "P3_Q", "P3_CMP"] },
+  { part: "Parte 4", types: ["P4_DESC", "P4_PAST", "P4_FUTURE", "P4_Q", "P4_STMT"] },
+];
+
 // ─── Helpers ────────────────────────────────────────────
 
 function scoreColor(score: number): string {
@@ -380,61 +403,72 @@ export default function SimulatorPage() {
             {/* Task Type Error Mini Cards */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <h3 className={`text-xs font-bold uppercase tracking-[0.06em] ${isDark ? "text-white/40" : "text-primary"}`}>
+                <h3 className={`text-sm font-bold ${isDark ? "text-white/60" : "text-primary"}`}>
                   Média de Erros por Tipo de Tarefa
                 </h3>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/30" : "bg-primary/[0.06] text-primary/50"}`}>
                   últimas 10 de cada
                 </span>
               </div>
-              <p className={`text-[10px] mb-3 ${textMuted}`}>
+              <p className={`text-xs mb-4 ${isDark ? "text-white/40" : "text-black/50"}`}>
                 Quanto mais próximo de 0, melhor o desempenho
               </p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-                {TASK_TYPE_ORDER.map((type) => {
-                  const data = stats.taskTypeErrors[type];
-                  if (!data) return null;
-                  return (
-                    <div
-                      key={type}
-                      className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
-                    >
-                      {/* Task name */}
-                      <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
-                        <span className={`text-[11px] font-semibold leading-tight block ${isDark ? "text-white/70" : "text-black/70"}`}>
-                          {data.label}
-                        </span>
-                      </div>
-                      {/* Divider */}
-                      <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
-                      {/* Error values: Structure | Vocabulary */}
-                      <div className="grid grid-cols-2">
-                        {/* Structure */}
-                        <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
-                          <span className={`text-lg font-bold font-mono block ${
-                            data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
-                          }`}>
-                            {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
-                          </span>
-                          <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/25" : "text-black/30"}`}>
-                            Estru.
-                          </span>
-                        </div>
-                        {/* Vocabulary */}
-                        <div className="px-2.5 py-2 text-center">
-                          <span className={`text-lg font-bold font-mono block ${
-                            data.avgVocabulary !== null ? errorHeatColor(data.avgVocabulary, isDark) : textMuted
-                          }`}>
-                            {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
-                          </span>
-                          <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/25" : "text-black/30"}`}>
-                            Vocab.
-                          </span>
-                        </div>
-                      </div>
+
+              {/* Grouped by part */}
+              <div className="space-y-4">
+                {TASK_TYPE_GROUPS.map((group) => (
+                  <div key={group.part}>
+                    <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${isDark ? "text-white/30" : "text-primary/60"}`}>
+                      {group.part}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                      {group.types.map((type) => {
+                        const data = stats.taskTypeErrors[type];
+                        if (!data) return null;
+                        return (
+                          <div
+                            key={type}
+                            className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
+                          >
+                            {/* Task name — centered, uppercase, blue */}
+                            <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
+                                {TASK_TYPE_SHORT[type] || data.label}
+                              </span>
+                            </div>
+                            {/* Divider */}
+                            <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
+                            {/* Error values: Structure | Vocabulary */}
+                            <div className="grid grid-cols-2">
+                              {/* Structure */}
+                              <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
+                                <span className={`text-lg font-bold font-mono block ${
+                                  data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
+                                }`}>
+                                  {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
+                                </span>
+                                <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                                  Estru.
+                                </span>
+                              </div>
+                              {/* Vocabulary */}
+                              <div className="px-2.5 py-2 text-center">
+                                <span className={`text-lg font-bold font-mono block ${
+                                  data.avgVocabulary !== null ? errorHeatColor(data.avgVocabulary, isDark) : textMuted
+                                }`}>
+                                  {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
+                                </span>
+                                <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                                  Vocab.
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
