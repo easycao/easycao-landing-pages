@@ -345,7 +345,7 @@ export default function SimulatorPage() {
                     )}
                   </div>
                   {stats.thisWeekCount > 0 && (
-                    <p className="text-[10px] mt-0.5 text-white/40">{stats.thisWeekCount} esta semana</p>
+                    <p className="text-[10px] mt-0.5 text-white/70">{stats.thisWeekCount} esta semana</p>
                   )}
                   {/* Per-part sub-boxes */}
                   <div className="grid grid-cols-5 gap-1.5 mt-3">
@@ -358,7 +358,7 @@ export default function SimulatorPage() {
                     ] as const).map(({ key, label }) => (
                       <div key={key} className="rounded-lg bg-white/10 px-2 py-1.5 text-center">
                         <span className="text-sm font-bold block">{stats.perPart[key] || 0}</span>
-                        <span className="text-[9px] text-white/50 uppercase">{label}</span>
+                        <span className="text-[9px] text-white/70 uppercase">{label}</span>
                       </div>
                     ))}
                   </div>
@@ -378,7 +378,7 @@ export default function SimulatorPage() {
                       <span className="text-[11px] text-white/40">/ 100</span>
                     )}
                   </div>
-                  <p className="text-[10px] mt-0.5 text-white/40">últimos 10 simulados</p>
+                  <p className="text-[10px] mt-0.5 text-white/70">últimos 10 simulados</p>
                 </div>
               </div>
 
@@ -395,7 +395,7 @@ export default function SimulatorPage() {
                       <span className="text-[11px] text-white/40">/ 100</span>
                     )}
                   </div>
-                  <p className="text-[10px] mt-0.5 text-white/40">últimos 10 simulados</p>
+                  <p className="text-[10px] mt-0.5 text-white/70">últimos 10 simulados</p>
                 </div>
               </div>
             </div>
@@ -406,7 +406,7 @@ export default function SimulatorPage() {
                 <h3 className={`text-sm font-bold ${isDark ? "text-white/60" : "text-primary"}`}>
                   Média de Erros por Tipo de Tarefa
                 </h3>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/30" : "bg-primary/[0.06] text-primary/50"}`}>
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
                   últimas 10 de cada
                 </span>
               </div>
