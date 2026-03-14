@@ -63,6 +63,7 @@ export async function POST(
   await db.collection("exams").doc(examId).update({
     status: "completed",
     completedAt: new Date(),
+    totalTasks: completedTasks.length,
   });
 
   // Determine history collection name

@@ -3,6 +3,27 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import { getFirestoreDb } from "@/lib/firebase-admin";
 
+/** Calculate total tasks from questionDocIds types. */
+function calcTotalTasks(exam: FirebaseFirestore.DocumentData): number {
+  // Prefer explicitly stored totalTasks
+  if (exam.totalTasks && exam.totalTasks > 0) return exam.totalTasks;
+  // For completed exams, currentTaskIndex equals total
+  if (exam.status === "completed" && exam.currentTaskIndex > 0) return exam.currentTaskIndex;
+  // Calculate from questionDocIds
+  const docs = exam.questionDocIds;
+  if (!Array.isArray(docs) || docs.length === 0) return 0;
+  let total = 0;
+  for (const q of docs) {
+    const t = (q.type as string) || "";
+    if (t === "Part1") total += 1;
+    else if (t.startsWith("Part2")) total += 4;
+    else if (t === "Part3Comparison") total += 1;
+    else if (t === "Part3") total += 2;
+    else total += 1;
+  }
+  return total;
+}
+
 /**
  * GET /api/simulator/history?part=P1|P2|P3|P4|complete
  * Returns student's simulation history including in-progress exams (with ≥1 task).
@@ -137,7 +158,7 @@ export async function GET(req: NextRequest) {
           status: "completed" as const,
           completedAt: exam.completedAt?.toDate?.()?.toISOString() || null,
           createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
-          taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
+          taskCount: calcTotalTasks(exam),
           answeredTasks: exam.currentTaskIndex || 0,
           summary: {
             avgPronunciation,
@@ -167,7 +188,7 @@ export async function GET(req: NextRequest) {
         status: "in_progress" as const,
         completedAt: null,
         createdAt: exam.createdAt?.toDate?.()?.toISOString() || null,
-        taskCount: exam.questionDocIds?.length || exam.questionIndexes?.length || 0,
+        taskCount: calcTotalTasks(exam),
         answeredTasks: exam.currentTaskIndex || 0,
         summary: {
           avgPronunciation: 0,

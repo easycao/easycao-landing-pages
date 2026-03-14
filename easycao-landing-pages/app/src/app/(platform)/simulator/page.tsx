@@ -129,7 +129,7 @@ const PART_LABELS: Record<string, string> = {
 
 const MODE_LABELS: Record<string, string> = {
   single: "Individual",
-  "single-image": "Imagem",
+  "single-image": "Situação Imagem",
   complete: "Completa",
   description: "Descrição",
   past: "Passado",
@@ -138,6 +138,12 @@ const MODE_LABELS: Record<string, string> = {
   statement: "Statement",
   sdea: "SDEA",
 };
+
+/** Context-aware mode label (P2 "single" → "Situação Áudio") */
+function getModeLabel(part: string, mode: string): string {
+  if (part === "P2" && mode === "single") return "Situação Áudio";
+  return MODE_LABELS[mode] || mode;
+}
 
 const TASK_TYPE_LABELS: Record<string, string> = {
   P1: "Parte 1: Pergunta",
@@ -224,6 +230,8 @@ export default function SimulatorPage() {
   const [creating, setCreating] = useState(false);
   const [historyFilter, setHistoryFilter] = useState<string>("all");
   const [visibleCount, setVisibleCount] = useState(10);
+  const [discardingId, setDiscardingId] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState<string | null>(null);
 
   const emptyStats: Stats = {
     totalCompleted: 0,
@@ -305,6 +313,18 @@ export default function SimulatorPage() {
 
   function handleCompleteClick() {
     startExam("complete", "complete");
+  }
+
+  async function handleDiscard(examId: string) {
+    setDiscardingId(examId);
+    try {
+      const res = await fetch(`/api/simulator/exam/${examId}/discard`, { method: "POST" });
+      if (res.ok) {
+        setHistory((prev) => prev.filter((s) => s.id !== examId));
+      }
+    } catch { /* ignore */ }
+    setDiscardingId(null);
+    setConfirmDiscard(null);
   }
 
   // Shared styles
@@ -505,8 +525,8 @@ export default function SimulatorPage() {
                           {part.taskCount} tarefa{part.taskCount !== 1 ? "s" : ""}
                         </span>
                         {stats && stats.perPart[part.id] > 0 && (
-                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${
-                            isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/60"
+                          <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                            isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"
                           }`}>
                             {stats.perPart[part.id]} feito{stats.perPart[part.id] !== 1 ? "s" : ""}
                           </span>
@@ -665,8 +685,8 @@ export default function SimulatorPage() {
                     <span className={`text-sm font-semibold ${textPrimary}`}>
                       {PART_LABELS[sim.part] || sim.part}
                     </span>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.06] text-primary/50"}`}>
-                      {MODE_LABELS[sim.mode] || sim.mode}
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
+                      {getModeLabel(sim.part, sim.mode)}
                     </span>
                     {/* Status badge */}
                     {sim.status === "in_progress" ? (
@@ -701,22 +721,38 @@ export default function SimulatorPage() {
                       F {sim.summary.avgFluency}
                     </span>
                     {sim.summary.totalErrors > 0 && (
-                      <span className={`text-[11px] px-2 py-1 rounded-lg border font-mono font-semibold ${scoreBg(Math.max(0, 100 - sim.summary.totalErrors * 10))}`}>
+                      <span className={`text-[11px] px-2 py-1 rounded-lg border font-mono font-semibold ${scoreBg(Math.max(0, 100 - (sim.summary.totalErrors / Math.max(sim.taskCount, 1)) * 50))}`}>
                         {sim.summary.totalErrors} erro{sim.summary.totalErrors !== 1 ? "s" : ""}
                       </span>
                     )}
                   </div>
                 )}
 
-                {/* Right: Action button */}
+                {/* Right: Action buttons */}
                 {sim.status === "in_progress" ? (
-                  <button
-                    onClick={() => router.push(`/simulator/exam/${sim.id}`)}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all duration-200 hover:shadow-md flex-shrink-0"
-                    style={{ background: "linear-gradient(135deg, #0057B4, #1F96F7)" }}
-                  >
-                    Continuar
-                  </button>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => router.push(`/simulator/exam/${sim.id}`)}
+                      className="px-4 py-2 rounded-xl text-xs font-semibold text-white transition-all duration-200 hover:shadow-md"
+                      style={{ background: "linear-gradient(135deg, #0057B4, #1F96F7)" }}
+                    >
+                      Continuar
+                    </button>
+                    <button
+                      onClick={() => setConfirmDiscard(sim.id)}
+                      disabled={discardingId === sim.id}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                        isDark
+                          ? "text-white/30 hover:text-red-400 hover:bg-red-400/10"
+                          : "text-black/25 hover:text-red-500 hover:bg-red-50"
+                      } disabled:opacity-50`}
+                      title="Descartar simulado"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
                 ) : (
                   <button
                     onClick={() => router.push(`/simulator/exam/${sim.id}/feedback`)}
@@ -809,6 +845,50 @@ export default function SimulatorPage() {
                 className={`w-full py-2.5 rounded-xl text-sm font-medium ${textSecondary} hover:bg-black/5 transition-colors`}
               >
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Discard Confirmation Modal ─── */}
+      {confirmDiscard && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setConfirmDiscard(null)}
+        >
+          <div
+            className={`w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-[#141418] border border-white/[0.06]" : "bg-white border border-gray-200"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 text-center">
+              <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <h3 className={`text-base font-bold mb-2 ${textPrimary}`}>
+                Descartar simulado?
+              </h3>
+              <p className={`text-sm ${textSecondary}`}>
+                Não será possível continuá-lo depois.
+              </p>
+            </div>
+            <div className="px-6 pb-6 flex gap-3">
+              <button
+                onClick={() => setConfirmDiscard(null)}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  isDark ? "text-white/60 hover:bg-white/[0.04]" : "text-black/50 hover:bg-gray-50"
+                }`}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDiscard(confirmDiscard)}
+                disabled={discardingId === confirmDiscard}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
+              >
+                {discardingId === confirmDiscard ? "Descartando..." : "Descartar"}
               </button>
             </div>
           </div>
