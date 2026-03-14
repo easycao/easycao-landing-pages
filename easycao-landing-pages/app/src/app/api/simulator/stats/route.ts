@@ -68,7 +68,15 @@ export async function GET() {
     vocabularyErrors: number;
   }
   const feedbackByType: Record<string, FeedbackEntry[]> = {};
-  const allFeedback: { pronunciation: number; fluency: number; completedAt: number }[] = [];
+  const allFeedback: {
+    pronunciation: number;
+    fluency: number;
+    avgStructure: number;
+    avgVocabulary: number;
+    comprehensionScore: number;
+    comprehensionTotal: number;
+    completedAt: number;
+  }[] = [];
 
   // Process exams and fetch their feedback
   await Promise.all(
@@ -94,6 +102,11 @@ export async function GET() {
       let examPronTotal = 0;
       let examFluTotal = 0;
       let examScoreCount = 0;
+      let examStructTotal = 0;
+      let examVocabTotal = 0;
+      let examTaskCount = 0;
+      let examCompScore = 0;
+      let examCompTotal = 0;
 
       fbSnap.docs.forEach((fbDoc) => {
         const fb = fbDoc.data();
@@ -107,6 +120,16 @@ export async function GET() {
             if (err.category === "structure") structureErrors++;
             else if (err.category === "vocabulary") vocabularyErrors++;
           });
+        }
+
+        examStructTotal += structureErrors;
+        examVocabTotal += vocabularyErrors;
+        examTaskCount++;
+
+        // Comprehension (if available)
+        if (fb.comprehension != null) {
+          examCompScore += fb.comprehension.score ?? 0;
+          examCompTotal += fb.comprehension.total ?? 0;
         }
 
         if (taskType && TASK_TYPE_LABELS[taskType]) {
@@ -133,6 +156,10 @@ export async function GET() {
         allFeedback.push({
           pronunciation: Math.round(examPronTotal / examScoreCount),
           fluency: Math.round(examFluTotal / examScoreCount),
+          avgStructure: examTaskCount > 0 ? examStructTotal / examTaskCount : 0,
+          avgVocabulary: examTaskCount > 0 ? examVocabTotal / examTaskCount : 0,
+          comprehensionScore: examCompScore,
+          comprehensionTotal: examCompTotal,
           completedAt,
         });
       }
@@ -147,7 +174,7 @@ export async function GET() {
     weeklyChange = 100; // all new
   }
 
-  // Average pronunciation/fluency from last 10 completed exams
+  // Descriptor averages from last 10 completed exams
   allFeedback.sort((a, b) => b.completedAt - a.completedAt);
   const last10 = allFeedback.slice(0, 10);
   const avgPronunciation = last10.length > 0
@@ -155,6 +182,17 @@ export async function GET() {
     : null;
   const avgFluency = last10.length > 0
     ? Math.round(last10.reduce((sum, f) => sum + f.fluency, 0) / last10.length)
+    : null;
+  const avgStructurePerTask = last10.length > 0
+    ? Math.round((last10.reduce((sum, f) => sum + f.avgStructure, 0) / last10.length) * 10) / 10
+    : null;
+  const avgVocabularyPerTask = last10.length > 0
+    ? Math.round((last10.reduce((sum, f) => sum + f.avgVocabulary, 0) / last10.length) * 10) / 10
+    : null;
+  const totalCompScore = last10.reduce((s, f) => s + f.comprehensionScore, 0);
+  const totalCompTotal = last10.reduce((s, f) => s + f.comprehensionTotal, 0);
+  const avgComprehension = totalCompTotal > 0
+    ? Math.round((totalCompScore / totalCompTotal) * 100)
     : null;
 
   // Per-task-type error averages (last 10 of each type)
@@ -189,6 +227,9 @@ export async function GET() {
     perPart,
     avgPronunciation,
     avgFluency,
+    avgStructurePerTask,
+    avgVocabularyPerTask,
+    avgComprehension,
     taskTypeErrors,
   });
 }

@@ -23,6 +23,9 @@ interface Stats {
   perPart: Record<string, number>;
   avgPronunciation: number | null;
   avgFluency: number | null;
+  avgStructurePerTask: number | null;
+  avgVocabularyPerTask: number | null;
+  avgComprehension: number | null;
   taskTypeErrors: Record<
     string,
     { label: string; avgStructure: number | null; avgVocabulary: number | null; count: number }
@@ -229,6 +232,9 @@ export default function SimulatorPage() {
     perPart: { P1: 0, P2: 0, P3: 0, P4: 0, complete: 0 },
     avgPronunciation: null,
     avgFluency: null,
+    avgStructurePerTask: null,
+    avgVocabularyPerTask: null,
+    avgComprehension: null,
     taskTypeErrors: Object.fromEntries(
       TASK_TYPE_ORDER.map((t) => [t, { label: TASK_TYPE_LABELS[t], avgStructure: null, avgVocabulary: null, count: 0 }])
     ),
@@ -329,144 +335,75 @@ export default function SimulatorPage() {
           </div>
         ) : stats ? (
           <div className="p-5 space-y-5">
-            {/* Summary Row — blue gradient boxes */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Total Simulados (with per-part sub-boxes inside) */}
-              <div className="rounded-xl p-4 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0057B4 0%, #1F96F7 100%)" }}>
-                <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-                <div className="relative">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Total Simulados</p>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-3xl font-bold">{stats.totalCompleted}</span>
-                    {stats.weeklyChange !== null && (
-                      <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-full ${stats.weeklyChange >= 0 ? "bg-emerald-400/20 text-emerald-200" : "bg-red-400/20 text-red-200"}`}>
-                        {stats.weeklyChange >= 0 ? "+" : ""}{stats.weeklyChange}% sem.
-                      </span>
-                    )}
-                  </div>
-                  {stats.thisWeekCount > 0 && (
-                    <p className="text-[10px] mt-0.5 text-white/70">{stats.thisWeekCount} esta semana</p>
+            {/* Total Simulados — blue gradient */}
+            <div className="rounded-xl p-4 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0057B4 0%, #1F96F7 100%)" }}>
+              <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+              <div className="relative">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Total Simulados</p>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <span className="text-3xl font-bold">{stats.totalCompleted}</span>
+                  {stats.weeklyChange !== null && (
+                    <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-full ${stats.weeklyChange >= 0 ? "bg-emerald-400/20 text-emerald-200" : "bg-red-400/20 text-red-200"}`}>
+                      {stats.weeklyChange >= 0 ? "+" : ""}{stats.weeklyChange}% sem.
+                    </span>
                   )}
-                  {/* Per-part sub-boxes */}
-                  <div className="grid grid-cols-5 gap-1.5 mt-3">
-                    {([
-                      { key: "P1", label: "P1" },
-                      { key: "P2", label: "P2" },
-                      { key: "P3", label: "P3" },
-                      { key: "P4", label: "P4" },
-                      { key: "complete", label: "Full" },
-                    ] as const).map(({ key, label }) => (
-                      <div key={key} className="rounded-lg bg-white/10 px-2 py-1.5 text-center">
-                        <span className="text-sm font-bold block">{stats.perPart[key] || 0}</span>
-                        <span className="text-[9px] text-white/70 uppercase">{label}</span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              </div>
-
-              {/* Pronúncia */}
-              <div className="rounded-xl p-4 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0057B4 0%, #1F96F7 100%)" }}>
-                <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-                <div className="relative">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Pronúncia</p>
-                  <div className="flex items-baseline gap-1.5 mt-1">
-                    <span className="text-3xl font-bold">
-                      {stats.avgPronunciation ?? "—"}
-                    </span>
-                    {stats.avgPronunciation != null && (
-                      <span className="text-[11px] text-white/40">/ 100</span>
-                    )}
-                  </div>
-                  <p className="text-[10px] mt-0.5 text-white/70">últimos 10 simulados</p>
-                </div>
-              </div>
-
-              {/* Fluência */}
-              <div className="rounded-xl p-4 text-white relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0057B4 0%, #1F96F7 100%)" }}>
-                <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-                <div className="relative">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-white/60">Fluência</p>
-                  <div className="flex items-baseline gap-1.5 mt-1">
-                    <span className="text-3xl font-bold">
-                      {stats.avgFluency ?? "—"}
-                    </span>
-                    {stats.avgFluency != null && (
-                      <span className="text-[11px] text-white/40">/ 100</span>
-                    )}
-                  </div>
-                  <p className="text-[10px] mt-0.5 text-white/70">últimos 10 simulados</p>
+                {stats.thisWeekCount > 0 && (
+                  <p className="text-[10px] mt-0.5 text-white/70">{stats.thisWeekCount} esta semana</p>
+                )}
+                {/* Per-part sub-boxes */}
+                <div className="grid grid-cols-5 gap-1.5 mt-3">
+                  {([
+                    { key: "P1", label: "P1" },
+                    { key: "P2", label: "P2" },
+                    { key: "P3", label: "P3" },
+                    { key: "P4", label: "P4" },
+                    { key: "complete", label: "Full" },
+                  ] as const).map(({ key, label }) => (
+                    <div key={key} className="rounded-lg bg-white/10 px-2 py-1.5 text-center">
+                      <span className="text-sm font-bold block">{stats.perPart[key] || 0}</span>
+                      <span className="text-[9px] text-white/70 uppercase">{label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Task Type Error Mini Cards */}
+            {/* 5 Descriptors Row */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className={`text-sm font-bold ${isDark ? "text-white/60" : "text-primary"}`}>
-                  Média de Erros por Tipo de Tarefa
-                </h3>
-                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
-                  últimas 10 de cada
-                </span>
-              </div>
-              <p className={`text-xs mb-4 ${isDark ? "text-white/40" : "text-black/50"}`}>
-                Quanto mais próximo de 0, melhor o desempenho
+              <p className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDark ? "text-white/40" : "text-black/40"}`}>
+                Descritores — últimos 10 simulados
               </p>
-
-              {/* Grouped by part */}
-              <div className="space-y-4">
-                {TASK_TYPE_GROUPS.map((group) => (
-                  <div key={group.part}>
-                    <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${isDark ? "text-white/30" : "text-primary/60"}`}>
-                      {group.part}
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-                      {group.types.map((type) => {
-                        const data = stats.taskTypeErrors[type];
-                        if (!data) return null;
-                        return (
-                          <div
-                            key={type}
-                            className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
-                          >
-                            {/* Task name — centered, uppercase, blue */}
-                            <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
-                              <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
-                                {TASK_TYPE_SHORT[type] || data.label}
-                              </span>
-                            </div>
-                            {/* Divider */}
-                            <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
-                            {/* Error values: Structure | Vocabulary */}
-                            <div className="grid grid-cols-2">
-                              {/* Structure */}
-                              <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
-                                <span className={`text-lg font-bold font-mono block ${
-                                  data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
-                                }`}>
-                                  {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
-                                </span>
-                                <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
-                                  Estru.
-                                </span>
-                              </div>
-                              {/* Vocabulary */}
-                              <div className="px-2.5 py-2 text-center">
-                                <span className={`text-lg font-bold font-mono block ${
-                                  data.avgVocabulary !== null ? errorHeatColor(data.avgVocabulary, isDark) : textMuted
-                                }`}>
-                                  {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
-                                </span>
-                                <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
-                                  Vocab.
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+              <div className="grid grid-cols-5 gap-2">
+                {([
+                  { label: "Estrutura", value: stats.avgStructurePerTask, type: "errors" as const },
+                  { label: "Vocabulário", value: stats.avgVocabularyPerTask, type: "errors" as const },
+                  { label: "Pronúncia", value: stats.avgPronunciation, type: "score" as const },
+                  { label: "Fluência", value: stats.avgFluency, type: "score" as const },
+                  { label: "Compreensão", value: stats.avgComprehension, type: "score" as const },
+                ] as const).map((desc) => (
+                  <div
+                    key={desc.label}
+                    className={`rounded-xl border p-3 text-center ${isDark ? "border-white/[0.06] bg-white/[0.03]" : "border-primary/15 bg-primary/[0.03]"}`}
+                  >
+                    <span className={`text-xl sm:text-2xl font-bold font-mono block ${
+                      desc.value === null
+                        ? textMuted
+                        : desc.type === "errors"
+                          ? errorHeatColor(desc.value, isDark)
+                          : scoreColor(desc.value)
+                    }`}>
+                      {desc.value !== null ? (desc.type === "errors" ? desc.value.toFixed(1) : desc.value) : "—"}
+                    </span>
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider block mt-1 ${isDark ? "text-white/40" : "text-primary/60"}`}>
+                      {desc.label}
+                    </span>
+                    {desc.value !== null && desc.type === "errors" && (
+                      <span className={`text-[9px] block ${textMuted}`}>erros/tarefa</span>
+                    )}
+                    {desc.value !== null && desc.type === "score" && (
+                      <span className={`text-[9px] block ${textMuted}`}>/ 100</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -576,6 +513,78 @@ export default function SimulatorPage() {
           ))}
         </div>
       </div>
+
+      {/* ─── Error Cards by Task Type ─── */}
+      {stats && (
+        <div className={`${cardClass} overflow-hidden`} style={cardBg}>
+          <div className={`px-5 py-3 border-b ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
+            <div className="flex items-center gap-2">
+              <h2 className={`text-base font-bold tracking-tight ${isDark ? "text-white/50" : "text-primary"}`}>
+                Média de Erros por Tipo de Tarefa
+              </h2>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isDark ? "bg-white/[0.06] text-white/40" : "bg-primary/[0.08] text-primary/70"}`}>
+                últimas 10 de cada
+              </span>
+            </div>
+            <p className={`text-xs mt-1 ${isDark ? "text-white/40" : "text-black/50"}`}>
+              Quanto mais próximo de 0, melhor o desempenho
+            </p>
+          </div>
+          <div className="p-5 space-y-4">
+            {TASK_TYPE_GROUPS.map((group) => (
+              <div key={group.part}>
+                <p className={`text-[11px] font-bold uppercase tracking-wider mb-2 ${isDark ? "text-white/30" : "text-primary/60"}`}>
+                  {group.part}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                  {group.types.map((type) => {
+                    const data = stats.taskTypeErrors[type];
+                    if (!data) return null;
+                    return (
+                      <div
+                        key={type}
+                        className={`rounded-xl border overflow-hidden ${isDark ? "border-white/[0.06]" : "border-primary/15"}`}
+                      >
+                        {/* Task name — centered, uppercase, blue */}
+                        <div className={`px-3 py-2 ${isDark ? "bg-white/[0.03]" : "bg-primary/[0.04]"}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-center block text-primary">
+                            {TASK_TYPE_SHORT[type] || data.label}
+                          </span>
+                        </div>
+                        {/* Divider */}
+                        <div className={`h-px ${isDark ? "bg-white/[0.06]" : "bg-primary/10"}`} />
+                        {/* Error values: Structure | Vocabulary */}
+                        <div className="grid grid-cols-2">
+                          <div className={`px-2.5 py-2 text-center border-r ${isDark ? "border-white/[0.06]" : "border-primary/10"}`}>
+                            <span className={`text-lg font-bold font-mono block ${
+                              data.avgStructure !== null ? errorHeatColor(data.avgStructure, isDark) : textMuted
+                            }`}>
+                              {data.avgStructure !== null ? data.avgStructure.toFixed(1) : "---"}
+                            </span>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                              Estru.
+                            </span>
+                          </div>
+                          <div className="px-2.5 py-2 text-center">
+                            <span className={`text-lg font-bold font-mono block ${
+                              data.avgVocabulary !== null ? errorHeatColor(data.avgVocabulary, isDark) : textMuted
+                            }`}>
+                              {data.avgVocabulary !== null ? data.avgVocabulary.toFixed(1) : "---"}
+                            </span>
+                            <span className={`text-[9px] uppercase tracking-wider ${isDark ? "text-white/30" : "text-black/40"}`}>
+                              Vocab.
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ─── History Section ─── */}
       <div>
